@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVDA Options Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b12;
+    --surface: #0d1520;
+    --surface2: #111d2e;
+    --border: #1e3a5f;
+    --green: #00ff9d;
+    --green-dim: #00c87a;
+    --red: #ff3a5e;
+    --red-dim: #cc1f40;
+    --yellow: #ffd700;
+    --orange: #ff8c42;
+    --blue: #4fc3f7;
+    --white: #e8f4ff;
+    --muted: #5a7a99;
+    --text: #c8ddf0;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+    background-image: 
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,80,160,0.15) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,58,95,0.15) 39px, rgba(30,58,95,0.15) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,58,95,0.08) 39px, rgba(30,58,95,0.08) 40px);
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(13,21,32,0.9);
+    backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 100;
+  }
+
+  .ticker-block { display:flex; align-items: baseline; gap: 14px; }
+  .ticker { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: var(--white); letter-spacing: 2px; }
+  .price { font-size: 1.5rem; color: var(--green); font-weight: 700; }
+  .price-change { font-size: 0.9rem; color: var(--red); }
+
+  .date-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 24px 20px; display: grid; gap: 20px; }
+
+  /* DAILY VERDICT BANNER */
+  .verdict-banner {
+    background: linear-gradient(135deg, #0a1929 0%, #0d2035 100%);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--orange);
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .verdict-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .verdict-status { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--orange); }
+  .verdict-sub { font-size: 0.78rem; color: var(--text); margin-top: 4px; line-height: 1.5; }
+
+  .bias-pill {
+    background: rgba(255,140,66,0.1);
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    padding: 8px 16px;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  /* 3 COLUMN GRID */
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 18px;
+  }
+
+  .card-title {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--blue);
+    display: block;
+    border-radius: 50%;
+  }
+
+  /* GAUGES */
+  .gauge-row { display: flex; flex-direction: column; gap: 10px; }
+  .gauge-item {}
+  .gauge-label-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .gauge-name { font-size: 0.7rem; color: var(--text); }
+  .gauge-val { font-size: 0.7rem; font-weight: 700; }
+  .gauge-bar { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+  .gauge-fill { height: 100%; border-radius: 2px; transition: width 0.8s ease; }
+
+  /* LEVELS TABLE */
+  .levels-table { width: 100%; border-collapse: collapse; }
+  .levels-table tr { border-bottom: 1px solid rgba(30,58,95,0.5); }
+  .levels-table tr:last-child { border-bottom: none; }
+  .levels-table td { padding: 7px 4px; font-size: 0.72rem; }
+  .levels-table td:first-child { color: var(--muted); font-size: 0.65rem; letter-spacing: 1px; }
+  .levels-table td:nth-child(2) { color: var(--white); font-weight: 700; text-align: right; }
+  .levels-table td:nth-child(3) { text-align: right; font-size: 0.65rem; padding-left: 8px; }
+
+  .tag-res { color: var(--red); }
+  .tag-sup { color: var(--green); }
+  .tag-cur { color: var(--yellow); }
+  .tag-key { color: var(--orange); }
+
+  /* INDICATOR STATUS */
+  .ind-row { display: flex; flex-direction: column; gap: 10px; }
+  .ind-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border: 1px solid rgba(30,58,95,0.5);
+  }
+  .ind-name { font-size: 0.72rem; color: var(--text); }
+  .ind-desc { font-size: 0.62rem; color: var(--muted); margin-top: 2px; }
+  .ind-badge {
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .bear { background: rgba(255,58,94,0.15); color: var(--red); border: 1px solid var(--red-dim); }
+  .bull { background: rgba(0,255,157,0.12); color: var(--green); border: 1px solid var(--green-dim); }
+  .neut { background: rgba(255,215,0,0.12); color: var(--yellow); border: 1px solid goldenrod; }
+  .wait { background: rgba(255,140,66,0.12); color: var(--orange); border: 1px solid var(--orange); }
+
+  /* OPTIONS CHAIN */
+  .chain-table { width: 100%; border-collapse: collapse; }
+  .chain-table th {
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chain-table th:first-child { text-align: left; }
+  .chain-table td { padding: 8px 8px; font-size: 0.72rem; text-align: right; border-bottom: 1px solid rgba(30,58,95,0.3); }
+  .chain-table td:first-child { text-align: left; color: var(--muted); font-size: 0.65rem; }
+  .chain-table tr:hover td { background: rgba(79,195,247,0.04); }
+  .strike-atm { background: rgba(255,215,0,0.06) !important; }
+  .strike-atm td { color: var(--yellow) !important; }
+  .delta-val { color: var(--blue); }
+  .theta-val { color: var(--red); }
+  .iv-val { color: var(--orange); }
+  .price-val { color: var(--white); font-weight: 700; }
+  .vol-val { color: var(--green-dim); }
+
+  /* VWAP SECTION */
+  .vwap-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .vwap-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px;
+    text-align: center;
+  }
+  .vwap-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
+  .vwap-price { font-size: 1rem; font-weight: 700; }
+  .vwap-status { font-size: 0.62rem; margin-top: 4px; }
+
+  /* ENTRY SIGNALS */
+  .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .signal-card {
+    border: 1px solid var(--border);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .signal-call { background: rgba(0,255,157,0.04); }
+  .signal-call::before { background: var(--green); }
+  .signal-put { background: rgba(255,58,94,0.04); }
+  .signal-put::before { background: var(--red); }
+  .signal-wait { background: rgba(255,140,66,0.04); }
+  .signal-wait::before { background: var(--orange); }
+
+  .signal-head { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
+  .signal-call .signal-head { color: var(--green); }
+  .signal-put .signal-head { color: var(--red); }
+  .signal-wait .signal-head { color: var(--orange); }
+
+  .signal-checklist { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .signal-checklist li { font-size: 0.7rem; line-height: 1.4; display: flex; gap: 8px; align-items: flex-start; }
+  .check-done { color: var(--green); }
+  .check-no { color: var(--red); }
+  .check-pend { color: var(--yellow); }
+
+  /* TRADE SETUP BOX */
+  .setup-box {
+    background: var(--surface2);
+    border: 1px solid var(--orange);
+    padding: 20px;
+  }
+  .setup-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 14px; }
+  .setup-item { text-align: center; }
+  .setup-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
+  .setup-value { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--white); }
+  .setup-note { font-size: 0.62rem; color: var(--muted); margin-top: 3px; }
+
+  /* DECISION TREE */
+  .tree { display: flex; flex-direction: column; gap: 0; }
+  .tree-node {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 10px;
+    padding: 10px 0;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+    margin-left: 10px;
+    position: relative;
+  }
+  .tree-node::before {
+    content: '';
+    position: absolute;
+    left: -6px; top: 16px;
+    width: 10px; height: 10px;
+    background: var(--border);
+    border-radius: 50%;
+  }
+  .tree-q { font-size: 0.72rem; color: var(--text); font-weight: 700; margin-bottom: 4px; }
+  .tree-sub { font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .tree-action {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.62rem;
+    margin-top: 6px;
+    font-weight: 700;
+  }
+
+  /* VOLUME BAR */
+  .vol-bar-container { display: flex; flex-direction: column; gap: 8px; }
+  .vol-bar-row { display: grid; grid-template-columns: 80px 1fr 60px; gap: 8px; align-items: center; }
+  .vol-bar-label { font-size: 0.65rem; color: var(--muted); text-align: right; }
+  .vol-bar-track { background: rgba(255,255,255,0.04); height: 8px; border-radius: 4px; overflow: hidden; }
+  .vol-bar-fill { height: 100%; border-radius: 4px; }
+  .vol-bar-num { font-size: 0.65rem; color: var(--text); text-align: right; }
+
+  /* NEWS FEED */
+  .news-item {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(30,58,95,0.4);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .news-text { font-size: 0.7rem; color: var(--text); line-height: 1.5; }
+  .news-source { font-size: 0.6rem; color: var(--muted); margin-top: 3px; }
+  .news-impact { font-size: 0.6rem; font-weight: 700; margin-left: 8px; }
+  .bull-news { color: var(--green); }
+  .bear-news { color: var(--red); }
+  .neut-news { color: var(--yellow); }
+
+  /* WATCHLIST QUICK CHECKS */
+  .wl-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(30,58,95,0.3); }
+  .wl-row:last-child { border-bottom: none; }
+  .wl-name { font-size: 0.75rem; font-weight: 700; color: var(--white); }
+  .wl-price { font-size: 0.75rem; color: var(--text); }
+  .wl-chg { font-size: 0.7rem; font-weight: 700; }
+
+  /* MENTAL MODEL */
+  .mental-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .mental-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 14px;
+    text-align: center;
+  }
+  .mental-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .mental-title { font-size: 0.72rem; font-weight: 700; color: var(--white); margin-bottom: 6px; }
+  .mental-desc { font-size: 0.64rem; color: var(--muted); line-height: 1.5; }
+
+  /* LIVE PULSE */
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  /* DAILY CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 8px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border: 1px solid rgba(30,58,95,0.5);
+  }
+  .check-box {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .check-box.done { background: rgba(0,255,157,0.1); border-color: var(--green); color: var(--green); }
+  .check-box.fail { background: rgba(255,58,94,0.1); border-color: var(--red); color: var(--red); }
+  .check-text { font-size: 0.7rem; color: var(--text); flex: 1; }
+  .check-result { font-size: 0.65rem; font-weight: 700; }
+
+  /* SCROLL HINT */
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+
+  .full-width { grid-column: 1 / -1; }
+
+  @media (max-width: 768px) {
+    .three-col { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .signal-grid { grid-template-columns: 1fr; }
+    .setup-grid { grid-template-columns: repeat(2, 1fr); }
+    .mental-grid { grid-template-columns: 1fr; }
+    .vwap-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="ticker-block">
+    <div class="ticker">NVDA</div>
+    <div class="price">$177.10</div>
+    <div class="price-change">▼ −$7.79 (−4.21%)</div>
+    <div style="font-size:0.65rem;color:var(--muted);margin-left:8px">Close Feb 27</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div style="font-size:0.65rem;color:var(--muted)"><span class="live-dot"></span>MARKET CLOSED</div>
+    <div class="date-badge">SUN MAR 01 · 2026</div>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- VERDICT BANNER -->
+  <div class="verdict-banner">
+    <div>
+      <div class="verdict-label">Today's Verdict</div>
+      <div class="verdict-status">⏸ WAIT — DO NOT TRADE YET</div>
+      <div class="verdict-sub">Both indicators still bearish. Wait for IMACD to cross zero + 5-12 cloud flip green before any call entry.</div>
+    </div>
+    <div>
+      <div class="verdict-label">Next Catalyst</div>
+      <div style="color:var(--white);font-size:0.85rem;font-weight:700;margin-bottom:4px">GTC Event — March (Inference Chip Reveal)</div>
+      <div style="font-size:0.7rem;color:var(--muted)">Next earnings: May 27, 2026 · Ex-div: Mar 11, 2026 ($0.01)</div>
+    </div>
+    <div>
+      <div class="bias-pill">BEARISH<br>BIAS</div>
+      <div style="font-size:0.6rem;color:var(--muted);text-align:center;margin-top:6px">Change at $183+</div>
+    </div>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="three-col">
+
+    <!-- INDICATOR SNAPSHOT -->
+    <div class="card">
+      <div class="card-title">Ripster EMA Cloud Status</div>
+      <div class="ind-row">
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">34-50 Cloud (Bias Filter)</div>
+            <div class="ind-desc">Price BELOW this cloud → bearish bias</div>
+          </div>
+          <div class="ind-badge bear">BEARISH</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">5-12 Cloud (Entry Trigger)</div>
+            <div class="ind-desc">Fast cloud still red after selloff</div>
+          </div>
+          <div class="ind-badge bear">RED</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">8-9 Cloud (Pullback Level)</div>
+            <div class="ind-desc">Price rejected off cloud underside</div>
+          </div>
+          <div class="ind-badge bear">REJECTED</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">Cloud Flip Signal</div>
+            <div class="ind-desc">Watch: 5-12 needs to flip green</div>
+          </div>
+          <div class="ind-badge wait">WAITING</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMACD STATUS -->
+    <div class="card">
+      <div class="card-title">IMACD_LB Status (34,9)</div>
+      <div class="ind-row">
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">Histogram Position</div>
+            <div class="ind-desc">Value: −6.24 | Still below zero</div>
+          </div>
+          <div class="ind-badge bear">NEGATIVE</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">Color (Current Bars)</div>
+            <div class="ind-desc">Fading red → slight blue tint forming</div>
+          </div>
+          <div class="ind-badge neut">FADING</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">Signal Line Cross</div>
+            <div class="ind-desc">MACD still below signal line</div>
+          </div>
+          <div class="ind-badge bear">NO CROSS</div>
+        </div>
+        <div class="ind-item">
+          <div>
+            <div class="ind-name">Zero Line Cross</div>
+            <div class="ind-desc">NEED this before buying calls</div>
+          </div>
+          <div class="ind-badge wait">WATCH</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IV & OPTIONS HEALTH -->
+    <div class="card">
+      <div class="card-title">Options Health Check</div>
+      <div class="gauge-row">
+        <div class="gauge-item">
+          <div class="gauge-label-row">
+            <span class="gauge-name">IV (30-Day)</span>
+            <span class="gauge-val" style="color:var(--orange)">49.1%</span>
+          </div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:49%;background:var(--orange)"></div></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">HIGH — options are expensive right now</div>
+        </div>
+        <div class="gauge-item">
+          <div class="gauge-label-row">
+            <span class="gauge-name">IV Rank</span>
+            <span class="gauge-val" style="color:var(--yellow)">34.3</span>
+          </div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:34%;background:var(--yellow)"></div></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">MODERATE — not ideal, wait for drop below 30</div>
+        </div>
+        <div class="gauge-item">
+          <div class="gauge-label-row">
+            <span class="gauge-name">52-Week Range</span>
+            <span class="gauge-val" style="color:var(--text)">$86.62 — $212.19</span>
+          </div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:55%;background:var(--blue)"></div></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">Price at 55th percentile of year range</div>
+        </div>
+        <div class="gauge-item">
+          <div class="gauge-label-row">
+            <span class="gauge-name">Volume Feb 27</span>
+            <span class="gauge-val" style="color:var(--green)">308M shares</span>
+          </div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:85%;background:var(--green-dim)"></div></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">HIGH — confirms strong selling pressure</div>
+        </div>
+        <div class="gauge-item">
+          <div class="gauge-label-row">
+            <span class="gauge-name">Expected 1-Day Move</span>
+            <span class="gauge-val" style="color:var(--orange)">±$3.64 (1.97%)</span>
+          </div>
+          <div class="gauge-bar"><div class="gauge-fill" style="width:40%;background:var(--orange)"></div></div>
+          <div style="font-size:0.6rem;color:var(--muted);margin-top:3px">Each day NVDA swings ~$3.64 on average</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="two-col">
+
+    <!-- SUPPORT & RESISTANCE + VWAP -->
+    <div class="card">
+      <div class="card-title">Support · Resistance · VWAP Levels</div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;margin-bottom:8px">KEY PRICE LEVELS</div>
+        <table class="levels-table">
+          <tr>
+            <td>MAJOR RES</td>
+            <td>$200.26</td>
+            <td><span class="tag-res">■ RESISTANCE</span></td>
+          </tr>
+          <tr>
+            <td>HIGH Feb 25</td>
+            <td>$196.20</td>
+            <td><span class="tag-res">■ RESISTANCE</span></td>
+          </tr>
+          <tr>
+            <td>KEY WALL</td>
+            <td>$189.07</td>
+            <td><span class="tag-key">★ KEY RES</span></td>
+          </tr>
+          <tr>
+            <td>CLOUD BASE</td>
+            <td>$185.97</td>
+            <td><span class="tag-res">■ RESISTANCE</span></td>
+          </tr>
+          <tr>
+            <td>CLOUD TOP</td>
+            <td>$183-184</td>
+            <td><span class="tag-res">■ CLOUD RES</span></td>
+          </tr>
+          <tr>
+            <td>───</td>
+            <td style="color:var(--yellow)">▶ $177.10</td>
+            <td><span class="tag-cur">◆ CURRENT</span></td>
+          </tr>
+          <tr>
+            <td>VOL SUPPORT</td>
+            <td>$174.19</td>
+            <td><span class="tag-sup">■ SUPPORT</span></td>
+          </tr>
+          <tr>
+            <td>FLOOR</td>
+            <td>$171.43</td>
+            <td><span class="tag-key">★ KEY SUP</span></td>
+          </tr>
+          <tr>
+            <td>MAJOR FLOOR</td>
+            <td>$168.00</td>
+            <td><span class="tag-sup">■ SUPPORT</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px">
+        <div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;margin-bottom:8px">VWAP ZONES — ADD TO TRADINGVIEW</div>
+        <div class="vwap-grid">
+          <div class="vwap-item">
+            <div class="vwap-label">DAILY VWAP</div>
+            <div class="vwap-price" style="color:var(--blue)">~$179-180</div>
+            <div class="vwap-status" style="color:var(--red)">Price below = bearish intraday</div>
+          </div>
+          <div class="vwap-item">
+            <div class="vwap-label">WEEKLY VWAP</div>
+            <div class="vwap-price" style="color:var(--blue)">~$183-185</div>
+            <div class="vwap-status" style="color:var(--red)">Below = sellers in control</div>
+          </div>
+          <div class="vwap-item">
+            <div class="vwap-label">MONTHLY VWAP</div>
+            <div class="vwap-price" style="color:var(--blue)">~$188-190</div>
+            <div class="vwap-status" style="color:var(--muted)">Major reclaim needed</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);font-size:0.68rem;color:var(--blue);line-height:1.6">
+          💡 <strong>VWAP Rule:</strong> Price must reclaim Daily VWAP ($179-180) AND hold above it for 2+ candles before considering a call. If it bounces off VWAP from below = short bounce only, not a full call play.
+        </div>
+      </div>
+    </div>
+
+    <!-- OPTIONS CHAIN (March 28 expiry) -->
+    <div class="card">
+      <div class="card-title">Options Chain — Mar 28, 2026 (~27 DTE)</div>
+      <div style="font-size:0.62rem;color:var(--muted);margin-bottom:10px">Your target: ~$3.00 premium · Delta 0.40-0.55 for 1-3 day plays</div>
+
+      <div style="font-size:0.62rem;color:var(--orange);letter-spacing:1px;margin-bottom:6px">── CALLS ──</div>
+      <table class="chain-table">
+        <tr>
+          <th>STRIKE</th>
+          <th>EST PRICE</th>
+          <th>DELTA</th>
+          <th>THETA/DAY</th>
+          <th>IV EST</th>
+        </tr>
+        <tr>
+          <td>$165C</td>
+          <td class="price-val">$14.50</td>
+          <td class="delta-val">0.82</td>
+          <td class="theta-val">−$0.04</td>
+          <td class="iv-val">48%</td>
+        </tr>
+        <tr>
+          <td>$170C</td>
+          <td class="price-val">$10.80</td>
+          <td class="delta-val">0.74</td>
+          <td class="theta-val">−$0.05</td>
+          <td class="iv-val">47%</td>
+        </tr>
+        <tr class="strike-atm">
+          <td>$177C ★ATM</td>
+          <td class="price-val">$6.90</td>
+          <td class="delta-val">0.52</td>
+          <td class="theta-val">−$0.08</td>
+          <td class="iv-val">49%</td>
+        </tr>
+        <tr>
+          <td>$180C</td>
+          <td class="price-val">$5.40</td>
+          <td class="delta-val">0.44</td>
+          <td class="theta-val">−$0.09</td>
+          <td class="iv-val">50%</td>
+        </tr>
+        <tr>
+          <td>$185C 🎯</td>
+          <td class="price-val">$3.20</td>
+          <td class="delta-val">0.34</td>
+          <td class="theta-val">−$0.08</td>
+          <td class="iv-val">51%</td>
+        </tr>
+        <tr>
+          <td>$190C</td>
+          <td class="price-val">$1.85</td>
+          <td class="delta-val">0.22</td>
+          <td class="theta-val">−$0.06</td>
+          <td class="iv-val">52%</td>
+        </tr>
+      </table>
+
+      <div style="font-size:0.62rem;color:var(--red);letter-spacing:1px;margin:12px 0 6px">── PUTS ──</div>
+      <table class="chain-table">
+        <tr>
+          <th>STRIKE</th>
+          <th>EST PRICE</th>
+          <th>DELTA</th>
+          <th>THETA/DAY</th>
+          <th>IV EST</th>
+        </tr>
+        <tr>
+          <td>$175P 🎯</td>
+          <td class="price-val">$3.10</td>
+          <td class="delta-val">−0.38</td>
+          <td class="theta-val">−$0.07</td>
+          <td class="iv-val">50%</td>
+        </tr>
+        <tr>
+          <td>$172P</td>
+          <td class="price-val">$2.10</td>
+          <td class="delta-val">−0.28</td>
+          <td class="theta-val">−$0.06</td>
+          <td class="iv-val">51%</td>
+        </tr>
+        <tr>
+          <td>$170P</td>
+          <td class="price-val">$1.50</td>
+          <td class="delta-val">−0.22</td>
+          <td class="theta-val">−$0.05</td>
+          <td class="iv-val">52%</td>
+        </tr>
+      </table>
+      <div style="margin-top:10px;padding:10px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.2);font-size:0.67rem;color:var(--yellow);line-height:1.6">
+        ⚠️ IV at 49% is elevated (post-earnings spike). This inflates premiums. For 1-3 day plays, <strong>$185C is your sweet spot</strong> at ~$3.20 once entry conditions are met. Verify exact prices on Yahoo Finance options tab before entering.
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTRY/EXIT SIGNALS -->
+  <div class="card">
+    <div class="card-title">Entry Conditions — Today's Checklist (Check Each Morning)</div>
+    <div class="signal-grid">
+      <div class="signal-card signal-call">
+        <div class="signal-head">🟢 CALL ENTRY — Not Yet Valid</div>
+        <ul class="signal-checklist">
+          <li><span class="check-no">✗</span>Price above 34-50 EMA cloud (currently below)</li>
+          <li><span class="check-no">✗</span>5-12 cloud flipped GREEN (currently red)</li>
+          <li><span class="check-no">✗</span>IMACD histogram above zero (currently −6.24)</li>
+          <li><span class="check-no">✗</span>Price held above Daily VWAP for 2+ candles</li>
+          <li><span class="check-pend">?</span>RSI above 50 on 1-hour chart</li>
+          <li><span class="check-no">✗</span>Volume confirms: green candles with higher vol than prior red</li>
+        </ul>
+        <div style="margin-top:12px;padding:8px;background:rgba(0,255,157,0.06);border-left:3px solid var(--green);font-size:0.68rem;line-height:1.5;color:var(--text)">
+          🎯 When 4+ boxes check: Buy $185C Mar 28 (~$3.20). Target: +80% ($5.76). Stop: −50% ($1.60).
+        </div>
+      </div>
+
+      <div class="signal-card signal-put">
+        <div class="signal-head">🔴 PUT ENTRY — Possible Soon</div>
+        <ul class="signal-checklist">
+          <li><span class="check-done">✓</span>Price below 34-50 EMA cloud</li>
+          <li><span class="check-done">✓</span>5-12 cloud is red</li>
+          <li><span class="check-done">✓</span>IMACD histogram below zero</li>
+          <li><span class="check-pend">?</span>Bounce fails at $179-180 VWAP resistance</li>
+          <li><span class="check-pend">?</span>Rejection candle off underside of 34-50 cloud</li>
+          <li><span class="check-pend">?</span>Volume spikes on down candle confirming move</li>
+        </ul>
+        <div style="margin-top:12px;padding:8px;background:rgba(255,58,94,0.06);border-left:3px solid var(--red);font-size:0.68rem;line-height:1.5;color:var(--text)">
+          🎯 If bounce fails at $179-180 VWAP: Buy $175P Mar 28 (~$3.10). Target: +80% ($5.58). Stop: −50% ($1.55). Target: $171.43 support.
+        </div>
+      </div>
+
+      <div class="signal-card signal-wait" style="grid-column:1/-1">
+        <div class="signal-head">⏸ DO NOTHING ZONE — Right Now (Sunday Prep)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <div style="font-size:0.7rem;color:var(--text);margin-bottom:8px;font-weight:700">Monday Morning Game Plan:</div>
+            <ul class="signal-checklist">
+              <li><span style="color:var(--orange)">1.</span>Open TradingView 9:25am ET (5 min before open)</li>
+              <li><span style="color:var(--orange)">2.</span>Check if NVDA opens above or below $177.10</li>
+              <li><span style="color:var(--orange)">3.</span>Watch first 15-min candle — direction sets the tone</li>
+              <li><span style="color:var(--orange)">4.</span>Check IMACD: are bars getting smaller (less negative)?</li>
+              <li><span style="color:var(--orange)">5.</span>If opens above $179 with green IMACD bars → call watch mode</li>
+              <li><span style="color:var(--orange)">6.</span>If opens below $176 with red IMACD → put watch mode</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:0.7rem;color:var(--text);margin-bottom:8px;font-weight:700">Set These TradingView Alerts Right Now:</div>
+            <ul class="signal-checklist">
+              <li><span style="color:var(--blue)">🔔</span>Alert at $183.00 — "Cloud breakout possible"</li>
+              <li><span style="color:var(--blue)">🔔</span>Alert at $179.50 — "VWAP reclaim test"</li>
+              <li><span style="color:var(--blue)">🔔</span>Alert at $175.50 — "Breaking toward $171 floor"</li>
+              <li><span style="color:var(--blue)">🔔</span>Alert at $171.00 — "Major floor test — high risk"</li>
+              <li><span style="color:var(--blue)">🔔</span>Check Yahoo Finance options tab before any trade</li>
+              <li><span style="color:var(--blue)">🔔</span>Verify IV hasn't spiked above 60% before buying</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: TRADE SETUP + DECISION TREE -->
+  <div class="two-col">
+
+    <!-- CURRENT BEST TRADE SETUP -->
+    <div class="card">
+      <div class="card-title">Best Trade Setup (When Ready)</div>
+      <div class="setup-box">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px">SCENARIO A — CALL (wait for confirmation)</div>
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--white);margin-top:4px">NVDA $185 Call · Mar 28, 2026</div>
+          </div>
+          <div class="ind-badge wait">PENDING</div>
+        </div>
+        <div class="setup-grid">
+          <div class="setup-item">
+            <div class="setup-label">ENTRY PRICE</div>
+            <div class="setup-value" style="color:var(--blue)">~$3.20</div>
+            <div class="setup-note">= $320/contract</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">TARGET EXIT</div>
+            <div class="setup-value" style="color:var(--green)">$5.76</div>
+            <div class="setup-note">+80% = +$256</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">STOP LOSS</div>
+            <div class="setup-value" style="color:var(--red)">$1.60</div>
+            <div class="setup-note">−50% = −$160</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">DELTA</div>
+            <div class="setup-value" style="color:var(--orange)">0.34</div>
+            <div class="setup-note">moves $0.34/dollar NVDA</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">THETA BLEED</div>
+            <div class="setup-value" style="color:var(--red)">−$0.08</div>
+            <div class="setup-note">per day you hold</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">STOCK TARGET</div>
+            <div class="setup-value">$189</div>
+            <div class="setup-note">first resistance</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">MAX HOLD</div>
+            <div class="setup-value" style="color:var(--yellow)">3 DAYS</div>
+            <div class="setup-note">exit regardless</div>
+          </div>
+          <div class="setup-item">
+            <div class="setup-label">R:R RATIO</div>
+            <div class="setup-value" style="color:var(--green)">1.6:1</div>
+            <div class="setup-note">acceptable for 1-3 day</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;margin-bottom:8px">SCENARIO B — PUT (closer to valid now)</div>
+        <div class="setup-box" style="border-color:var(--red)">
+          <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--white)">NVDA $175 Put · Mar 28, 2026</div>
+          <div class="setup-grid" style="margin-top:10px">
+            <div class="setup-item">
+              <div class="setup-label">ENTRY</div>
+              <div class="setup-value" style="color:var(--blue)">~$3.10</div>
+              <div class="setup-note">on bounce fail at $179</div>
+            </div>
+            <div class="setup-item">
+              <div class="setup-label">TARGET</div>
+              <div class="setup-value" style="color:var(--green)">$5.58</div>
+              <div class="setup-note">+80% at $171 floor test</div>
+            </div>
+            <div class="setup-item">
+              <div class="setup-label">STOP</div>
+              <div class="setup-value" style="color:var(--red)">$1.55</div>
+              <div class="setup-note">if price reclaims $183</div>
+            </div>
+            <div class="setup-item">
+              <div class="setup-label">DELTA</div>
+              <div class="setup-value" style="color:var(--orange)">−0.38</div>
+              <div class="setup-note">moves on drops</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DECISION TREE -->
+    <div class="card">
+      <div class="card-title">Morning Decision Tree — Run This Every Day</div>
+      <div class="tree">
+        <div class="tree-node">
+          <div>
+            <div class="tree-q">Step 1: Open Daily Chart (9:25am)</div>
+            <div class="tree-sub">Is NVDA price above or below the 34-50 EMA cloud?</div>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--green-dim)">
+          <div>
+            <div class="tree-q" style="color:var(--green)">Above cloud →</div>
+            <div class="tree-sub">CALL bias. Check IMACD. Is it above zero?<br>YES → Move to Step 2 for call entry</div>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--red-dim)">
+          <div>
+            <div class="tree-q" style="color:var(--red)">Below cloud (NOW) →</div>
+            <div class="tree-sub">PUT bias OR wait. Check IMACD below zero?<br>YES → Watch for put entry on bounce fail</div>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div>
+            <div class="tree-q">Step 2: Switch to 1-Hour Chart</div>
+            <div class="tree-sub">Is IMACD histogram growing (bars getting taller in your direction)?</div>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--green-dim)">
+          <div>
+            <div class="tree-q" style="color:var(--green)">Growing green bars →</div>
+            <div class="tree-sub">Momentum confirming. Look for price near VWAP or support. Enter call if all checks pass.</div>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--yellow)">
+          <div>
+            <div class="tree-q" style="color:var(--yellow)">Shrinking/orange bars →</div>
+            <div class="tree-sub">Momentum fading = CHOP ZONE. Do NOT enter. Options bleed theta here. Wait.</div>
+          </div>
+        </div>
+        <div class="tree-node">
+          <div>
+            <div class="tree-q">Step 3: Check Volume Confirmation</div>
+            <div class="tree-sub">Is today's volume higher than previous 3 candles in your direction?</div>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--green-dim)">
+          <div>
+            <div class="tree-q" style="color:var(--green)">YES — Volume confirms →</div>
+            <div class="tree-sub">Enter trade. Set stop alert. Walk away. Check in 4-6 hours only.</div>
+            <span class="tree-action" style="background:rgba(0,255,157,0.1);color:var(--green);border:1px solid var(--green)">✅ EXECUTE TRADE</span>
+          </div>
+        </div>
+        <div class="tree-node" style="margin-left:30px;border-color:var(--red-dim)">
+          <div>
+            <div class="tree-q" style="color:var(--red)">NO — Low volume →</div>
+            <div class="tree-sub">Fake move. No volume = no conviction. Skip trade. Wait for next setup.</div>
+            <span class="tree-action" style="background:rgba(255,58,94,0.1);color:var(--red);border:1px solid var(--red)">❌ SKIP TRADE</span>
+          </div>
+        </div>
+        <div class="tree-node" style="border-color:var(--orange)">
+          <div>
+            <div class="tree-q" style="color:var(--orange)">In Trade: Exit Rules</div>
+            <div class="tree-sub">
+              +80% profit → <strong style="color:var(--green)">TAKE FULL PROFIT</strong><br>
+              −50% loss → <strong style="color:var(--red)">HARD EXIT NO QUESTIONS</strong><br>
+              Day 3 regardless → <strong style="color:var(--yellow)">EXIT (theta kills you)</strong><br>
+              IMACD flips against you → <strong style="color:var(--orange)">EXIT HALF IMMEDIATELY</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS + VOLUME -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Latest NVDA News (Impact Rating)</div>
+      <div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="news-text">Morgan Stanley says stocks like NVDA "have more room to run in March" — upgrades outlook <span class="news-impact bull-news">[BULLISH]</span></div>
+            <div class="news-source">CNBC · 9 hours ago</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="news-text">NVDA developing new inference chip using Groq tech from $20B deal — to debut at GTC March event <span class="news-impact bull-news">[BULLISH CATALYST]</span></div>
+            <div class="news-source">Wall Street Journal / TipRanks · 13 hours ago</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="news-text">Dan Ives (Wedbush) maintains $210-215 price target despite 9% post-earnings drop — calls it "noise" <span class="news-impact bull-news">[BULLISH]</span></div>
+            <div class="news-source">CNBC · Feb 27</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--red)"></div>
+          <div>
+            <div class="news-text">Steve Weiss (CNBC) sold his NVDA position. Traders "dumping Nvidia, buying Apple" during volatility <span class="news-impact bear-news">[SHORT-TERM BEARISH]</span></div>
+            <div class="news-source">CNBC Trade Tracker · Feb 27</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--red)"></div>
+          <div>
+            <div class="news-text">SoftBank sold its entire NVDA stake in Q4. AI bubble fears persist, market in "prove it" mode for 2027 <span class="news-impact bear-news">[BEARISH]</span></div>
+            <div class="news-source">Reuters · 51 min ago</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--yellow)"></div>
+          <div>
+            <div class="news-text">NVDA next earnings May 27, 2026. Q4 EPS beat $1.62 vs $1.54 est. Revenue +73% YoY. But stock sold off. <span class="news-impact neut-news">[MIXED]</span></div>
+            <div class="news-source">TradingView / StockAnalysis</div>
+          </div>
+        </div>
+        <div class="news-item">
+          <div class="news-dot" style="background:var(--yellow)"></div>
+          <div>
+            <div class="news-text">Jensen Huang meeting India PM Modi — expanding AI infrastructure deal with Indian operators <span class="news-impact neut-news">[MINOR BULLISH]</span></div>
+            <div class="news-source">Webull · 14 min ago</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);font-size:0.68rem;color:var(--yellow);line-height:1.6">
+        📰 <strong>News Summary:</strong> Long-term bull case intact (GTC catalyst, strong earnings beat, Morgan Stanley upside). Short-term bearish (SoftBank exit, trader rotation, AI bubble fears). This confirms: wait for technical confirmation — don't fight the chart based on news alone.
+      </div>
+    </div>
+
+    <!-- DAILY PRE-TRADE CHECKLIST + MENTAL MODEL -->
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card">
+        <div class="card-title">Pre-Trade Checklist — Before Every Single Trade</div>
+        <div class="checklist">
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">Expiration ≥ 20 DTE (you want 25-30 for 1-3 day play)</div>
+            <div class="check-result" style="color:var(--green)">Mar 28 ✓</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">Delta 0.30–0.50 for $3 premium target</div>
+            <div class="check-result" style="color:var(--yellow)">Check chain</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">IV Rank below 40 (currently 34.3 — borderline OK)</div>
+            <div class="check-result" style="color:var(--yellow)">34.3 → OK</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">IMACD above zero (calls) or below zero (puts) — confirmed</div>
+            <div class="check-result" style="color:var(--red)">NOT YET</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">5-12 Ripster cloud color matches direction</div>
+            <div class="check-result" style="color:var(--red)">Red now</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">Clear entry price + stop price written down before clicking</div>
+            <div class="check-result" style="color:var(--muted)">Write it</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">Risk ≤ $300 (1 contract max at $3.00)</div>
+            <div class="check-result" style="color:var(--green)">Your limit</div>
+          </div>
+          <div class="check-item">
+            <div class="check-box" onclick="this.classList.toggle('done')">✓</div>
+            <div class="check-text">NOT the 3rd loss in a row (3 losses = no trade rest of week)</div>
+            <div class="check-result" style="color:var(--muted)">Track it</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:0.65rem;color:var(--muted);font-style:italic">Click boxes to check off each morning. All 8 = trade. Any fail = no trade.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Mental Model — The Only 3 Moves</div>
+        <div class="mental-grid">
+          <div class="mental-item">
+            <div class="mental-icon">🟢</div>
+            <div class="mental-title">SETUP VALID</div>
+            <div class="mental-desc">All checklist boxes green. Enter with conviction. Set stop. Walk away. Check in 4-6 hours.</div>
+          </div>
+          <div class="mental-item">
+            <div class="mental-icon">⏸</div>
+            <div class="mental-title">NO SETUP</div>
+            <div class="mental-desc">Mixed signals or chop. Do nothing. Boredom is your ally. Cash is a position. Next setup will come.</div>
+          </div>
+          <div class="mental-item">
+            <div class="mental-icon">🚪</div>
+            <div class="mental-title">EXIT TRIGGERED</div>
+            <div class="mental-desc">+80% hit → sell. −50% hit → sell. Day 3 → sell. IMACD flips → sell half. No emotional holds.</div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px;background:rgba(79,195,247,0.06);border:1px solid rgba(79,195,247,0.2);font-size:0.7rem;color:var(--blue);line-height:1.6;text-align:center">
+          <strong>YOUR MONTHLY MATH:</strong> 3 trades/week × 4 weeks = 12 max trades.<br>
+          Win 5 × $240 avg = $1,200. Lose 7 × $150 = $1,050 lost.<br>
+          Net: +$150... not enough. You need <strong>6-7 wins</strong> or bigger winners.<br>
+          Solution: <strong>Better entries = higher win rate.</strong> Patience is the edge.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW TO CHECK YAHOO FINANCE -->
+  <div class="card">
+    <div class="card-title">How to Verify Options Data on Yahoo Finance (Daily Routine)</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--blue);margin-bottom:6px">1</div>
+        <div style="font-size:0.7rem;color:var(--white);font-weight:700;margin-bottom:4px">Go to Yahoo</div>
+        <div style="font-size:0.63rem;color:var(--muted);line-height:1.4">finance.yahoo.com/quote/NVDA/options</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--blue);margin-bottom:6px">2</div>
+        <div style="font-size:0.7rem;color:var(--white);font-weight:700;margin-bottom:4px">Select Expiry</div>
+        <div style="font-size:0.63rem;color:var(--muted);line-height:1.4">Pick "Mar 28, 2026" from dropdown at top</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--blue);margin-bottom:6px">3</div>
+        <div style="font-size:0.7rem;color:var(--white);font-weight:700;margin-bottom:4px">Find $185 Call</div>
+        <div style="font-size:0.63rem;color:var(--muted);line-height:1.4">Check: Last Price, Bid, Ask, Volume, Open Interest, IV</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--blue);margin-bottom:6px">4</div>
+        <div style="font-size:0.7rem;color:var(--white);font-weight:700;margin-bottom:4px">Check Volume</div>
+        <div style="font-size:0.63rem;color:var(--muted);line-height:1.4">Volume > 500 = liquid. Open Interest > 1000 = safe. Avoid low liquidity.</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);padding:14px;text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;color:var(--blue);margin-bottom:6px">5</div>
+        <div style="font-size:0.7rem;color:var(--white);font-weight:700;margin-bottom:4px">Check Spread</div>
+        <div style="font-size:0.63rem;color:var(--muted);line-height:1.4">Bid/Ask spread < $0.20 = good. Wider = you lose immediately on entry.</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.7rem">
+      <div style="padding:10px;background:rgba(0,255,157,0.05);border:1px solid rgba(0,255,157,0.2);line-height:1.6">
+        ✅ <strong style="color:var(--green)">GOOD liquidity signs:</strong> Volume &gt; 1,000 today · OI &gt; 5,000 · Bid-ask spread &lt; $0.15 · Last trade recent (not hours old)
+      </div>
+      <div style="padding:10px;background:rgba(255,58,94,0.05);border:1px solid rgba(255,58,94,0.2);line-height:1.6">
+        ❌ <strong style="color:var(--red)">AVOID if:</strong> Volume &lt; 100 · Spread &gt; $0.30 · No recent trades · Last = $0.00 · Open Interest under 500
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:16px 0;font-size:0.63rem;color:var(--muted);line-height:1.8;border-top:1px solid var(--border)">
+    📊 Data sourced from Investing.com · CNBC · Fintel.io · StockAnalysis · Unusual Whales · TradingView &nbsp;|&nbsp; Prices estimated from Feb 27 close<br>
+    ⚠️ This is educational analysis only, not financial advice. Verify all option prices on Yahoo Finance before trading. Options involve substantial risk of loss.<br>
+    🔄 <strong>Refresh this guide each morning</strong> — check new price, re-run the decision tree, update your checklist.
+  </div>
+
+</div>
+
+<script>
+  // Make check boxes toggleable
+  document.querySelectorAll('.check-box').forEach(box => {
+    box.addEventListener('click', () => {
+      if(box.classList.contains('done')) {
+        box.classList.remove('done');
+      } else {
+        box.classList.add('done');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
