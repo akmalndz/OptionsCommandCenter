@@ -1,11 +1,67 @@
-name: Update NVDA Dashboard Daily
+name: Update NVDA Dashboard (12x Daily)
+
+# ─────────────────────────────────────────────────────────────────
+# All times below are UTC.
+# Chicago is CST (UTC-6) Nov–Mar  |  CDT (UTC-5) Mar–Nov
+#
+# NVDA REFRESH SCHEDULE — CHICAGO TIME → UTC
+#
+#  PREMARKET BIAS
+#   7:50 AM CT  (CST=13:50 / CDT=12:50 UTC)
+#   8:20 AM CT  (CST=14:20 / CDT=13:20 UTC)
+#
+#  OPENING EXPANSION
+#   8:35 AM CT  (CST=14:35 / CDT=13:35 UTC)
+#   8:45 AM CT  (CST=14:45 / CDT=13:45 UTC)
+#   9:00 AM CT  (CST=15:00 / CDT=14:00 UTC)
+#   9:20 AM CT  (CST=15:20 / CDT=14:20 UTC)
+#
+#  MIDDAY STRUCTURE CHECK
+#  10:30 AM CT  (CST=16:30 / CDT=15:30 UTC)
+#  12:15 PM CT  (CST=18:15 / CDT=17:15 UTC)
+#
+#  POWER WINDOW
+#   1:00 PM CT  (CST=19:00 / CDT=18:00 UTC)
+#   1:30 PM CT  (CST=19:30 / CDT=18:30 UTC)
+#   2:00 PM CT  (CST=20:00 / CDT=19:00 UTC)
+#   2:30 PM CT  (CST=20:30 / CDT=19:30 UTC)
+# ─────────────────────────────────────────────────────────────────
 
 on:
   schedule:
-    # 8:00am ET = 13:00 UTC (EST) / 12:00 UTC (EDT)
-    - cron: '0 13 * * 1-5'   # Weekdays 8am ET (EST)
-    - cron: '0 12 * * 1-5'   # Weekdays 8am ET (EDT / summer)
-  workflow_dispatch:           # Also lets you trigger it manually anytime
+    # ── PREMARKET BIAS ──────────────────────────
+    - cron: '50 13 * * 1-5'   # 7:50 AM CST
+    - cron: '50 12 * * 1-5'   # 7:50 AM CDT
+    - cron: '20 14 * * 1-5'   # 8:20 AM CST
+    - cron: '20 13 * * 1-5'   # 8:20 AM CDT
+
+    # ── OPENING EXPANSION ───────────────────────
+    - cron: '35 14 * * 1-5'   # 8:35 AM CST
+    - cron: '35 13 * * 1-5'   # 8:35 AM CDT
+    - cron: '45 14 * * 1-5'   # 8:45 AM CST
+    - cron: '45 13 * * 1-5'   # 8:45 AM CDT
+    - cron: '0  15 * * 1-5'   # 9:00 AM CST
+    - cron: '0  14 * * 1-5'   # 9:00 AM CDT
+    - cron: '20 15 * * 1-5'   # 9:20 AM CST
+    - cron: '20 14 * * 1-5'   # 9:20 AM CDT
+
+    # ── MIDDAY STRUCTURE ────────────────────────
+    - cron: '30 16 * * 1-5'   # 10:30 AM CST
+    - cron: '30 15 * * 1-5'   # 10:30 AM CDT
+    - cron: '15 18 * * 1-5'   # 12:15 PM CST
+    - cron: '15 17 * * 1-5'   # 12:15 PM CDT
+
+    # ── POWER WINDOW (most important) ───────────
+    - cron: '0  19 * * 1-5'   # 1:00 PM CST
+    - cron: '0  18 * * 1-5'   # 1:00 PM CDT
+    - cron: '30 19 * * 1-5'   # 1:30 PM CST
+    - cron: '30 18 * * 1-5'   # 1:30 PM CDT
+    - cron: '0  20 * * 1-5'   # 2:00 PM CST
+    - cron: '0  19 * * 1-5'   # 2:00 PM CDT
+    - cron: '30 20 * * 1-5'   # 2:30 PM CST
+    - cron: '30 19 * * 1-5'   # 2:30 PM CDT
+
+  workflow_dispatch:  # Manual trigger anytime from Actions tab
 
 permissions:
   contents: write
@@ -18,22 +74,27 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-nvda-v2
+
       - name: Install dependencies
-        run: |
-          pip install yfinance feedparser numpy pytz
+        run: pip install yfinance feedparser numpy pytz
 
       - name: Run dashboard updater
         run: python update_dashboard.py
 
-      - name: Commit and push updated index.html
+      - name: Commit and push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --staged --quiet || git commit -m "📊 Daily NVDA dashboard update $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "📊 NVDA — $(TZ='America/Chicago' date '+%I:%M %p CT, %b %d')"
           git push
