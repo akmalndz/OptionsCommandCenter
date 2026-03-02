@@ -1,0 +1,39 @@
+name: Update NVDA Dashboard Daily
+
+on:
+  schedule:
+    # 8:00am ET = 13:00 UTC (EST) / 12:00 UTC (EDT)
+    - cron: '0 13 * * 1-5'   # Weekdays 8am ET (EST)
+    - cron: '0 12 * * 1-5'   # Weekdays 8am ET (EDT / summer)
+  workflow_dispatch:           # Also lets you trigger it manually anytime
+
+permissions:
+  contents: write
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install yfinance feedparser numpy pytz
+
+      - name: Run dashboard updater
+        run: python update_dashboard.py
+
+      - name: Commit and push updated index.html
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "📊 Daily NVDA dashboard update $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
