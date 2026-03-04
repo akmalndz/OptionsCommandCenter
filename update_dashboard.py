@@ -247,6 +247,7 @@ def fetch_all():
             "macd_turning_bear": mh_n<0 and mh_p>0,
             "rsi_pullback_bull":  40<=r<=60,
             "rsi_expansion_bull": r>60,
+            "rsi_pullback_bear": 40<=r<=60,
             "rsi_expansion_bear": r<40,
             "vol_expanded": vr>=1.5,
             "vol_ok":       vr>=1.0,
