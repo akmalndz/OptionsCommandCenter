@@ -2,436 +2,291 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="refresh" content="300">
-<title>Daily Research Notes — NVDA</title>
+<title>Research Notes — NVDA</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#070b12;--surface:#0d1520;--surface2:#111d2e;--border:#1e3a5f;
   --green:#00ff9d;--green-dim:#00c87a;--red:#ff3a5e;--red-dim:#cc1f40;
   --yellow:#ffd700;--orange:#ff8c42;--blue:#4fc3f7;--white:#e8f4ff;--muted:#5a7a99;--text:#c8ddf0;}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;
-  background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,80,160,.15) 0%,transparent 70%),
-  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(30,58,95,.12) 39px,rgba(30,58,95,.12) 40px),
-  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(30,58,95,.07) 39px,rgba(30,58,95,.07) 40px);}
-.header{border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;
-  background:rgba(13,21,32,.97);backdrop-filter:blur(10px);position:sticky;top:0;z-index:100;}
-.ticker{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--white);letter-spacing:2px;}
-.main{max-width:1200px;margin:0 auto;padding:18px;display:grid;gap:14px;}
-.verdict-banner{background:linear-gradient(135deg,#0a1929,#0d2035);border:1px solid var(--border);
-  border-left:4px solid #ff3a5e;padding:16px 20px;display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center;}
-.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.card{background:var(--surface);border:1px solid var(--border);padding:14px;}
-.card-title{font-size:.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;
-  padding-bottom:8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;}
-.card-title::before{content:'';width:5px;height:5px;background:var(--blue);display:block;border-radius:50%;}
-.ind-row{display:flex;flex-direction:column;gap:7px;}
-.ind-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:8px 10px;
-  background:var(--surface2);border:1px solid rgba(30,58,95,.5);}
-.ind-name{font-size:.68rem;color:var(--text);}
-.ind-desc{font-size:.58rem;color:var(--muted);margin-top:2px;}
-.ind-badge{font-size:.58rem;letter-spacing:1px;padding:3px 8px;font-weight:700;white-space:nowrap;}
-.bear{background:rgba(255,58,94,.15);color:var(--red);border:1px solid var(--red-dim);}
-.bull{background:rgba(0,255,157,.12);color:var(--green);border:1px solid var(--green-dim);}
-.neut{background:rgba(255,215,0,.12);color:var(--yellow);border:1px solid goldenrod;}
-.wait{background:rgba(255,140,66,.12);color:var(--orange);border:1px solid var(--orange);}
-.gauge-row{display:flex;flex-direction:column;gap:8px;}
-.gauge-bar{height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;}
-.gauge-fill{height:100%;border-radius:2px;}
-.levels-table,.chain-table,.ema-table,.candle-table{width:100%;border-collapse:collapse;}
-.levels-table tr,.chain-table tr,.ema-table tr,.candle-table tr{border-bottom:1px solid rgba(30,58,95,.4);}
-.levels-table tr:last-child,.chain-table tr:last-child,.ema-table tr:last-child,.candle-table tr:last-child{border-bottom:none;}
-.levels-table td,.ema-table td,.candle-table td{padding:5px 4px;font-size:.68rem;}
-.levels-table td:first-child{color:var(--muted);font-size:.6rem;}
-.levels-table td:nth-child(2){color:var(--white);font-weight:700;text-align:right;}
-.levels-table td:nth-child(3){text-align:right;font-size:.6rem;padding-left:6px;}
-.levels-table td:nth-child(4){text-align:right;font-size:.58rem;color:var(--muted);}
-.chain-table th{font-size:.58rem;letter-spacing:1px;color:var(--muted);text-align:right;padding:5px 5px;border-bottom:1px solid var(--border);}
-.chain-table th:first-child{text-align:left;}
-.chain-table td{padding:6px 5px;font-size:.68rem;text-align:right;}
-.chain-table td:first-child{text-align:left;color:var(--muted);font-size:.6rem;}
-.strike-atm td{background:rgba(255,215,0,.06);color:var(--yellow)!important;}
-.delta-val{color:var(--blue);} .iv-val{color:var(--orange);}
-.price-val{color:var(--white);font-weight:700;} .vol-val{color:var(--green-dim);}
-.news-item{padding:8px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:auto 1fr;gap:7px;}
-.news-item:last-child{border-bottom:none;}
-.news-dot{width:5px;height:5px;border-radius:50%;margin-top:4px;flex-shrink:0;}
-.news-text{font-size:.66rem;color:var(--text);line-height:1.4;}
-.news-source{font-size:.57rem;color:var(--muted);margin-top:2px;}
-.news-impact{font-size:.57rem;font-weight:700;margin-left:5px;}
-.checklist{display:flex;flex-direction:column;gap:6px;}
-.check-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border:1px solid rgba(30,58,95,.5);}
-.check-box{width:14px;height:14px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
-  font-size:.6rem;flex-shrink:0;cursor:pointer;}
-.check-box.done{background:rgba(0,255,157,.1);border-color:var(--green);color:var(--green);}
-.check-box.fail{background:rgba(255,58,94,.1);border-color:var(--red);color:var(--red);}
-.check-text{font-size:.66rem;color:var(--text);flex:1;}
-.check-result{font-size:.6rem;font-weight:700;}
+body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,80,160,.12) 0%,transparent 70%),
+  repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(30,58,95,.1) 39px,rgba(30,58,95,.1) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(30,58,95,.06) 39px,rgba(30,58,95,.06) 40px);}
+.hdr{border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;
+  justify-content:space-between;background:rgba(13,21,32,.97);backdrop-filter:blur(10px);
+  position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px;}
+.main{max-width:1260px;margin:0 auto;padding:14px 16px;display:grid;gap:11px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.card{background:var(--surface);border:1px solid var(--border);padding:13px;}
+.ct{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;
+  padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;}
+.ct::before{content:'';width:4px;height:4px;background:var(--blue);display:block;border-radius:50%;}
+.vb{padding:14px 18px;border:1px solid var(--border);border-left:4px solid #ff3a5e;
+  background:linear-gradient(135deg,#0a1929,#0d2035);display:grid;grid-template-columns:1fr auto;gap:16px;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:5px;font-size:.66rem;border-bottom:1px solid rgba(30,58,95,.35);}
+th{color:var(--muted);font-size:.58rem;letter-spacing:1px;text-align:left;}
+tr:last-child td{border-bottom:none;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.live-dot{width:6px;height:6px;border-radius:50%;animation:pulse 1.5s infinite;display:inline-block;margin-right:5px;}
-.session-banner{padding:10px 14px;border:1px solid #5a7a99;background:#5a7a9911;
-  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;}
-@media(max-width:768px){.three-col,.two-col{grid-template-columns:1fr;}}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 1.5s infinite;}
+@media(max-width:900px){.g3,.g2{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<header class="header">
-  <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
-    <div class="ticker">NVDA</div>
-    <div style="font-size:1.4rem;color:#ff3a5e;font-weight:700">$180.05</div>
-    <div style="font-size:.85rem;color:#ff3a5e;font-weight:700">▼ -2.32 (-1.27%)</div>
-    <div style="font-size:.6rem;color:var(--muted)">H:183.46 · L:174.64</div>
+<header class="hdr">
+  <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap">
+    <span style="font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--white);letter-spacing:2px">NVDA</span>
+    <span style="font-size:1.3rem;color:#00ff9d;font-weight:700">$181.74</span>
+    <span style="font-size:.8rem;color:#00ff9d">▲ +1.69 (+0.94%)</span>
+    <span style="font-size:.58rem;color:var(--muted)">H:182.33 · L:176.92 · ATR:$6.1</span>
   </div>
-  <div style="display:flex;align-items:center;gap:12px">
-    <div style="font-size:.6rem;color:#5a7a99"><span class="live-dot" style="background:#5a7a99"></span>🌙 AFTER HOURS</div>
-    <div style="background:var(--surface2);border:1px solid var(--border);padding:5px 11px;font-size:.68rem;color:var(--muted)">Tuesday, March 03 · 2026 · 03:54 PM CT</div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:.65rem;color:#ff8c42;font-weight:700">⚠️ ON $180.34 — DECISION</span>
+    <span style="font-size:.6rem;color:#ff8c42"><span class="dot" style="background:#ff8c42"></span>⚠️ OPENING FAKE-OUT</span>
+    <span style="color:#ff3a5e;font-size:.6rem">SPY BEAR ✗</span>
+    <span style="background:var(--surface2);border:1px solid var(--border);padding:4px 10px;font-size:.62rem;color:var(--muted)">Wed Mar 04, 2026 · 08:37 AM CT</span>
   </div>
 </header>
 
 <div class="main">
 
-<!-- SESSION TIMELINE -->
-<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">07:00–08:30 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">🌅 PRE-MARKET</div>
-          
-        </div><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">08:30–09:15 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">⚠️ OPENING FAKE-OUT</div>
-          
-        </div><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">09:15–10:30 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">📈 CONTINUATION</div>
-          
-        </div><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">10:30–13:00 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">💤 DEAD ZONE / CHOP</div>
-          
-        </div><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">13:00–14:30 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">🏆 POWER WINDOW</div>
-          
-        </div><div style="background:var(--surface2);border:1px solid var(--border);padding:8px;text-align:center">
-          <div style="font-size:.55rem;color:var(--muted)">14:30–15:00 CT</div>
-          <div style="font-size:.62rem;font-weight:700;color:var(--muted);margin-top:2px">🔔 CLOSING PUSH</div>
-          
-        </div></div>
+<!-- ON-LEVEL ALERT (shows when price within $3 of a starred Brando level) -->
+<div style="background:rgba(255,215,0,.1);border:1px solid #ffd700;padding:9px 14px;font-size:.7rem;color:#ffd700;font-weight:700;text-align:center;margin-bottom:0">⚡ PRICE ON BRANDO LEVEL: $180.34 — CRITICAL PIVOT (DAILY) · Most important daily level — floor AND ceiling — decision pt</div>
 
-<!-- SESSION ADVICE -->
-<div class="session-banner">
-  <div style="font-size:1.8rem">🌙</div>
-  <div>
-    <div style="font-size:.6rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">AFTER HOURS · 15:00–23:59 CT</div>
-    <div style="font-size:.75rem;color:#5a7a99;font-weight:700">Market closed. Review today's trade. Plan tomorrow's setup.</div>
-  </div>
-</div>
+<!-- SESSION TIMELINE -->
+<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px"><div style="background:var(--surface2);border:1px solid var(--border);padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">07:00 CT</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);margin-top:1px">🌅 PRE-MARKET</div></div><div style="background:#ff8c4218;border:1px solid #ff8c42;padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">08:30 CT</div><div style="font-size:.6rem;font-weight:700;color:#ff8c42;margin-top:1px">⚠️ OPENING FAKE-OUT</div><div style="font-size:.52rem;color:#ff8c42;margin-top:2px">● NOW</div></div><div style="background:var(--surface2);border:1px solid var(--border);padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">09:15 CT</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);margin-top:1px">📈 CONTINUATION</div></div><div style="background:var(--surface2);border:1px solid var(--border);padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">10:30 CT</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);margin-top:1px">💤 DEAD ZONE / CHOP</div></div><div style="background:var(--surface2);border:1px solid var(--border);padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">13:00 CT</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);margin-top:1px">🏆 POWER WINDOW</div></div><div style="background:var(--surface2);border:1px solid var(--border);padding:7px;text-align:center"><div style="font-size:.52rem;color:var(--muted)">14:30 CT</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);margin-top:1px">🔔 CLOSING PUSH</div></div></div>
 
 <!-- VERDICT -->
-<div class="verdict-banner">
+<div class="vb">
   <div>
-    <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">VERDICT — 03:54 PM CT</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:#ff3a5e">🔴 PUT SETUP — High Confidence</div>
-    <div style="font-size:.7rem;color:var(--text);margin-top:4px;line-height:1.5">Daily + 1H both bearish. IMACD Daily: -0.307 | 1H: -0.940. Market closed. Review today's trade. Plan tomorrow's setup.</div>
+    <div style="font-size:.56rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">INSTITUTIONAL VERDICT · 08:37 AM CT</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:#ff3a5e">💤 OPENING FAKE-OUT — NO NEW TRADES</div>
+    <div style="font-size:.67rem;color:var(--text);margin-top:5px;line-height:1.55">FAKE-OUT ZONE. Wait for direction to hold 2+ candles before entering.</div>
+    <div style="margin-top:8px;padding:9px;background:rgba(255,255,255,.03);border-left:3px solid #ff3a5e;font-size:.67rem;color:var(--white);line-height:1.6">Hold existing if profitable. Next window: Power Window 1:00 PM CT.</div>
   </div>
-  <div>
-    <div style="font-size:.6rem;color:var(--muted);margin-bottom:5px;letter-spacing:1px">TRADE IDEA</div>
-    <div style="font-size:.72rem;color:var(--white);line-height:1.6;background:rgba(255,255,255,.04);padding:9px;border-left:3px solid #ff3a5e">Buy $165P 2026-04-02 (~$4.06) on bounce fail at VWAP/cloud. Stop: -50%. Target: next support.</div>
-    <div style="font-size:.6rem;color:var(--muted);margin-top:5px">Expiry: <strong style="color:var(--white)">2026-04-02</strong> · IV: <strong style="color:var(--orange)">46.0%</strong> · Vol ratio: <strong style="color:#ff8c42">0.97x</strong></div>
-  </div>
-  <div style="text-align:center">
-    <div style="background:rgba(0,0,0,.3);border:1px solid #ff3a5e;color:#ff3a5e;padding:7px 13px;font-size:.7rem;letter-spacing:1px;margin-bottom:6px">BEARISH</div>
-    <div style="font-size:.55rem;color:var(--muted)">Next refresh</div>
-    <div style="font-size:.65rem;color:var(--text)">auto in ~30min</div>
+  <div style="min-width:150px;text-align:center">
+    <div style="border:1px solid #ff8c42;color:#ff8c42;padding:7px 12px;font-size:.7rem;letter-spacing:1px;margin-bottom:8px">WAIT</div>
+    <div style="font-size:.58rem;color:var(--muted)">Call 1/7</div>
+    <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;margin:3px 0 7px">
+      <div style="height:100%;width:14%;background:#00ff9d;border-radius:3px"></div></div>
+    <div style="font-size:.58rem;color:var(--muted)">Put 3/7</div>
+    <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;margin:3px 0 7px">
+      <div style="height:100%;width:43%;background:#ff3a5e;border-radius:3px"></div></div>
+    <div style="font-size:.55rem;color:var(--muted)">IV <strong style="color:var(--orange)">0.0%</strong> · DTE <strong style="color:var(--white)">29</strong></div>
+    <div style="font-size:.55rem;color:var(--muted)">Exp move <strong style="color:var(--blue)">±$0.0</strong></div>
   </div>
 </div>
 
-<!-- ROW 1: CLOUD + OPTIONS HEALTH + S/R -->
-<div class="three-col">
+<!-- ═══════════════════════════════════════════════════
+     BRANDO / ELITE OPTIONS LEVEL MAP + SCENARIO ENGINE
+     ═══════════════════════════════════════════════════ -->
+<div class="g2">
 
-  <!-- CLOUD STATUS — DAILY + 1H -->
+  <!-- BRANDO LEVEL TABLE -->
   <div class="card">
-    <div class="card-title">EMA Cloud — Daily + 1-Hour</div>
-    <div style="font-size:.58rem;color:var(--orange);letter-spacing:1px;margin-bottom:6px">── DAILY (Bias) ──</div>
-    <div class="ind-row">
-      <div class="ind-item">
-        <div><div class="ind-name">34-50 Cloud</div>
-          <div class="ind-desc">$185.69 / $185.43</div></div>
-        <div class="ind-badge bear">BELOW ✗</div>
-      </div>
-      <div class="ind-item">
-        <div><div class="ind-name">5-12 Cloud (EMA9/21)</div>
-          <div class="ind-desc">$184.74 / $185.75</div></div>
-        <div class="ind-badge bear">RED ✗</div>
-      </div>
-      <div class="ind-item">
-        <div><div class="ind-name">IMACD Daily (34,9)</div>
-          <div class="ind-desc">-0.307 (prev -0.042)</div></div>
-        <div class="ind-badge bear">-0.307 BEAR</div>
+    <div class="ct">Brando · Elite Options S/R Map (Monthly + Weekly + Daily)</div>
+    <div style="font-size:.6rem;color:var(--muted);margin-bottom:8px">
+      Source: @EliteOptions2 TrendSpider · 
+      <span style="color:#b39ddb">■ Monthly</span> &nbsp;
+      <span style="color:#7c4dff">■ Weekly</span> &nbsp;
+      <span style="color:#4fc3f7">■ Daily</span> &nbsp;
+      <span style="color:#ffd700">★ = Key starred level</span>
+    </div>
+    <table>
+      <tr><th>TF</th><th>LEVEL</th><th>LABEL</th><th style="text-align:right">DIST</th></tr>
+      <tr style="background:rgba(255,215,0,.05);"><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#ffd700;font-weight:700">$184.58</td><td style="color:var(--muted);font-size:.6rem">★ KEY RESISTANCE</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+$2.84</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#ff3a5e;font-weight:700">$190.40</td><td style="color:var(--muted);font-size:.6rem">RESISTANCE</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+$8.66</td></tr><tr style="background:rgba(255,215,0,.05);"><td style="color:#b39ddb;font-size:.58rem">MONTHLY</td><td style="color:#ffd700;font-weight:700">$191.00</td><td style="color:var(--muted);font-size:.6rem">★ YELLOW LINE $191</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+$9.26</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#ff3a5e;font-weight:700">$196.05</td><td style="color:var(--muted);font-size:.6rem">RESISTANCE</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+$14.31</td></tr><tr style="background:rgba(255,215,0,.05);"><td style="color:#b39ddb;font-size:.58rem">MONTHLY</td><td style="color:#ffd700;font-weight:700">$200.00</td><td style="color:var(--muted);font-size:.6rem">★ KEY WALL $200</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+$18.26</td></tr><tr style="background:rgba(255,215,0,.08)"><td style="color:#ffd700;font-size:.6rem">NOW</td><td style="color:#ffd700;font-weight:700;font-size:.8rem">▶ $181.74</td><td style="color:#ffd700;font-size:.6rem" colspan="2">H:182.33 L:176.92 ⚡ ON LEVEL: CRITICAL PIVOT</td></tr><tr style="background:rgba(255,215,0,.05);"><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#ffd700;font-weight:700">$180.34</td><td style="color:var(--muted);font-size:.6rem">★ CRITICAL PIVOT</td><td style="color:var(--muted);font-size:.58rem;text-align:right">−$1.40</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#00ff9d;font-weight:700">$175.20</td><td style="color:var(--muted);font-size:.6rem">SUPPORT</td><td style="color:var(--muted);font-size:.58rem;text-align:right">−$6.54</td></tr><tr style="background:rgba(255,215,0,.05);"><td style="color:#7c4dff;font-size:.58rem">WEEKLY</td><td style="color:#ffd700;font-weight:700">$175.00</td><td style="color:var(--muted);font-size:.6rem">★ CRITICAL SUPPORT</td><td style="color:var(--muted);font-size:.58rem;text-align:right">−$6.74</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.58rem">DAILY</td><td style="color:#00ff9d;font-weight:700">$168.69</td><td style="color:var(--muted);font-size:.6rem">SUPPORT</td><td style="color:var(--muted);font-size:.58rem;text-align:right">−$13.05</td></tr><tr style=""><td style="color:#b39ddb;font-size:.58rem">MONTHLY</td><td style="color:#00ff9d;font-weight:700">$168.00</td><td style="color:var(--muted);font-size:.6rem">RESISTANCE</td><td style="color:var(--muted);font-size:.58rem;text-align:right">−$13.74</td></tr>
+    </table>
+  </div>
+
+  <!-- SCENARIO ENGINE -->
+  <div class="card">
+    <div class="ct">Scenario Engine — Two-Path Trade Plan</div>
+    <div style="background:#ff8c4215;border:1px solid #ff8c42;padding:10px;margin-bottom:11px">
+      <div style="font-size:.62rem;color:var(--muted);margin-bottom:3px">CURRENT POSITION</div>
+      <div style="font-size:.85rem;font-weight:700;color:#ff8c42">⚠️ ON $180.34 — DECISION</div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:4px">
+        Next KEY resistance: <strong style="color:#ff3a5e">$184.58 KEY RESISTANCE</strong> (+$2.84) &nbsp;|&nbsp;
+        Next KEY support: <strong style="color:#00ff9d">$180.34 CRITICAL PIVOT</strong> (−$1.4)
       </div>
     </div>
-    <div style="font-size:.58rem;color:var(--blue);letter-spacing:1px;margin:10px 0 6px">── 1-HOUR (Entry Trigger) ──</div>
-    <div class="ind-row">
-      <div class="ind-item">
-        <div><div class="ind-name">34-50 Cloud 1H</div>
-          <div class="ind-desc">$183.19 / $184.43</div></div>
-        <div class="ind-badge bear">BELOW ✗</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div style="background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.3);padding:10px">
+        <div style="font-size:.58rem;color:#00ff9d;letter-spacing:1px;margin-bottom:5px;font-weight:700">SCENARIO A — BULL</div>
+        <div style="font-size:.66rem;color:var(--text);line-height:1.6">CALL: Holds $180.34, reclaims $184.58 → April $190C or $195C. Target $191.</div>
       </div>
-      <div class="ind-item">
-        <div><div class="ind-name">5-12 Cloud 1H</div>
-          <div class="ind-desc">$180.25 / $181.62</div></div>
-        <div class="ind-badge bear">RED ✗</div>
+      <div style="background:rgba(255,58,94,.06);border:1px solid rgba(255,58,94,.3);padding:10px">
+        <div style="font-size:.58rem;color:#ff3a5e;letter-spacing:1px;margin-bottom:5px;font-weight:700">SCENARIO B — BEAR</div>
+        <div style="font-size:.66rem;color:var(--text);line-height:1.6">PUT: Breaks $180.34 on volume → April $175P. Target $175 weekly support.</div>
       </div>
-      <div class="ind-item">
-        <div><div class="ind-name">IMACD 1-Hour (34,9)</div>
-          <div class="ind-desc">-0.940 (prev -0.986)</div></div>
-        <div class="ind-badge bear">-0.940 BEAR</div>
+    </div>
+    <div style="margin-top:9px;background:var(--surface2);border:1px solid var(--border);padding:9px">
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">BRANDO'S KEY GATES (must watch)</div>
+      <div style="font-size:.65rem;line-height:1.8">
+        ❌ <strong style="color:#ffd700">$191.00</strong> — Yellow line (MO+WK) · Clears = target $200 wall<br>
+        ❌ <strong style="color:#4fc3f7">$184.58</strong> — Daily key resistance · 200MA cluster zone<br>
+        ✅ <strong style="color:#ff8c42">$180.34</strong> — Critical daily pivot · MOST WATCHED LEVEL<br>
+        ✅ <strong style="color:#7c4dff">$175.00</strong> — Weekly purple support · Last bull defense<br>
+        ✅ <strong style="color:#b39ddb">$153.37</strong> — Monthly demand zone top · Institutional buy zone
       </div>
     </div>
   </div>
+</div>
 
-  <!-- OPTIONS HEALTH -->
+<!-- ROW: MTF ALIGNMENT + REGIME + COMPRESSION + CANDLES -->
+<div class="g3">
+
+  <!-- MTF ALIGNMENT -->
   <div class="card">
-    <div class="card-title">Options Health — Live</div>
-    <div class="gauge-row">
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-          <span style="font-size:.66rem">Implied Volatility</span>
-          <span style="font-size:.66rem;font-weight:700;color:#ffd700">46.0%</span>
-        </div>
-        <div class="gauge-bar"><div class="gauge-fill" style="width:46.0%;background:#ffd700"></div></div>
-        <div style="font-size:.58rem;color:var(--muted);margin-top:2px">⚠️ Elevated — options pricey</div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-          <span style="font-size:.66rem">Volume vs Average</span>
-          <span style="font-size:.66rem;font-weight:700;color:#ff8c42">0.97x</span>
-        </div>
-        <div class="gauge-bar"><div class="gauge-fill" style="width:48%;background:#ff8c42"></div></div>
-        <div style="font-size:.58rem;color:var(--muted);margin-top:2px">170M today · 175M avg · Normal</div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-          <span style="font-size:.66rem">52W Range Position</span>
-          <span style="font-size:.66rem;color:var(--text)">$87–$212</span>
-        </div>
-        <div class="gauge-bar"><div class="gauge-fill" style="width:74%;background:var(--blue)"></div></div>
-        <div style="font-size:.58rem;color:var(--muted);margin-top:2px">74th percentile of year range</div>
-      </div>
+    <div class="ct">Multi-Timeframe Alignment</div>
+    <table>
+      <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD HIST</th><th>BIAS</th><th>VOL</th></tr>
+      <tr><td style="color:var(--white);font-weight:700">DAILY</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ffd700">41.4 ~</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.09x</span></td></tr><tr><td style="color:var(--white);font-weight:700">4-HOUR</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ff3a5e">35.9 ↓</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.24x</span></td></tr><tr><td style="color:var(--white);font-weight:700">1-HOUR</td><td style="color:#ffd700;font-weight:700">NEUTRAL</td><td style="color:#ffd700">54.3 ~</td><td style="color:#00c87a">EXPANDING</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.69x</span></td></tr>
+    </table>
+    <div style="margin-top:8px;padding:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);font-size:.62rem">
+      <span style="color:var(--muted)">TF AGREEMENT: </span>
+      <span style="color:#ff3a5e;font-weight:700">
+      🔴 ALL BEAR — Max conviction
+      </span>
     </div>
-    <div style="margin-top:10px;background:var(--surface2);border:1px solid var(--border);padding:10px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:6px">VWAP APPROXIMATION</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
-        <div><div style="font-size:.55rem;color:var(--muted)">DAILY</div>
-          <div style="font-size:.85rem;color:var(--blue);font-weight:700">$179.69</div>
-          <div style="font-size:.55rem;color:#00ff9d">Above ✓</div></div>
-        <div><div style="font-size:.55rem;color:var(--muted)">EMA9 (1H)</div>
-          <div style="font-size:.85rem;color:var(--blue);font-weight:700">$180.25</div>
-          <div style="font-size:.55rem;color:#ff3a5e">Below ✗</div></div>
-        <div><div style="font-size:.55rem;color:var(--muted)">EMA21 (1H)</div>
-          <div style="font-size:.85rem;color:var(--blue);font-weight:700">$181.62</div>
-          <div style="font-size:.55rem;color:#ff3a5e">Below ✗</div></div>
+    <div style="margin-top:7px;font-size:.6rem;color:var(--muted);line-height:1.5">
+      RSI RULE: 4H in <strong style="color:var(--white)">40–60</strong> = pullback → entry zone.<br>
+      NOT 30/70. NVDA trends. Overbought stays overbought.
+    </div>
+  </div>
+
+  <!-- REGIME + COMPRESSION -->
+  <div class="card">
+    <div class="ct">Market Regime · ATR · Compression</div>
+    <div style="background:rgba(0,0,0,.2);border:1px solid #ff3a5e;padding:9px;margin-bottom:9px">
+      <div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SPY MACRO REGIME</div>
+      <div style="font-size:.8rem;font-weight:700;color:#ff3a5e">SPY BEAR ✗ · $681.36 vs 50 EMA $685.5</div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:2px">❌ Macro headwind — reduce longs, prefer puts</div>
+    </div>
+    <div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:.62rem">ATR Compression Score</span>
+        <span style="font-size:.62rem;font-weight:700;color:#5a7a99">0.0/100</span>
       </div>
+      <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:0.0%;background:#5a7a99;border-radius:3px"></div></div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">Normal range</div>
+    </div>
+    <div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:.62rem">Daily ATR (14)</span>
+        <span style="font-size:.62rem;color:var(--orange);font-weight:700">$6.10</span>
+      </div>
+      <div style="font-size:.58rem;color:var(--muted)">Expected 1-day move. Exp options move: <strong style="color:var(--blue)">±$0.0</strong></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:.62rem">Volume vs 20-bar avg</span>
+        <span style="font-size:.62rem;font-weight:700;color:#ff3a5e">0.1x · 17M / 175M</span>
+      </div>
+      <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:5%;background:#ff3a5e;border-radius:3px"></div></div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">❌ Low — likely chop</div>
+    </div>
+  </div>
+
+  <!-- 5-MIN CANDLES + RANGE -->
+  <div class="card">
+    <div class="ct">Recent 5-Min Candles (Chicago time)</div>
+    <table>
+      <tr><th>TIME</th><th>CLOSE</th><th></th><th>HIGH</th><th>LOW</th><th>VOL</th></tr>
+      <tr><td style="color:var(--muted);font-size:.6rem">02:30 PM</td><td style="color:#00ff9d;font-weight:700">$180.24</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$180.44</td><td style="color:var(--muted)">$180.16</td><td style="color:var(--green-dim);font-size:.6rem">1521K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:35 PM</td><td style="color:#ff3a5e;font-weight:700">$180.13</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$180.57</td><td style="color:var(--muted)">$180.06</td><td style="color:var(--green-dim);font-size:.6rem">1765K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:40 PM</td><td style="color:#00ff9d;font-weight:700">$180.26</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$180.32</td><td style="color:var(--muted)">$179.97</td><td style="color:var(--green-dim);font-size:.6rem">1418K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:45 PM</td><td style="color:#ff3a5e;font-weight:700">$180.12</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$180.34</td><td style="color:var(--muted)">$179.97</td><td style="color:var(--green-dim);font-size:.6rem">1361K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:50 PM</td><td style="color:#00ff9d;font-weight:700">$180.23</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$180.35</td><td style="color:var(--muted)">$179.90</td><td style="color:var(--green-dim);font-size:.6rem">2582K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:55 PM</td><td style="color:#ff3a5e;font-weight:700">$179.99</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$180.32</td><td style="color:var(--muted)">$179.91</td><td style="color:var(--green-dim);font-size:.6rem">3515K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">08:30 AM</td><td style="color:#00ff9d;font-weight:700">$182.19</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$182.25</td><td style="color:var(--muted)">$180.06</td><td style="color:var(--green-dim);font-size:.6rem">15048K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">08:35 AM</td><td style="color:#ff3a5e;font-weight:700">$181.81</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$182.33</td><td style="color:var(--muted)">$181.47</td><td style="color:var(--green-dim);font-size:.6rem">1932K</td></tr>
+    </table>
+    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:9px">
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">52W RANGE</div>
+      <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-bottom:3px">
+        <span>$87</span><span style="color:var(--white)">$181.74 (76th pct)</span><span>$212</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:76%;background:var(--blue);border-radius:3px"></div></div>
     </div>
     <div style="margin-top:10px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:6px">RECENT 5-MIN CANDLES</div>
-      <table class="candle-table">
-        <tr style="border-bottom:1px solid var(--border)">
-          <th style="font-size:.58rem;color:var(--muted);text-align:left;padding:3px">TIME (CT)</th>
-          <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:3px">CLOSE</th>
-          <th style="font-size:.58rem;color:var(--muted);padding:3px"></th>
-          <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:3px">HIGH</th>
-          <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:3px">LOW</th>
-          <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:3px">VOL</th>
-        </tr>
-        <tr>
-          <td style="color:var(--muted);font-size:.62rem">02:20 PM</td>
-          <td style="color:#00ff9d;font-weight:700">$179.91</td>
-          <td style="color:#00ff9d">▲</td>
-          <td style="color:var(--muted)">$180.05</td>
-          <td style="color:var(--muted)">$179.71</td>
-          <td style="color:var(--green-dim)">1194K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:25 PM</td>
-          <td style="color:#00ff9d;font-weight:700">$180.21</td>
-          <td style="color:#00ff9d">▲</td>
-          <td style="color:var(--muted)">$180.24</td>
-          <td style="color:var(--muted)">$179.63</td>
-          <td style="color:var(--green-dim)">1341K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:30 PM</td>
-          <td style="color:#00ff9d;font-weight:700">$180.24</td>
-          <td style="color:#00ff9d">▲</td>
-          <td style="color:var(--muted)">$180.44</td>
-          <td style="color:var(--muted)">$180.16</td>
-          <td style="color:var(--green-dim)">1521K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:35 PM</td>
-          <td style="color:#ff3a5e;font-weight:700">$180.13</td>
-          <td style="color:#ff3a5e">▼</td>
-          <td style="color:var(--muted)">$180.57</td>
-          <td style="color:var(--muted)">$180.06</td>
-          <td style="color:var(--green-dim)">1765K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:40 PM</td>
-          <td style="color:#00ff9d;font-weight:700">$180.26</td>
-          <td style="color:#00ff9d">▲</td>
-          <td style="color:var(--muted)">$180.32</td>
-          <td style="color:var(--muted)">$179.97</td>
-          <td style="color:var(--green-dim)">1418K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:45 PM</td>
-          <td style="color:#ff3a5e;font-weight:700">$180.12</td>
-          <td style="color:#ff3a5e">▼</td>
-          <td style="color:var(--muted)">$180.34</td>
-          <td style="color:var(--muted)">$179.97</td>
-          <td style="color:var(--green-dim)">1361K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:50 PM</td>
-          <td style="color:#00ff9d;font-weight:700">$180.23</td>
-          <td style="color:#00ff9d">▲</td>
-          <td style="color:var(--muted)">$180.35</td>
-          <td style="color:var(--muted)">$179.90</td>
-          <td style="color:var(--green-dim)">2582K</td>
-        </tr><tr>
-          <td style="color:var(--muted);font-size:.62rem">02:55 PM</td>
-          <td style="color:#ff3a5e;font-weight:700">$180.08</td>
-          <td style="color:#ff3a5e">▼</td>
-          <td style="color:var(--muted)">$180.32</td>
-          <td style="color:var(--muted)">$179.91</td>
-          <td style="color:var(--green-dim)">3518K</td>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <!-- S/R LEVELS -->
-  <div class="card">
-    <div class="card-title">Support · Resistance (Auto-Calc)</div>
-    <table class="levels-table">
-      <tr style="border-bottom:1px solid var(--border)">
-        <th style="font-size:.58rem;color:var(--muted);text-align:left;padding:4px">ZONE</th>
-        <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:4px">LEVEL</th>
-        <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:4px">TYPE</th>
-        <th style="font-size:.58rem;color:var(--muted);text-align:right;padding:4px">DIST</th>
-      </tr>
-      <tr><td>RESISTANCE</td><td>$212.18</td><td style="color:#ff8c42">★ KEY</td><td style="color:var(--muted);font-size:.6rem">+$32.13</td></tr><tr><td>RESISTANCE</td><td>$193.93</td><td style="color:#ff3a5e">■</td><td style="color:var(--muted);font-size:.6rem">+$13.88</td></tr><tr><td>RESISTANCE</td><td>$190.44</td><td style="color:#ff3a5e">■</td><td style="color:var(--muted);font-size:.6rem">+$10.39</td></tr><tr><td>──</td><td style="color:#ffd700">▶ $180.05</td><td style="color:#ffd700" colspan="2">◆ NOW | H:183.46 L:174.64</td></tr><tr><td>SUPPORT</td><td>$178.40</td><td style="color:#00ff9d">■</td><td style="color:var(--muted);font-size:.6rem">-$1.65</td></tr><tr><td>SUPPORT</td><td>$170.67</td><td style="color:#00ff9d">■</td><td style="color:var(--muted);font-size:.6rem">-$9.38</td></tr><tr><td>SUPPORT</td><td>$86.60</td><td style="color:#ff8c42">★ KEY</td><td style="color:var(--muted);font-size:.6rem">-$93.45</td></tr>
-    </table>
-    <div style="margin-top:10px;padding:7px;background:rgba(79,195,247,.06);border:1px solid rgba(79,195,247,.2);font-size:.62rem;color:var(--blue);line-height:1.5">
-      💡 Copy these to TradingView as horizontal lines. Levels recalculate every refresh from 3-month pivot highs/lows.
-    </div>
-  </div>
-</div>
-
-<!-- ROW 2: OPTIONS CHAIN + NEWS -->
-<div class="two-col">
-  <div class="card">
-    <div class="card-title">Options Chain — 2026-04-02 (Live)</div>
-    <div style="font-size:.6rem;color:var(--muted);margin-bottom:7px">🎯 = ~$3 target · ⚠️ = low liquidity · Spread color: green&lt;$0.20 / yellow&lt;$0.40 / red&gt;$0.40</div>
-    <div style="font-size:.58rem;color:var(--orange);letter-spacing:1px;margin-bottom:4px">── CALLS ──</div>
-    <table class="chain-table">
-      <tr><th>STRIKE</th><th>PRICE</th><th>DELTA</th><th>IV</th><th>SPREAD</th><th>VOLUME</th></tr>
-      <tr><td>$160C </td><td class="price-val">$23.85</td><td class="delta-val">—</td><td class="iv-val">54.7%</td><td style="color:#ffd700">$0.20</td><td class="vol-val">63 ⚠️</td></tr><tr><td>$165C </td><td class="price-val">$20.05</td><td class="delta-val">—</td><td class="iv-val">52.3%</td><td style="color:#00ff9d">$0.15</td><td class="vol-val">41 ⚠️</td></tr><tr><td>$170C </td><td class="price-val">$15.99</td><td class="delta-val">—</td><td class="iv-val">50.0%</td><td style="color:#00ff9d">$0.15</td><td class="vol-val">219 ⚠️</td></tr><tr><td>$175C </td><td class="price-val">$12.55</td><td class="delta-val">—</td><td class="iv-val">48.1%</td><td style="color:#00ff9d">$0.15</td><td class="vol-val">738</td></tr><tr class="strike-atm"><td>$180C </td><td class="price-val">$9.61</td><td class="delta-val">—</td><td class="iv-val">46.0%</td><td style="color:#00ff9d">$0.10</td><td class="vol-val">2,529</td></tr><tr><td>$185C </td><td class="price-val">$7.00</td><td class="delta-val">—</td><td class="iv-val">43.9%</td><td style="color:#00ff9d">$0.10</td><td class="vol-val">2,622</td></tr><tr><td>$190C </td><td class="price-val">$4.97</td><td class="delta-val">—</td><td class="iv-val">42.5%</td><td style="color:#00ff9d">$0.10</td><td class="vol-val">2,816</td></tr>
-    </table>
-    <div style="font-size:.58rem;color:var(--red);letter-spacing:1px;margin:9px 0 4px">── PUTS ──</div>
-    <table class="chain-table">
-      <tr><th>STRIKE</th><th>PRICE</th><th>DELTA</th><th>IV</th><th>SPREAD</th><th>VOLUME</th></tr>
-      <tr><td>$180P </td><td class="price-val">$8.95</td><td class="delta-val">—</td><td class="iv-val">42.9%</td><td style="color:#00ff9d">$0.10</td><td class="vol-val">735</td></tr><tr><td>$175P </td><td class="price-val">$6.90</td><td class="delta-val">—</td><td class="iv-val">45.1%</td><td style="color:#00ff9d">$0.15</td><td class="vol-val">743</td></tr><tr><td>$170P </td><td class="price-val">$5.31</td><td class="delta-val">—</td><td class="iv-val">47.0%</td><td style="color:#00ff9d">$0.05</td><td class="vol-val">650</td></tr><tr><td>$165P </td><td class="price-val">$4.06</td><td class="delta-val">—</td><td class="iv-val">49.2%</td><td style="color:#00ff9d">$0.10</td><td class="vol-val">698</td></tr>
-    </table>
-    <div style="margin-top:9px;padding:8px;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);font-size:.63rem;color:var(--yellow);line-height:1.5">
-      ⚠️ Verify on Yahoo Finance before trading: finance.yahoo.com/quote/NVDA/options<br>
-      Check: Vol &gt; 500 · OI &gt; 1,000 · Bid-Ask &lt; $0.20
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-title">NVDA News — Auto-Updated</div>
-    <div class="news-item">
-          <div class="news-dot" style="background:#ff3a5e"></div>
-          <div><div class="news-text"><a href="https://finance.yahoo.com/m/c1add9ec-a86f-3839-becb-88c19fce4003/dow-jones-futures%3A-stock.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Dow Jones Futures: Stock Market Slashes Losses, Oil Pares Gains As Trump Says This</a>
-            <span class="news-impact" style="color:#ff3a5e">[BEARISH]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:38:58 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#ff3a5e"></div>
-          <div><div class="news-text"><a href="https://www.fool.com/investing/2026/03/03/why-sea-limited-plunged-today/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Why Sea Limited Plunged Today</a>
-            <span class="news-impact" style="color:#ff3a5e">[BEARISH]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:29:33 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#ffd700"></div>
-          <div><div class="news-text"><a href="https://finance.yahoo.com/m/c5c3dfde-de4b-3274-867a-ae7d220b2f84/stock-market-today%3A-dow-loses.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Stock Market Today: Dow Loses 400 Points Amid U.S.-Iran Battle; Palantir Climbs As Nvidia Slips (Live Coverage)</a>
-            <span class="news-impact" style="color:#ffd700">[NEUTRAL]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:28:08 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#00ff9d"></div>
-          <div><div class="news-text"><a href="https://www.fool.com/investing/2026/03/03/better-cryptocurrency-to-buy-right-now-with-2000-a/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Better Cryptocurrency to Buy Right Now With $2,000 and Hold for 5 Years: XRP vs. Ethereum</a>
-            <span class="news-impact" style="color:#00ff9d">[BULLISH]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:20:00 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#ff3a5e"></div>
-          <div><div class="news-text"><a href="https://www.fool.com/investing/2026/03/03/target-just-reported-its-13th-consecutive-quarter/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Target Just Reported Its 13th Consecutive Quarter of Falling Sales, But CEO Michael Fiddelke Says He Has a Plan to Turn </a>
-            <span class="news-impact" style="color:#ff3a5e">[BEARISH]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:17:22 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#ffd700"></div>
-          <div><div class="news-text"><a href="https://finance.yahoo.com/news/corvex-among-first-companies-achieve-210500477.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Corvex Among the First Companies to Achieve Verified Production Deployment of Confidential Computing for AI on NVIDIA HG</a>
-            <span class="news-impact" style="color:#ffd700">[NEUTRAL]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 21:05:00 +000</div></div></div><div class="news-item">
-          <div class="news-dot" style="background:#00ff9d"></div>
-          <div><div class="news-text"><a href="https://www.fool.com/investing/2026/03/03/2-dividend-stocks-to-double-up-on-right-now/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">2 Dividend Stocks to Double Up on Right Now</a>
-            <span class="news-impact" style="color:#00ff9d">[BULLISH]</span></div>
-            <div class="news-source">Tue, 03 Mar 2026 20:50:00 +000</div></div></div>
-  </div>
-</div>
-
-<!-- CHECKLIST -->
-<div class="card">
-  <div class="card-title">Pre-Trade Checklist — All 8 Green Before You Click Buy</div>
-  <div class="checklist"><div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text">Expiration ≥ 20 DTE — using 2026-04-02</div><div class="check-result" style="color:#00ff9d">2026-04-02</div></div><div class="check-item"><div class="check-box fail" onclick="toggleCheck(this)">✗</div><div class="check-text">Call near $3.00 in chain</div><div class="check-result" style="color:#ff3a5e">NOT FOUND</div></div><div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text">IV below 50% (now 46.0%)</div><div class="check-result" style="color:#00ff9d">46.0% OK</div></div><div class="check-item"><div class="check-box fail" onclick="toggleCheck(this)">✗</div><div class="check-text">IMACD Daily above zero (-0.307)</div><div class="check-result" style="color:#ff3a5e">✗ WAIT</div></div><div class="check-item"><div class="check-box fail" onclick="toggleCheck(this)">✗</div><div class="check-text">IMACD 1H above zero (-0.940)</div><div class="check-result" style="color:#ff3a5e">✗ WAIT</div></div><div class="check-item"><div class="check-box fail" onclick="toggleCheck(this)">✗</div><div class="check-text">Price above daily 34-50 cloud ($185.43–$185.69)</div><div class="check-result" style="color:#ff3a5e">✗ BELOW</div></div><div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text">Session OK: AFTER HOURS</div><div class="check-result" style="color:#00ff9d">GOOD SESSION</div></div><div class="check-item"><div class="check-box done" onclick="toggleCheck(this)">✓</div><div class="check-text">Volume: 0.97x avg (170M / 175M avg)</div><div class="check-result" style="color:#00ff9d">LIQUID</div></div></div>
-  <div style="margin-top:7px;font-size:.6rem;color:var(--muted);font-style:italic">Click boxes to toggle. All 8 green = trade. Any red = no trade. This rule will save your account.</div>
-</div>
-
-<!-- DECISION TREE -->
-<div class="card">
-  <div class="card-title">Signal Scorecard — Daily + 1H Combined</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:.68rem;line-height:1.7">
-    <div>
-      <div style="color:var(--green);font-weight:700;margin-bottom:6px">CALL SIGNALS (0/6):</div>
-      ❌ Price above daily 34-50 cloud<br>
-      ❌ Price above 1H 34-50 cloud<br>
-      ❌ Daily 5-12 cloud green (EMA9 &gt; EMA21)<br>
-      ❌ 1H 5-12 cloud green<br>
-      ❌ IMACD Daily above zero (-0.307)<br>
-      ❌ IMACD 1H above zero (-0.940)
-      <div style="margin-top:8px;padding:8px;border-left:3px solid var(--green);background:rgba(0,255,157,.05);font-size:.63rem">
-      ⏸ &lt;4/6: NOT READY
-      </div>
-    </div>
-    <div>
-      <div style="color:var(--red);font-weight:700;margin-bottom:6px">PUT SIGNALS (6/6):</div>
-      ✅ Price below daily 34-50 cloud<br>
-      ✅ Price below 1H 34-50 cloud<br>
-      ✅ Daily 5-12 cloud red<br>
-      ✅ 1H 5-12 cloud red<br>
-      ✅ IMACD Daily below zero<br>
-      ✅ IMACD 1H below zero
-      <div style="margin-top:8px;padding:8px;border-left:3px solid var(--red);background:rgba(255,58,94,.05);font-size:.63rem">
-      🔴 5-6/6: STRONG PUT SETUP — wait for VWAP bounce fail
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">1H EMA LEVELS (Pullback Entry)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.63rem">
+        <div>EMA8:  <strong style="color:var(--blue)">$180.52</strong></div>
+        <div>EMA21: <strong style="color:var(--blue)">$181.62</strong></div>
+        <div>EMA50: <strong style="color:var(--blue)">$184.32</strong></div>
+        <div>4H RSI: <strong style="color:#ffd700">35.9 </strong></div>
       </div>
     </div>
   </div>
-  <div style="margin-top:12px;padding:10px;background:rgba(255,140,66,.06);border:1px solid rgba(255,140,66,.3);font-size:.66rem;color:var(--orange);line-height:1.6">
-    🚪 <strong>EXIT RULES:</strong> +80% → SELL ALL · -50% → HARD STOP · Day 3 → EXIT · IMACD flips → EXIT HALF · Session enters Dead Zone → Consider exiting
+</div>
+
+<!-- SIGNAL BREAKDOWN + OPTIONS -->
+<div class="g3">
+  <div class="card">
+    <div class="ct">Call Signal (1/7)</div>
+    <div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Daily below cloud ($185.39) — bias bearish</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Daily HH/HL broken — trend not confirmed</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ SPY below 50 EMA ($681.36 vs $685.5) — macro headwind</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Above Brando $180.34 critical pivot — call bias valid</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 4H RSI not in pullback zone (35.9) — wait for cooling</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ 1H MACD positive (+0.417) — momentum up</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Volume weak (0.1x) — no institutional conviction</div><div style="font-size:.63rem;color:#ffd700;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">⚠️ Wrong session (OPENING FAKE-OUT) — wait for Power Window 1PM CT</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 1/7 (14%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:14%;background:#ff3a5e;border-radius:3px"></div></div></div>
+    <div style="margin-top:10px">
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">CALL R:R CALCULATOR</div>
+      <div style="font-size:.65rem;color:var(--muted);padding:10px">No $3 option near ATM</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Put Signal (3/7)</div>
+    <div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Daily below 21/50 EMA cloud — bearish structure</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Daily HH/HL structure broken — downtrend confirmed</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ SPY below 50 EMA — macro bear regime</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Above Brando $180.34 — wait for break + retest as resistance</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 4H RSI not in range (35.9)</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 1H MACD not negative</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Volume weak on decline — possible dead cat</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 3/7 (43%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:43%;background:#ff3a5e;border-radius:3px"></div></div></div>
+    <div style="margin-top:10px">
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">PUT R:R CALCULATOR</div>
+      <div style="font-size:.65rem;color:var(--muted);padding:10px">No $3 option near ATM</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Options Chain — 2026-04-02 (29 DTE)</div>
+    <div style="font-size:.58rem;color:var(--muted);margin-bottom:5px">🎯 ~$3 target · Δ delta · θ theta · Spread color</div>
+    <div style="font-size:.58rem;color:var(--orange);letter-spacing:1px;margin-bottom:3px">── CALLS ──</div>
+    <table>
+      <tr><th>STRIKE</th><th>PRICE</th><th>Δ</th><th>θ</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
+      <tr><td style="font-size:.61rem;color:var(--muted)">$160 </td><td style="color:var(--white);font-weight:700">$23.85</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">63⚠️</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$165 </td><td style="color:var(--white);font-weight:700">$20.05</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">41⚠️</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$170 </td><td style="color:var(--white);font-weight:700">$15.99</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">219⚠️</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$175 </td><td style="color:var(--white);font-weight:700">$12.55</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">738</td></tr><tr style="background:rgba(255,215,0,.07)"><td style="font-size:.61rem;color:var(--muted)">$180 </td><td style="color:var(--white);font-weight:700">$9.61</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">2,529</td></tr><tr style="background:rgba(255,215,0,.07)"><td style="font-size:.61rem;color:var(--muted)">$185 </td><td style="color:var(--white);font-weight:700">$7.00</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">1.6%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">2,622</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$190 </td><td style="color:var(--white);font-weight:700">$4.97</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">3.1%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">2,816</td></tr>
+    </table>
+    <div style="font-size:.58rem;color:var(--red);letter-spacing:1px;margin:7px 0 3px">── PUTS ──</div>
+    <table>
+      <tr><th>STRIKE</th><th>PRICE</th><th>Δ</th><th>θ</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
+      <tr style="background:rgba(255,215,0,.07)"><td style="font-size:.61rem;color:var(--muted)">$185 </td><td style="color:var(--white);font-weight:700">$11.37</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.0%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">147⚠️</td></tr><tr style="background:rgba(255,215,0,.07)"><td style="font-size:.61rem;color:var(--muted)">$180 </td><td style="color:var(--white);font-weight:700">$8.95</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">0.8%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">735</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$175 </td><td style="color:var(--white);font-weight:700">$6.90</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">3.1%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">743</td></tr><tr><td style="font-size:.61rem;color:var(--muted)">$170 </td><td style="color:var(--white);font-weight:700">$5.31</td><td style="color:var(--blue)">—</td><td style="color:#ffd700">—</td><td style="color:var(--orange)">6.3%</td><td style="color:#00ff9d">$0.00</td><td style="color:var(--green-dim)">650</td></tr>
+    </table>
+    <div style="margin-top:7px;padding:7px;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);font-size:.6rem;color:var(--yellow);line-height:1.5">
+      Verify: finance.yahoo.com/quote/NVDA/options · Vol&gt;500 · OI&gt;1K · Spread&lt;$0.20
+    </div>
   </div>
 </div>
 
-<div style="text-align:center;padding:12px;font-size:.58rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.8">
-  🤖 Auto-refreshed 12× per trading day at key NVDA liquidity windows (Chicago time) · Data: Yahoo Finance<br>
-  ⚠️ Educational only — not financial advice. Verify prices before trading. Options involve substantial risk.<br>
-  Last update: <strong style="color:var(--text)">2026-03-03 15:54:10 CT</strong> · Page auto-reloads every 5 min
+<!-- ENTRY MODEL + NEWS -->
+<div class="g2">
+  <div class="card">
+    <div class="ct">Institutional Entry Model — Brando + Pullback Method</div>
+    <div style="font-size:.66rem;line-height:1.8;color:var(--text)">
+      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ CALL ENTRY (Pullback, NOT breakout):</div>
+      1. Daily + 4H above cloud · HH/HL intact · Above Brando $180.34<br>
+      2. 4H RSI cools to <strong style="color:var(--white)">40–60</strong> (premium discounted)<br>
+      3. Price pulls to <strong style="color:var(--white)">1H EMA8 ($180.52)</strong> and holds<br>
+      4. 1H MACD histogram flips positive → re-acceleration signal<br>
+      5. Volume ≥ <strong style="color:var(--white)">1.5x</strong> on confirming expansion candle<br>
+      6. Enter on break of prior 1H high · Stop under pullback low<br>
+      7. First target: next Brando resistance above ($184.58)
+    </div>
+    <div style="margin-top:9px;font-size:.66rem;line-height:1.8;color:var(--text)">
+      <div style="color:var(--red);font-weight:700;margin-bottom:4px">❌ WHAT DESTROYS 30 DTE:</div>
+      Buying breakouts (premium euphoric) · Midday 10:30–1:00 PM CT ·
+      MACD already extended · Inside prior day range · Ignoring volume · Holding losers
+    </div>
+    <div style="margin-top:9px;padding:9px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.65rem;color:var(--orange);line-height:1.6">
+      🚪 <strong>EXIT:</strong> +80% → SELL ALL · −50% → HARD STOP · Day 3 → EXIT · IMACD flips → HALF OUT
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">NVDA News — Live</div>
+    <div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/04/2-high-flying-stocks-with-more-upside-to-buy-and-h/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">2 High-Flying Stocks With More Upside to Buy and Hold</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:32:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/04/another-credit-crash-coming-this-stress-indicator/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Another Credit Crash Coming? This Stress Indicator Is Hitting Financial Crisis Levels.</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:20:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/live/earnings-live-abercrombie--fitch-stock-sinks-despite-earnings-beat-crowdstrike-ceo-touts-best-year-yet-141916238.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Earnings live: Abercrombie & Fitch stock sinks despite earnings beat, CrowdStrike CEO touts 'best year yet'</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:19:16 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ff3a5e;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/m/69885568-120b-32ce-8274-0b59522d7129/stock-market-today%3A-dow-rises.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Stock Market Today: Dow Rises Amid Iran, Tariff News; Nvidia, Tesla Rebound (Live Coverage)</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ff3a5e">[BEARISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:09:35 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/netris-posts-622-growth-captures-140000534.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Netris Posts 622% Growth and Captures 12% of Global Neocloud Market in 10 Months, Establishes Leadership in AI Network A</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:00:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/04/abbvie-the-only-big-pharma-stock-id-consider-a-buy/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">AbbVie: The Only Big Pharma Stock I'd Consider a Buy‑and‑Never‑Sell</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:00:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/fortanix-showcases-confidential-ai-innovation-140000281.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Fortanix Showcases Confidential AI Innovation at NVIDIA GTC 2026</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Wed, 04 Mar 2026 14:00:00 +000</div></div></div>
+  </div>
 </div>
 
+<div style="text-align:center;padding:10px;font-size:.56rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px">
+  🤖 Auto-updated 12× daily · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2 TrendSpider · Page reloads every 5 min<br>
+  ⚠️ Educational only — not financial advice. Verify all prices before trading.<br>
+  Last update: <strong style="color:var(--text)">2026-03-04 08:37:18 CT</strong>
 </div>
-<script>
-function toggleCheck(b){
-  if(b.classList.contains('done')){b.classList.remove('done');b.classList.add('fail');b.textContent='✗';}
-  else if(b.classList.contains('fail')){b.classList.remove('fail');b.classList.add('done');b.textContent='✓';}
-  else{b.classList.add('done');b.textContent='✓';}
-}
-</script>
-</body>
-</html>
+</div>
+</body></html>
