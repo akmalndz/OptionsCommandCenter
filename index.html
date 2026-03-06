@@ -26,7 +26,7 @@ body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;m
   padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;}
 .ct::before{content:'';width:4px;height:4px;background:var(--blue);display:block;border-radius:50%;}
 .vb{padding:14px 18px;border:1px solid var(--border);border-left:4px solid #ff3a5e;
-  background:linear-gradient(135deg,#0a1929,#0d2035);display:grid;grid-template-columns:1fr auto;gap:16px;}
+  background:linear-gradient(135deg,#0a1929,#0d2035);display:grid;grid-template-columns:1fr 180px;gap:16px;align-items:center;}
 table{width:100%;border-collapse:collapse;}
 th,td{padding:5px;font-size:.66rem;border-bottom:1px solid rgba(30,58,95,.35);}
 th{color:var(--muted);font-size:.58rem;letter-spacing:1px;text-align:left;}
@@ -48,7 +48,7 @@ tr:last-child td{border-bottom:none;}
     <span style="font-size:.65rem;color:#ff3a5e;font-weight:700">🔴 BELOW $180 — BEARISH</span>
     <span style="font-size:.6rem;color:#5a7a99"><span class="dot" style="background:#5a7a99"></span>🌙 AFTER HOURS</span>
     <span style="color:#ff3a5e;font-size:.6rem">SPY BEAR ✗</span>
-    <span style="background:var(--surface2);border:1px solid var(--border);padding:4px 10px;font-size:.62rem;color:var(--muted)">Fri Mar 06, 2026 · 03:50 PM CT</span>
+    <span style="background:var(--surface2);border:1px solid var(--border);padding:4px 10px;font-size:.62rem;color:var(--muted)">Fri Mar 06, 2026 · 03:55 PM CT</span>
   </div>
 </header>
 
@@ -63,21 +63,35 @@ tr:last-child td{border-bottom:none;}
 <!-- VERDICT -->
 <div class="vb">
   <div>
-    <div style="font-size:.56rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">INSTITUTIONAL VERDICT · 03:50 PM CT</div>
+    <div style="font-size:.56rem;color:var(--muted);letter-spacing:1px;margin-bottom:3px">INSTITUTIONAL VERDICT · 03:55 PM CT</div>
     <div style="font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:800;color:#ff3a5e">💤 AFTER HOURS — NO NEW TRADES</div>
     <div style="font-size:.67rem;color:var(--text);margin-top:5px;line-height:1.55">Market closed. Review trades. Plan tomorrow's setup.</div>
     <div style="margin-top:8px;padding:9px;background:rgba(255,255,255,.03);border-left:3px solid #ff3a5e;font-size:.67rem;color:var(--white);line-height:1.6">Hold existing if profitable. Next window: Power Window 1:00 PM CT.</div>
   </div>
-  <div style="min-width:150px;text-align:center">
-    <div style="border:1px solid #ff8c42;color:#ff8c42;padding:7px 12px;font-size:.7rem;letter-spacing:1px;margin-bottom:8px">WAIT</div>
-    <div style="font-size:.58rem;color:var(--muted)">Call 0/7</div>
-    <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;margin:3px 0 7px">
-      <div style="height:100%;width:0%;background:#00ff9d;border-radius:3px"></div></div>
-    <div style="font-size:.58rem;color:var(--muted)">Put 8/7</div>
-    <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;margin:3px 0 7px">
-      <div style="height:100%;width:114%;background:#ff3a5e;border-radius:3px"></div></div>
-    <div style="font-size:.55rem;color:var(--muted)">IV <strong style="color:var(--orange)">51.1%</strong> · DTE <strong style="color:var(--white)">27</strong></div>
-    <div style="font-size:.55rem;color:var(--muted)">Exp move <strong style="color:var(--blue)">±$24.71</strong></div>
+  <div style="min-width:160px;text-align:center;display:flex;flex-direction:column;gap:7px;justify-content:center">
+    <div style="border:1px solid #ff8c42;color:#ff8c42;padding:7px 12px;font-size:.7rem;letter-spacing:1px;font-weight:700">WAIT</div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px">
+        <span style="color:var(--muted)">CALL</span>
+        <span style="color:#00ff9d;font-weight:700">0/7</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px">
+        <div style="height:100%;width:0%;background:linear-gradient(90deg,#00c87a,#00ff9d);border-radius:3px"></div>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px">
+        <span style="color:var(--muted)">PUT</span>
+        <span style="color:#ff3a5e;font-weight:700">6/7</span>
+      </div>
+      <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px">
+        <div style="height:100%;width:86%;background:linear-gradient(90deg,#cc1f40,#ff3a5e);border-radius:3px"></div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
+      <div style="font-size:.55rem;color:var(--muted)">IV <strong style="color:var(--orange)">51.1%</strong> &nbsp;·&nbsp; DTE <strong style="color:var(--white)">27</strong></div>
+      <div style="font-size:.55rem;color:var(--muted)">Exp move <strong style="color:var(--blue)">±$24.71</strong></div>
+    </div>
   </div>
 </div>
 
@@ -144,7 +158,7 @@ tr:last-child td{border-bottom:none;}
     <div class="ct">Multi-Timeframe Alignment</div>
     <table>
       <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD HIST</th><th>BIAS</th><th>VOL</th></tr>
-      <tr><td style="color:var(--white);font-weight:700">DAILY</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ffd700">44.8 ~</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.96x</span></td></tr><tr><td style="color:var(--white);font-weight:700">4-HOUR</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ff3a5e">29.3 ↓</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.83x</span></td></tr><tr><td style="color:var(--white);font-weight:700">1-HOUR</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ff3a5e">35.7 ↓</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ffd700;font-size:.6rem">1.17x</span></td></tr>
+      <tr><td style="color:var(--white);font-weight:700">DAILY</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ffd700">44.8 ~</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.96x</span></td></tr><tr><td style="color:var(--white);font-weight:700">4-HOUR</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ff3a5e">29.1 ↓</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ff3a5e;font-size:.6rem">0.85x</span></td></tr><tr><td style="color:var(--white);font-weight:700">1-HOUR</td><td style="color:#ff3a5e;font-weight:700">BEARISH</td><td style="color:#ff3a5e">35.5 ↓</td><td style="color:#ff3a5e">NEGATIVE</td><td style="color:#ff3a5e;font-weight:700">SHORT</td><td><span style="color:#ffd700;font-size:.6rem">1.18x</span></td></tr>
     </table>
     <div style="margin-top:8px;padding:7px;background:rgba(255,255,255,.03);border:1px solid var(--border);font-size:.62rem">
       <span style="color:var(--muted)">TF AGREEMENT: </span>
@@ -196,7 +210,7 @@ tr:last-child td{border-bottom:none;}
     <div class="ct">Recent 5-Min Candles (Chicago time)</div>
     <table>
       <tr><th>TIME</th><th>CLOSE</th><th></th><th>HIGH</th><th>LOW</th><th>VOL</th></tr>
-      <tr><td style="color:var(--muted);font-size:.6rem">02:20 PM</td><td style="color:#ff3a5e;font-weight:700">$177.93</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$178.95</td><td style="color:var(--muted)">$177.90</td><td style="color:var(--green-dim);font-size:.6rem">3700K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:25 PM</td><td style="color:#ff3a5e;font-weight:700">$177.13</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$177.94</td><td style="color:var(--muted)">$176.95</td><td style="color:var(--green-dim);font-size:.6rem">4696K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:30 PM</td><td style="color:#00ff9d;font-weight:700">$177.21</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$177.51</td><td style="color:var(--muted)">$177.00</td><td style="color:var(--green-dim);font-size:.6rem">3385K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:35 PM</td><td style="color:#00ff9d;font-weight:700">$177.30</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$177.92</td><td style="color:var(--muted)">$176.82</td><td style="color:var(--green-dim);font-size:.6rem">5456K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:40 PM</td><td style="color:#00ff9d;font-weight:700">$177.76</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.10</td><td style="color:var(--muted)">$177.00</td><td style="color:var(--green-dim);font-size:.6rem">4754K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:45 PM</td><td style="color:#00ff9d;font-weight:700">$178.09</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.19</td><td style="color:var(--muted)">$177.60</td><td style="color:var(--green-dim);font-size:.6rem">2810K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:50 PM</td><td style="color:#00ff9d;font-weight:700">$178.25</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.38</td><td style="color:var(--muted)">$177.88</td><td style="color:var(--green-dim);font-size:.6rem">3775K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:55 PM</td><td style="color:#ff3a5e;font-weight:700">$177.73</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$178.25</td><td style="color:var(--muted)">$177.60</td><td style="color:var(--green-dim);font-size:.6rem">6069K</td></tr>
+      <tr><td style="color:var(--muted);font-size:.6rem">02:20 PM</td><td style="color:#ff3a5e;font-weight:700">$177.93</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$178.95</td><td style="color:var(--muted)">$177.90</td><td style="color:var(--green-dim);font-size:.6rem">3700K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:25 PM</td><td style="color:#ff3a5e;font-weight:700">$177.13</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$177.94</td><td style="color:var(--muted)">$176.95</td><td style="color:var(--green-dim);font-size:.6rem">4696K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:30 PM</td><td style="color:#00ff9d;font-weight:700">$177.21</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$177.51</td><td style="color:var(--muted)">$177.00</td><td style="color:var(--green-dim);font-size:.6rem">3385K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:35 PM</td><td style="color:#00ff9d;font-weight:700">$177.30</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$177.92</td><td style="color:var(--muted)">$176.82</td><td style="color:var(--green-dim);font-size:.6rem">5456K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:40 PM</td><td style="color:#00ff9d;font-weight:700">$177.76</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.10</td><td style="color:var(--muted)">$177.00</td><td style="color:var(--green-dim);font-size:.6rem">4754K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:45 PM</td><td style="color:#00ff9d;font-weight:700">$178.09</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.19</td><td style="color:var(--muted)">$177.60</td><td style="color:var(--green-dim);font-size:.6rem">2810K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:50 PM</td><td style="color:#00ff9d;font-weight:700">$178.25</td><td style="color:#00ff9d">▲</td><td style="color:var(--muted)">$178.38</td><td style="color:var(--muted)">$177.88</td><td style="color:var(--green-dim);font-size:.6rem">3775K</td></tr><tr><td style="color:var(--muted);font-size:.6rem">02:55 PM</td><td style="color:#ff3a5e;font-weight:700">$177.69</td><td style="color:#ff3a5e">▼</td><td style="color:var(--muted)">$178.25</td><td style="color:var(--muted)">$177.60</td><td style="color:var(--green-dim);font-size:.6rem">6073K</td></tr>
     </table>
     <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:9px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">52W RANGE</div>
@@ -208,22 +222,10 @@ tr:last-child td{border-bottom:none;}
     <div style="margin-top:10px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">1H EMA LEVELS (Pullback Entry)</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.63rem">
-        <div>EMA8:  <strong style="color:var(--blue)">$179.83</strong></div>
-        <div>EMA21: <strong style="color:var(--blue)">$180.96</strong></div>
+        <div>EMA8:  <strong style="color:var(--blue)">$179.82</strong></div>
+        <div>EMA21: <strong style="color:var(--blue)">$180.95</strong></div>
         <div>EMA50: <strong style="color:var(--blue)">$182.64</strong></div>
-        <div>4H RSI: <strong style="color:#ffd700">29.3 ⏳</strong></div>
-        <div>1H RSI: <strong style="color:#ff3a5e">35.7 ↓</strong></div>
-      </div>
-      <div style="margin-top:7px;border-top:1px solid var(--border);padding-top:6px">
-        <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">RSI DIVERGENCE (eemani123 · period 5)</div>
-        <div style="font-size:.63rem;margin-bottom:3px">
-          1H: <strong style="color:#5a7a99">—</strong>
-        </div>
-        <div style="font-size:.6rem;color:var(--muted);line-height:1.4">No divergence detected</div>
-        <div style="font-size:.63rem;margin-top:4px;margin-bottom:3px">
-          4H: <strong style="color:#5a7a99">—</strong>
-        </div>
-        <div style="font-size:.6rem;color:var(--muted);line-height:1.4">No divergence detected</div>
+        <div>4H RSI: <strong style="color:#ffd700">29.1 </strong></div>
       </div>
     </div>
   </div>
@@ -232,8 +234,8 @@ tr:last-child td{border-bottom:none;}
 <!-- SIGNAL BREAKDOWN + OPTIONS -->
 <div class="g3">
   <div class="card">
-    <div class="ct">Call Signal (0/9)</div>
-    <div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G1: Daily below cloud ($185.04) — bias bearish</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G2: Daily HH/HL broken — trend not confirmed</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G3: SPY below 50 EMA ($672.38 vs $684.97) — macro headwind</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G4: Below Brando $180.34 — not valid for calls until reclaimed</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G5: 4H RSI too weak (29.3) — trend not ready</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G6: 1H RSI below 50 (35.7) — wait for cross above 50</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G7: 1H MACD not positive (-0.347)</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ G8: Volume not confirming (1.06x)</div><div style="font-size:.63rem;color:#ffd700;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">➖ G9: No divergence signal on 1H/4H — standard gate scoring applies</div><div style="font-size:.63rem;color:#ffd700;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">⚠️ Wrong session (AFTER HOURS) — wait for Power Window 1PM CT</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 0/9 (0%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:0%;background:#ff3a5e;border-radius:3px"></div></div></div>
+    <div class="ct">Call Signal (0/7)</div>
+    <div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Daily below cloud ($185.04) — bias bearish</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Daily HH/HL broken — trend not confirmed</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ SPY below 50 EMA ($672.38 vs $684.97) — macro headwind</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Below Brando $180.34 — not valid for calls until reclaimed</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 4H RSI not in pullback zone (29.1) — wait for cooling</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 1H MACD not positive yet (-0.35)</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ Volume not confirming (1.06x) — wait for clearer signal</div><div style="font-size:.63rem;color:#ffd700;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">⚠️ Wrong session (AFTER HOURS) — wait for Power Window 1PM CT</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 0/7 (0%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:0%;background:#ff3a5e;border-radius:3px"></div></div></div>
     <div style="margin-top:10px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">CALL R:R CALCULATOR</div>
       <div style="background:var(--surface2);border:1px solid #00ff9d;padding:11px">
@@ -250,8 +252,8 @@ tr:last-child td{border-bottom:none;}
     </div>
   </div>
   <div class="card">
-    <div class="ct">Put Signal (8/9)</div>
-    <div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G1: Daily below 21/50 EMA cloud — bearish structure</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G2: Daily HH/HL structure broken — downtrend confirmed</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G3: SPY below 50 EMA — macro bear regime</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G4: Below Brando $180.34 — put bias valid</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G5: 4H RSI oversold (29.3) — breakdown confirmed, puts valid</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G6: 1H RSI below 50 (35.7) — bearish momentum confirmed</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G7: 1H MACD negative (-0.347) — momentum down</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ G8: Volume confirming decline (1.06x) — sellers in control</div><div style="font-size:.63rem;color:#ffd700;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">➖ G9: No divergence signal on 1H/4H — standard gate scoring applies</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 8/9 (89%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:89%;background:#00ff9d;border-radius:3px"></div></div></div>
+    <div class="ct">Put Signal (6/7)</div>
+    <div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Daily below 21/50 EMA cloud — bearish structure</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Daily HH/HL structure broken — downtrend confirmed</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ SPY below 50 EMA — macro bear regime</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Below Brando $180.34 — put bias valid</div><div style="font-size:.63rem;color:#ff3a5e;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">❌ 4H RSI not in range (29.1)</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ 1H MACD negative (-0.350) — momentum down</div><div style="font-size:.63rem;color:#00ff9d;padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">✅ Volume confirming decline (1.06x) — sellers in control</div><div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: 6/7 (86%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:86%;background:#00ff9d;border-radius:3px"></div></div></div>
     <div style="margin-top:10px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">PUT R:R CALCULATOR</div>
       <div style="background:var(--surface2);border:1px solid #ff3a5e;padding:11px">
@@ -289,46 +291,36 @@ tr:last-child td{border-bottom:none;}
 <!-- ENTRY MODEL + NEWS -->
 <div class="g2">
   <div class="card">
-    <div class="ct">Entry &amp; Exit Model — Brando + Two-Layer RSI + Divergence</div>
+    <div class="ct">Institutional Entry Model — Brando + Pullback Method</div>
     <div style="font-size:.66rem;line-height:1.8;color:var(--text)">
-      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ CALL ENTRY CHECKLIST:</div>
+      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ CALL ENTRY (Pullback, NOT breakout):</div>
       1. Daily + 4H above cloud · HH/HL intact · Above Brando $180.34<br>
-      2. 4H RSI cools to <strong style="color:var(--white)">45–55</strong> — setup valid, premium discounted<br>
-      3. 1H RSI <strong style="color:var(--white)">crosses above 50</strong> — entry trigger fires<br>
-      4. Bonus: <strong style="color:#00ff9d">Regular Bull Div</strong> (seller exhaustion) or <strong style="color:#4fc3f7">Hidden Bull Div</strong> (continuation) on 1H/4H<br>
-      5. 1H MACD histogram turns positive · Volume ≥ 1.5x<br>
-      6. Enter on break of prior 1H high · Stop under pullback low
+      2. 4H RSI cools to <strong style="color:var(--white)">45–55</strong> (tight zone = premium discounted, best entries)<br>
+      3. Price pulls to <strong style="color:var(--white)">1H EMA8 ($179.82)</strong> and holds<br>
+      4. 1H MACD histogram flips positive → re-acceleration signal<br>
+      5. Volume ≥ <strong style="color:var(--white)">1.5x</strong> on confirming expansion candle<br>
+      6. Enter on break of prior 1H high · Stop under pullback low<br>
+      7. First target: next Brando resistance above ($180.34)
     </div>
-    <div style="margin-top:8px;font-size:.66rem;line-height:1.8;color:var(--text)">
-      <div style="color:var(--red);font-weight:700;margin-bottom:4px">🔴 PUT ENTRY CHECKLIST:</div>
-      1. Daily below cloud · HH/HL broken · Below Brando $180.34<br>
-      2. 4H RSI bounces to <strong style="color:var(--white)">45–55</strong> on retest OR oversold (&lt;40)<br>
-      3. 1H RSI <strong style="color:var(--white)">crosses below 50</strong> — entry trigger fires<br>
-      4. Bonus: <strong style="color:#ff3a5e">Regular Bear Div</strong> (buyer exhaustion) or <strong style="color:#ff8c42">Hidden Bear Div</strong> (dead cat) on 1H/4H<br>
-      5. 1H MACD negative · High volume on down bars<br>
-      6. Enter on break of prior 1H low · Stop above bounce high
+    <div style="margin-top:9px;font-size:.66rem;line-height:1.8;color:var(--text)">
+      <div style="color:var(--red);font-weight:700;margin-bottom:4px">❌ WHAT DESTROYS 30 DTE:</div>
+      Buying breakouts (premium euphoric) · Midday 10:30–1:00 PM CT ·
+      MACD already extended · Inside prior day range · Ignoring volume · Holding losers
     </div>
-    <div style="margin-top:8px;padding:8px;background:rgba(0,255,157,.05);border:1px solid rgba(0,255,157,.2);font-size:.63rem;color:var(--green);line-height:1.7">
-      🟢 <strong>DIVERGENCE EXIT RULES (eemani123):</strong><br>
-      In CALLS → <strong>Regular Bear Div</strong> appears = SELL ALL immediately (buyer exhaustion at top)<br>
-      In CALLS → <strong>1H RSI(5) hits 75+</strong> = profit target reached, SELL ALL<br>
-      In PUTS → <strong>Regular Bull Div</strong> appears = COVER immediately (seller exhaustion at bottom)<br>
-      In PUTS → <strong>Hidden Bull Div</strong> = tighten stop to entry, ready to flip
-    </div>
-    <div style="margin-top:8px;padding:8px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.65rem;color:var(--orange);line-height:1.6">
-      🚪 <strong>HARD EXITS:</strong> +80% → SELL ALL · −50% → HARD STOP · Day 3 → EXIT · IMACD flips → HALF OUT
+    <div style="margin-top:9px;padding:9px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.65rem;color:var(--orange);line-height:1.6">
+      🚪 <strong>EXIT:</strong> +80% → SELL ALL · −50% → HARD STOP · Day 3 → EXIT · IMACD flips → HALF OUT
     </div>
   </div>
   <div class="card">
     <div class="ct">NVDA News — Live</div>
-    <div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/06/3-moves-millennials-are-making-with-their-crypto/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">3 Moves Millennials Are Making With Their Crypto Portfolio</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:43:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/m/813084aa-a02d-3d77-b4d2-3ab9224fd1e7/stock-market-today%3A-dow-loses.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Stock Market Today: Dow Loses 450 Points As Oil Prices Surge; Palantir Rises, Nvidia Falls (Live Coverage)</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:28:58 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/nvidia-sets-4-million-cash-212604965.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Nvidia sets $4 million cash bonus for CEO Huang under 2027 compensation plan</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:26:04 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://247wallst.com/investing/2026/03/06/the-top-5-ai-stocks-to-buy-in-march/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">The Top 5 AI Stocks to Buy in March</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:17:39 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/06/alphabet-and-nvidia-just-might-be-the-ultimate-ai/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Alphabet and Nvidia Just Might Be the Ultimate AI Stocks. But Which Will Be the Bigger Winner Over the Next 10 Years?</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:13:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/oracle-openai-end-plans-expand-201106441.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Oracle and OpenAI End Plans to Expand Flagship Data Center</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:08:29 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/oracle-stock-falls-report-scrapped-205325877.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Oracle stock falls on report of scrapped Texas data center plans</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 20:53:25 +000</div></div></div>
+    <div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/m/2b36c0ff-57a4-338c-9fbe-81c6023bc296/oracle%2C-openai-reportedly.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Oracle, OpenAI Reportedly Scrap Plan To Expand AI Data Center</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:45:24 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/06/3-moves-millennials-are-making-with-their-crypto/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">3 Moves Millennials Are Making With Their Crypto Portfolio</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:43:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/m/813084aa-a02d-3d77-b4d2-3ab9224fd1e7/stock-market-today%3A-dow-loses.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Stock Market Today: Dow Loses 450 Points As Oil Prices Surge; Palantir Rises, Nvidia Falls (Live Coverage)</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:28:58 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/nvidia-sets-4-million-cash-212604965.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Nvidia sets $4 million cash bonus for CEO Huang under 2027 compensation plan</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:26:04 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://247wallst.com/investing/2026/03/06/the-top-5-ai-stocks-to-buy-in-march/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">The Top 5 AI Stocks to Buy in March</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:17:39 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#ffd700;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://www.fool.com/investing/2026/03/06/alphabet-and-nvidia-just-might-be-the-ultimate-ai/?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Alphabet and Nvidia Just Might Be the Ultimate AI Stocks. But Which Will Be the Bigger Winner Over the Next 10 Years?</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#ffd700">[NEUTRAL]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:13:00 +000</div></div></div><div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:#00ff9d;margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="https://finance.yahoo.com/news/oracle-openai-end-plans-expand-201106441.html?.tsrc=rss" target="_blank" style="color:inherit;text-decoration:none">Oracle and OpenAI End Plans to Expand Flagship Data Center</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:#00ff9d">[BULLISH]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">Fri, 06 Mar 2026 21:08:29 +000</div></div></div>
   </div>
 </div>
 
 <div style="text-align:center;padding:10px;font-size:.56rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px">
-  🤖 Auto-updated 24× daily · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2 TrendSpider · RSI Div: eemani123 · Page reloads every 5 min<br>
+  🤖 Auto-updated 12× daily · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2 TrendSpider · Page reloads every 5 min<br>
   ⚠️ Educational only — not financial advice. Verify all prices before trading.<br>
-  Last update: <strong style="color:var(--text)">2026-03-06 15:50:47 CT</strong>
+  Last update: <strong style="color:var(--text)">2026-03-06 15:55:23 CT</strong>
 </div>
 </div>
 </body></html>
