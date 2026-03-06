@@ -1,113 +1,66 @@
 name: Options Command Center — Auto Update
 
 # ─────────────────────────────────────────────────────────────────
-# RELIABILITY STRATEGY
-# - Fewer, cleaner cron entries (GitHub throttles large cron lists)
-# - Retry logic on the Python step (3 attempts before failing)
-# - Hard timeout so a hung yfinance call can't lock the runner
-# - Email/Slack notification on failure via GitHub's built-in system
-# - Pinned action versions (SHA hash) — security best practice
-# - Minimal permissions — only what is strictly needed
+# Chicago = CST (UTC-6) year-round entries only.
+# GitHub Actions cron runs in UTC — CST = UTC-6, so add 6 hours.
 #
-# Chicago time: CST = UTC-6 (Nov–Mar) | CDT = UTC-5 (Mar–Nov)
-# Both rows run year-round; GitHub deduplicates exact-minute matches.
+# SCHEDULE (15 refreshes during market hours)
+#
+#  PREMARKET BIAS      7:00, 7:30, 8:20 AM CT
+#  OPENING EXPANSION   8:35, 9:00, 9:45 AM CT
+#  CONTINUATION        10:00, 10:20 AM CT
+#  MIDDAY              11:00 AM, 12:00 PM CT
+#  POWER WINDOW        1:00, 1:30, 2:00, 2:30, 3:00 PM CT
 # ─────────────────────────────────────────────────────────────────
 
 on:
   schedule:
-    # ── PREMARKET BIAS (7:00 – 8:20 AM CT) ─────────────────────
-    - cron: '0  13 * * 1-5'   # 7:00 AM CST
-    - cron: '0  12 * * 1-5'   # 7:00 AM CDT
-    - cron: '30 13 * * 1-5'   # 7:30 AM CST
-    - cron: '30 12 * * 1-5'   # 7:30 AM CDT
-    - cron: '20 14 * * 1-5'   # 8:20 AM CST
-    - cron: '20 13 * * 1-5'   # 8:20 AM CDT
+    - cron: '0  13 * * 1-5'   # 7:00 AM CT
+    - cron: '30 13 * * 1-5'   # 7:30 AM CT
+    - cron: '20 14 * * 1-5'   # 8:20 AM CT
+    - cron: '35 14 * * 1-5'   # 8:35 AM CT
+    - cron: '0  15 * * 1-5'   # 9:00 AM CT
+    - cron: '45 15 * * 1-5'   # 9:45 AM CT
+    - cron: '0  16 * * 1-5'   # 10:00 AM CT
+    - cron: '20 16 * * 1-5'   # 10:20 AM CT
+    - cron: '0  17 * * 1-5'   # 11:00 AM CT
+    - cron: '0  18 * * 1-5'   # 12:00 PM CT
+    - cron: '0  19 * * 1-5'   # 1:00 PM CT
+    - cron: '30 19 * * 1-5'   # 1:30 PM CT
+    - cron: '0  20 * * 1-5'   # 2:00 PM CT
+    - cron: '30 20 * * 1-5'   # 2:30 PM CT
+    - cron: '0  21 * * 1-5'   # 3:00 PM CT
 
-    # ── OPENING EXPANSION (8:35 – 9:45 AM CT) ───────────────────
-    - cron: '35 14 * * 1-5'   # 8:35 AM CST
-    - cron: '35 13 * * 1-5'   # 8:35 AM CDT
-    - cron: '0  15 * * 1-5'   # 9:00 AM CST
-    - cron: '0  14 * * 1-5'   # 9:00 AM CDT
-    - cron: '45 15 * * 1-5'   # 9:45 AM CST
-    - cron: '45 14 * * 1-5'   # 9:45 AM CDT
-
-    # ── CONTINUATION (10:00 – 10:20 AM CT) ──────────────────────
-    - cron: '0  16 * * 1-5'   # 10:00 AM CST
-    - cron: '0  15 * * 1-5'   # 10:00 AM CDT
-    - cron: '20 16 * * 1-5'   # 10:20 AM CST
-    - cron: '20 15 * * 1-5'   # 10:20 AM CDT
-
-    # ── MIDDAY (11:00 AM – 1:00 PM CT) ──────────────────────────
-    - cron: '0  17 * * 1-5'   # 11:00 AM CST
-    - cron: '0  16 * * 1-5'   # 11:00 AM CDT
-    - cron: '0  18 * * 1-5'   # 12:00 PM CST
-    - cron: '0  17 * * 1-5'   # 12:00 PM CDT
-
-    # ── POWER WINDOW (1:00 – 3:00 PM CT) ────────────────────────
-    - cron: '0  19 * * 1-5'   # 1:00 PM CST
-    - cron: '0  18 * * 1-5'   # 1:00 PM CDT
-    - cron: '30 19 * * 1-5'   # 1:30 PM CST
-    - cron: '30 18 * * 1-5'   # 1:30 PM CDT
-    - cron: '0  20 * * 1-5'   # 2:00 PM CST
-    - cron: '0  19 * * 1-5'   # 2:00 PM CDT
-    - cron: '30 20 * * 1-5'   # 2:30 PM CST
-    - cron: '30 19 * * 1-5'   # 2:30 PM CDT
-    - cron: '0  21 * * 1-5'   # 3:00 PM CST
-    - cron: '0  20 * * 1-5'   # 3:00 PM CDT
-
-  # Manual trigger — run anytime from GitHub Actions UI
   workflow_dispatch:
 
-# ── SECURITY: Minimal permissions — only what the job actually needs ──
 permissions:
-  contents: write   # needed to push index.html
-  actions: none
-  checks: none
-  deployments: none
-  issues: none
-  packages: none
-  pull-requests: none
-  repository-projects: none
-  security-events: none
-  statuses: none
+  contents: write
 
 jobs:
   update-dashboard:
     runs-on: ubuntu-latest
-
-    # Hard cap: kill the job if it runs longer than 10 minutes.
-    # A normal run takes ~60-90 seconds. 10 min = something is hung.
     timeout-minutes: 10
 
     steps:
-      # ── SECURITY: Pin to exact commit SHA, not floating tag ──
-      # To update: check https://github.com/actions/checkout/releases
       - name: Checkout repo
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b  # v5.3.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Cache pip dependencies
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c6158d  # v4.2.0
+      - name: Cache pip
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-dashboard-v5
-          restore-keys: |
-            ${{ runner.os }}-pip-dashboard-
 
       - name: Install dependencies
-        run: |
-          pip install --quiet --upgrade pip
-          pip install --quiet yfinance feedparser numpy pytz
+        run: pip install --quiet yfinance feedparser numpy pytz
 
-      # ── RETRY LOGIC: 3 attempts with 30s wait between failures ──
-      # yfinance / Yahoo Finance rate limits are the #1 cause of failures.
-      # This handles transient network errors without human intervention.
+      # 3 attempts with 30s wait — handles yfinance/Yahoo rate limits
       - name: Run dashboard updater (with retry)
-        id: run_updater
         run: |
           for attempt in 1 2 3; do
             echo "▶ Attempt $attempt of 3..."
@@ -116,45 +69,29 @@ jobs:
               exit 0
             fi
             if [ $attempt -lt 3 ]; then
-              echo "⚠️  Attempt $attempt failed. Waiting 30s before retry..."
+              echo "⚠️  Failed. Waiting 30s..."
               sleep 30
             fi
           done
           echo "❌ All 3 attempts failed."
           exit 1
 
-      # ── COMMIT: Only pushes if index.html actually changed ──
-      # git diff --staged --quiet exits 0 = no changes = skip commit
-      # This prevents empty commits polluting your git history
       - name: Commit and push if changed
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git diff --staged --quiet && echo "No changes — skipping commit." && exit 0
+          git diff --staged --quiet && echo "No changes." && exit 0
           git commit -m "📊 Dashboard — $(TZ='America/Chicago' date '+%I:%M %p CT, %b %d')"
           git push
 
-  # ── FAILURE NOTIFICATION JOB ────────────────────────────────────
-  # Runs ONLY when the main job fails. Uses GitHub's built-in email
-  # notification — no Slack token or third-party service needed.
-  # GitHub automatically emails the repo owner on workflow failure
-  # IF you have "Failed workflows" enabled in your notification settings:
-  # github.com → Settings → Notifications → Actions → check "Failed workflows"
   notify-on-failure:
     runs-on: ubuntu-latest
     needs: update-dashboard
     if: failure()
     timeout-minutes: 2
     steps:
-      - name: Log failure details
+      - name: Log failure
         run: |
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "❌ DASHBOARD UPDATE FAILED"
-          echo "Time (CT): $(TZ='America/Chicago' date '+%I:%M %p CT, %b %d %Y')"
-          echo "Workflow:  ${{ github.workflow }}"
-          echo "Run ID:    ${{ github.run_id }}"
-          echo "Run URL:   ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "ACTION REQUIRED: Check the run URL above for error details."
-          echo "Common causes: yfinance rate limit, Yahoo Finance outage, Python error."
+          echo "❌ DASHBOARD FAILED at $(TZ='America/Chicago' date '+%I:%M %p CT')"
+          echo "🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
