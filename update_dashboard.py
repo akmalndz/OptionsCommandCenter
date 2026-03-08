@@ -1037,7 +1037,7 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
             <span>Max loss: <strong style="color:var(--red)">${rr["max_risk"]}</strong></span>
           </div></div>'''
 
-    # Options chain
+    # Options chain (compact: STR, $, IV, SPRD, VOL)
     def chain_rows(items):
         rows=""
         for c in items:
@@ -1046,8 +1046,7 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
             sp=round(c["ask"]-c["bid"],2)
             sp_c="#00ff9d" if sp<0.20 else ("#ffd700" if sp<0.40 else "#ff3a5e")
             liq="⚠️" if c["volume"]<200 or c["oi"]<500 else ""
-            theta_c="#ff3a5e" if c["theta"]<-0.10 else "#ffd700"
-            rows+=f'<tr{atm}><td style="font-size:.61rem;color:var(--muted)">${c["strike"]:.0f} {tgt}</td><td style="color:var(--white);font-weight:700">${c["price"]:.2f}</td><td style="color:var(--blue)">{c["delta"] or "—"}</td><td style="color:{theta_c}">{c["theta"] if c["theta"] else "—"}</td><td style="color:var(--orange)">{c["iv"]}%</td><td style="color:{sp_c}">${sp:.2f}</td><td style="color:var(--green-dim)">{c["volume"]:,}{liq}</td></tr>'
+            rows+=f'<tr{atm}><td style="font-size:.58rem;color:var(--muted)">${c["strike"]:.0f}{tgt}</td><td style="color:var(--white);font-weight:700">${c["price"]:.2f}</td><td style="color:var(--orange)">{c["iv"]}%</td><td style="color:{sp_c}">${sp:.2f}</td><td style="color:var(--green-dim)">{c["volume"]:,}{liq}</td></tr>'
         return rows
 
     # News
@@ -1240,41 +1239,40 @@ tr:last-child td{{border-bottom:none;}}
 </div>
 
 <!-- ═══════════════════════════════════════════════════
-     PROVEN SIGNAL CARDS (4 columns)
+     PROVEN SIGNALS (2x2 left) + DIVERGENCE (right)
      ═══════════════════════════════════════════════════ -->
-<div class="g4">
-  {sig_card("S1 · ICHIMOKU", sig1, "PF 4.18", "15MIN", "☁️", "#b39ddb")}
-  {sig_card("S2 · KAUFMAN", sig2, "PF 4.34", "4H", "📐", "#7c4dff")}
-  {sig_card("S3 · RSI", sig3, "77% WR", "1H", "📊", "#4fc3f7")}
-  {sig_card("S4 · MACD+RSI", sig4, "68% WR", "1H", "⚡", "#ff8c42")}
-</div>
-
-<!-- DIVERGENCE CONTEXT -->
-<div class="card">
-  <div class="ct">RSI Divergence Monitor — Bonus Context</div>
-  <div style="background:{div_bg};border:1px solid {div_color}40;padding:10px;margin-bottom:8px">
-    <div style="font-size:.78rem;font-weight:700;color:{div_color}">{h1_div['label']}</div>
-    <div style="font-size:.58rem;color:var(--muted);margin-top:4px">{h1_div['detail'] or "No divergence on current 1H bars"}</div>
-    {div_action}
+<div style="display:grid;grid-template-columns:3fr 2fr;gap:10px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    {sig_card("S1 ICHIMOKU", sig1, "PF 4.18", "15M", "☁️", "#b39ddb")}
+    {sig_card("S2 KAUFMAN", sig2, "PF 4.34", "4H", "📐", "#7c4dff")}
+    {sig_card("S3 RSI", sig3, "77%WR", "1H", "📊", "#4fc3f7")}
+    {sig_card("S4 MACD+RSI", sig4, "68%WR", "1H", "⚡", "#ff8c42")}
   </div>
-  <div style="font-size:.58rem;color:var(--muted);line-height:1.7;padding:4px">
-    <span style="color:#00ff9d">Reg Bull:</span> Price LL + RSI HL → reversal &nbsp;·&nbsp;
-    <span style="color:#4fc3f7">Hid Bull:</span> Price HL + RSI LL → continuation<br>
-    <span style="color:#ff3a5e">Reg Bear:</span> Price HH + RSI LH → reversal &nbsp;·&nbsp;
-    <span style="color:#ff8c42">Hid Bear:</span> Price LH + RSI HH → continuation
+  <div class="card">
+    <div class="ct">RSI Divergence — Bonus</div>
+    <div style="background:{div_bg};border:1px solid {div_color}40;padding:9px;margin-bottom:6px">
+      <div style="font-size:.73rem;font-weight:700;color:{div_color}">{h1_div['label']}</div>
+      <div style="font-size:.56rem;color:var(--muted);margin-top:3px">{h1_div['detail'] or "No divergence on 1H"}</div>
+      {div_action}
+    </div>
+    <div style="font-size:.55rem;color:var(--muted);line-height:1.65">
+      <span style="color:#00ff9d">Reg Bull:</span> Price LL + RSI HL<br>
+      <span style="color:#4fc3f7">Hid Bull:</span> Price HL + RSI LL<br>
+      <span style="color:#ff3a5e">Reg Bear:</span> Price HH + RSI LH<br>
+      <span style="color:#ff8c42">Hid Bear:</span> Price LH + RSI HH
+    </div>
   </div>
 </div>
 
 <!-- BRANDO MAP + SCENARIO -->
 <div class="g2">
   <div class="card">
-    <div class="ct">Brando · Elite Options S/R Map (Monthly + Weekly + Daily)</div>
-    <div style="font-size:.6rem;color:var(--muted);margin-bottom:8px">
-      Source: @EliteOptions2 TrendSpider ·
-      <span style="color:{TF_COLOR['MO']}">■ Monthly</span> &nbsp;
-      <span style="color:{TF_COLOR['WK']}">■ Weekly</span> &nbsp;
-      <span style="color:{TF_COLOR['DY']}">■ Daily</span> &nbsp;
-      <span style="color:#ffd700">★ = Key starred level</span>
+    <div class="ct">Brando S/R Map</div>
+    <div style="font-size:.55rem;color:var(--muted);margin-bottom:6px">
+      <span style="color:{TF_COLOR['MO']}">■ MO</span>
+      <span style="color:{TF_COLOR['WK']}">■ WK</span>
+      <span style="color:{TF_COLOR['DY']}">■ DY</span>
+      <span style="color:#ffd700">★ Key</span>
     </div>
     <table>
       <tr><th>TF</th><th>LEVEL</th><th>LABEL</th><th style="text-align:right">DIST</th></tr>
@@ -1283,142 +1281,115 @@ tr:last-child td{{border-bottom:none;}}
   </div>
 
   <div class="card">
-    <div class="ct">Scenario Engine — Two-Path Trade Plan</div>
-    <div style="background:{bctx['scen_color']}15;border:1px solid {bctx['scen_color']};padding:10px;margin-bottom:11px">
-      <div style="font-size:.62rem;color:var(--muted);margin-bottom:3px">CURRENT POSITION</div>
-      <div style="font-size:.85rem;font-weight:700;color:{bctx['scen_color']}">{bctx['scen_label']}</div>
-      <div style="font-size:.6rem;color:var(--muted);margin-top:4px">
-        Next KEY resistance: <strong style="color:#ff3a5e">${bctx['key_res'][0]:.2f} {bctx['key_res'][2]}</strong> (+${round(bctx['key_res'][0]-price,2)}) &nbsp;|&nbsp;
-        Next KEY support: <strong style="color:#00ff9d">${bctx['key_sup'][0]:.2f} {bctx['key_sup'][2]}</strong> (−${round(price-bctx['key_sup'][0],2)})
+    <div class="ct">Scenario Engine</div>
+    <div style="background:{bctx['scen_color']}15;border:1px solid {bctx['scen_color']};padding:8px;margin-bottom:9px">
+      <div style="font-size:.8rem;font-weight:700;color:{bctx['scen_color']}">{bctx['scen_label']}</div>
+      <div style="font-size:.56rem;color:var(--muted);margin-top:3px">
+        Res: <strong style="color:#ff3a5e">${bctx['key_res'][0]:.2f}</strong> (+${round(bctx['key_res'][0]-price,2)}) · Sup: <strong style="color:#00ff9d">${bctx['key_sup'][0]:.2f}</strong> (−${round(price-bctx['key_sup'][0],2)})
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
-      <div style="background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.3);padding:10px">
-        <div style="font-size:.58rem;color:#00ff9d;letter-spacing:1px;margin-bottom:5px;font-weight:700">SCENARIO A — BULL</div>
-        <div style="font-size:.66rem;color:var(--text);line-height:1.6">{bctx['scen_a']}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div style="background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.3);padding:8px">
+        <div style="font-size:.55rem;color:#00ff9d;letter-spacing:1px;margin-bottom:4px;font-weight:700">A — BULL</div>
+        <div style="font-size:.6rem;color:var(--text);line-height:1.5">{bctx['scen_a']}</div>
       </div>
-      <div style="background:rgba(255,58,94,.06);border:1px solid rgba(255,58,94,.3);padding:10px">
-        <div style="font-size:.58rem;color:#ff3a5e;letter-spacing:1px;margin-bottom:5px;font-weight:700">SCENARIO B — BEAR</div>
-        <div style="font-size:.66rem;color:var(--text);line-height:1.6">{bctx['scen_b']}</div>
+      <div style="background:rgba(255,58,94,.06);border:1px solid rgba(255,58,94,.3);padding:8px">
+        <div style="font-size:.55rem;color:#ff3a5e;letter-spacing:1px;margin-bottom:4px;font-weight:700">B — BEAR</div>
+        <div style="font-size:.6rem;color:var(--text);line-height:1.5">{bctx['scen_b']}</div>
       </div>
     </div>
-    <div style="margin-top:9px;background:var(--surface2);border:1px solid var(--border);padding:9px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">BRANDO'S KEY GATES</div>
-      <div style="font-size:.65rem;line-height:1.8">
-        {"✅" if price>=191 else "❌"} <strong style="color:#ffd700">$191.00</strong> — Yellow line (MO+WK)<br>
-        {"✅" if price>=184.58 else "❌"} <strong style="color:#4fc3f7">$184.58</strong> — Daily key resistance<br>
-        {"✅" if price>=180.34 else "❌"} <strong style="color:#ff8c42">$180.34</strong> — Critical daily pivot ★<br>
-        {"✅" if price>=175.00 else "❌"} <strong style="color:#7c4dff">$175.00</strong> — Weekly purple support<br>
-        {"✅" if price>=153.37 else "❌"} <strong style="color:#b39ddb">$153.37</strong> — Monthly demand zone top
-      </div>
+    <div style="margin-top:7px;background:var(--surface2);border:1px solid var(--border);padding:7px;font-size:.6rem;line-height:1.7">
+      {"✅" if price>=191 else "❌"} <strong style="color:#ffd700">$191</strong> YL &nbsp;
+      {"✅" if price>=184.58 else "❌"} <strong style="color:#4fc3f7">$184.58</strong> Res &nbsp;
+      {"✅" if price>=180.34 else "❌"} <strong style="color:#ff8c42">$180.34</strong> Pivot★ &nbsp;
+      {"✅" if price>=175 else "❌"} <strong style="color:#7c4dff">$175</strong> Sup &nbsp;
+      {"✅" if price>=153.37 else "❌"} <strong style="color:#b39ddb">$153</strong> Demand
     </div>
   </div>
 </div>
 
-<!-- MTF + REGIME + CANDLES -->
-<div class="g3">
+<!-- CALL + PUT + OPTIONS CHAIN (3-col) -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
   <div class="card">
-    <div class="ct">Multi-Timeframe Bias Table</div>
+    <div class="ct">Call ({al['call_count']}/{max_s})</div>
+    {signal_panel(al['call_reasons'], al['call_context'], al['call_count'], max_s, "call")}
+    <div style="margin-top:8px;font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">R:R</div>
+    {rr_box(al['call_rr'],"call")}
+  </div>
+  <div class="card">
+    <div class="ct">Put ({al['put_count']}/{max_s})</div>
+    {signal_panel(al['put_reasons'], al['put_context'], al['put_count'], max_s, "put")}
+    <div style="margin-top:8px;font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">R:R</div>
+    {rr_box(al['put_rr'],"put")}
+  </div>
+  <div class="card">
+    <div class="ct">Chain — {opts['expiry']} ({opts['dte']}d)</div>
+    <div style="font-size:.55rem;color:var(--orange);letter-spacing:1px;margin-bottom:3px">CALLS</div>
     <table>
-      <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD HIST</th><th>BIAS</th><th>VOL</th></tr>
+      <tr><th>STR</th><th>$</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
+      {chain_rows(opts['calls']) or "<tr><td colspan='5' style='color:var(--muted)'>—</td></tr>"}
+    </table>
+    <div style="font-size:.55rem;color:var(--red);letter-spacing:1px;margin:6px 0 3px">PUTS</div>
+    <table>
+      <tr><th>STR</th><th>$</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
+      {chain_rows(opts['puts']) or "<tr><td colspan='5' style='color:var(--muted)'>—</td></tr>"}
+    </table>
+  </div>
+</div>
+
+<!-- MTF + REGIME + CANDLES (3-col) -->
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+  <div class="card">
+    <div class="ct">MTF Bias</div>
+    <table>
+      <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD</th><th>BIAS</th><th>VOL</th></tr>
       {mtf_html}
     </table>
-    <div style="margin-top:7px;font-size:.6rem;color:var(--muted);line-height:1.6;background:rgba(0,0,0,.15);padding:7px;border:1px solid var(--border)">
-      <strong style="color:var(--white)">v6 PROVEN SYSTEM:</strong> Signals come from backtested indicators (Ichimoku + KAMA + RSI), not gate counts. MTF table is context only.<br>
-      <strong style="color:var(--yellow)">Position sizing:</strong> 2 signals = $500 · 3 signals = $750 · 4 signals = $1000
+    <div style="margin-top:6px;font-size:.55rem;color:var(--muted);line-height:1.5;background:rgba(0,0,0,.15);padding:6px;border:1px solid var(--border)">
+      <strong style="color:var(--yellow)">Sizing:</strong> 2sig=$500 · 3=$750 · 4=$1000
     </div>
   </div>
 
   <div class="card">
-    <div class="ct">Market Regime · ATR · Compression</div>
-    <div style="background:rgba(0,0,0,.2);border:1px solid {spy_c};padding:9px;margin-bottom:9px">
-      <div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SPY MACRO REGIME</div>
-      <div style="font-size:.8rem;font-weight:700;color:{spy_c}">SPY {spy_l} · ${d['spy_price']} vs 50 EMA ${d['spy_e50']}</div>
-      <div style="font-size:.6rem;color:var(--muted);margin-top:2px">{"✅ Macro tailwind" if d['spy_bull'] else "❌ Macro headwind"}</div>
+    <div class="ct">Market Regime</div>
+    <div style="background:rgba(0,0,0,.2);border:1px solid {spy_c};padding:7px;margin-bottom:7px">
+      <div style="font-size:.7rem;font-weight:700;color:{spy_c}">SPY {spy_l}</div>
+      <div style="font-size:.55rem;color:var(--muted)">${d['spy_price']} vs 50EMA ${d['spy_e50']}</div>
     </div>
-    <div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:.62rem">ATR Compression Score</span>
-        <span style="font-size:.62rem;font-weight:700;color:{comp_c}">{comp}/100</span>
+    <div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:.58rem">Compression</span>
+        <span style="font-size:.58rem;font-weight:700;color:{comp_c}">{comp}/100</span>
       </div>
-      <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{comp}%;background:{comp_c};border-radius:3px"></div></div>
-      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">{"HIGH — Breakout imminent" if comp>70 else ("BUILDING" if comp>40 else "Normal range")}</div>
+      <div style="height:4px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{comp}%;background:{comp_c};border-radius:3px"></div></div>
     </div>
-    <div style="margin-bottom:9px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:.62rem">Daily ATR (14)</span>
-        <span style="font-size:.62rem;color:var(--orange);font-weight:700">${d['atr']:.2f}</span>
-      </div>
-      <div style="font-size:.58rem;color:var(--muted)">Expected move. Exp options move: <strong style="color:var(--blue)">±${opts['exp_move']}</strong></div>
+    <div style="margin-bottom:7px;display:flex;justify-content:space-between;font-size:.58rem">
+      <span>ATR (14)</span><span style="color:var(--orange);font-weight:700">${d['atr']:.2f}</span>
     </div>
-    <div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:.62rem">Volume vs 20-bar avg</span>
-        <span style="font-size:.62rem;font-weight:700;color:{vol_c}">{d['vol_ratio']}x · {vol_m:.0f}M / {avg_m:.0f}M</span>
-      </div>
-      <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{min(d['vol_ratio']*50,100):.0f}%;background:{vol_c};border-radius:3px"></div></div>
-      <div style="font-size:.58rem;color:var(--muted);margin-top:2px">{"✅ 1.5x+ = high conviction" if d['vol_ratio']>=1.5 else ("OK" if d['vol_ratio']>=1.0 else "❌ Low — likely chop")}</div>
+    <div style="display:flex;justify-content:space-between;font-size:.58rem">
+      <span>Volume</span><span style="font-weight:700;color:{vol_c}">{d['vol_ratio']}x · {vol_m:.0f}M/{avg_m:.0f}M</span>
     </div>
+    <div style="height:4px;background:rgba(255,255,255,.05);border-radius:3px;margin-top:3px"><div style="height:100%;width:{min(d['vol_ratio']*50,100):.0f}%;background:{vol_c};border-radius:3px"></div></div>
   </div>
 
   <div class="card">
-    <div class="ct">Recent 5-Min Candles (Chicago time)</div>
+    <div class="ct">5-Min Candles</div>
     <table>
-      <tr><th>TIME</th><th>CLOSE</th><th></th><th>HIGH</th><th>LOW</th><th>VOL</th></tr>
-      {candle_rows or "<tr><td colspan='6' style='color:var(--muted);padding:7px'>Market closed / no data</td></tr>"}
+      <tr><th>TIME</th><th>CLOSE</th><th></th><th>H</th><th>L</th><th>VOL</th></tr>
+      {candle_rows or "<tr><td colspan='6' style='color:var(--muted)'>No data</td></tr>"}
     </table>
-    <div style="margin-top:10px;border-top:1px solid var(--border);padding-top:9px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">52W RANGE</div>
-      <div style="display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted);margin-bottom:3px">
-        <span>${d['week52l']:.0f}</span><span style="color:var(--white)">${price:.2f} ({yr:.0f}th pct)</span><span>${d['week52h']:.0f}</span>
+    <div style="margin-top:8px;border-top:1px solid var(--border);padding-top:6px">
+      <div style="font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">52W RANGE</div>
+      <div style="display:flex;justify-content:space-between;font-size:.55rem;color:var(--muted);margin-bottom:2px">
+        <span>${d['week52l']:.0f}</span><span style="color:var(--white)">${price:.2f}</span><span>${d['week52h']:.0f}</span>
       </div>
-      <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{yr:.0f}%;background:var(--blue);border-radius:3px"></div></div>
+      <div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{yr:.0f}%;background:var(--blue);border-radius:3px"></div></div>
     </div>
-    <div style="margin-top:10px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">1H EMA LEVELS (Pullback Entry)</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.63rem">
-        <div>EMA8:  <strong style="color:var(--blue)">${d['h1']['e8']  if d['h1'] else '—'}</strong></div>
-        <div>EMA21: <strong style="color:var(--blue)">${d['h1']['e21'] if d['h1'] else '—'}</strong></div>
-        <div>EMA50: <strong style="color:var(--blue)">${d['h1']['e50'] if d['h1'] else '—'}</strong></div>
-        <div>RSI: <strong style="color:var(--blue)">{d['h1']['rsi'] if d['h1'] else '—'}</strong></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- SIGNAL BREAKDOWN + OPTIONS -->
-<div class="g3">
-  <div class="card">
-    <div class="ct">Call Analysis ({al['call_count']}/{max_s})</div>
-    {signal_panel(al['call_reasons'], al['call_context'], al['call_count'], max_s, "call")}
-    <div style="margin-top:10px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">CALL R:R CALCULATOR</div>
-      {rr_box(al['call_rr'],"call")}
-    </div>
-  </div>
-  <div class="card">
-    <div class="ct">Put Analysis ({al['put_count']}/{max_s})</div>
-    {signal_panel(al['put_reasons'], al['put_context'], al['put_count'], max_s, "put")}
-    <div style="margin-top:10px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">PUT R:R CALCULATOR</div>
-      {rr_box(al['put_rr'],"put")}
-    </div>
-  </div>
-  <div class="card">
-    <div class="ct">Options Chain — {opts['expiry']} ({opts['dte']} DTE)</div>
-    <div style="font-size:.58rem;color:var(--muted);margin-bottom:5px">🎯 ~$5 target ($3.50–$6.50) · Δ delta · θ theta · Spread color</div>
-    <div style="font-size:.58rem;color:var(--orange);letter-spacing:1px;margin-bottom:3px">── CALLS ──</div>
-    <table>
-      <tr><th>STRIKE</th><th>PRICE</th><th>Δ</th><th>θ</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
-      {chain_rows(opts['calls']) or "<tr><td colspan='7' style='color:var(--muted)'>Fetching...</td></tr>"}
-    </table>
-    <div style="font-size:.58rem;color:var(--red);letter-spacing:1px;margin:7px 0 3px">── PUTS ──</div>
-    <table>
-      <tr><th>STRIKE</th><th>PRICE</th><th>Δ</th><th>θ</th><th>IV</th><th>SPRD</th><th>VOL</th></tr>
-      {chain_rows(opts['puts']) or "<tr><td colspan='7' style='color:var(--muted)'>Fetching...</td></tr>"}
-    </table>
-    <div style="margin-top:7px;padding:7px;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2);font-size:.6rem;color:var(--yellow);line-height:1.5">
-      Verify: finance.yahoo.com/quote/NVDA/options · Vol&gt;500 · OI&gt;1K · Spread&lt;$0.20
+    <div style="margin-top:7px;font-size:.55rem;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+      <div>EMA8: <strong style="color:var(--blue)">${d['h1']['e8'] if d['h1'] else '—'}</strong></div>
+      <div>EMA21: <strong style="color:var(--blue)">${d['h1']['e21'] if d['h1'] else '—'}</strong></div>
+      <div>EMA50: <strong style="color:var(--blue)">${d['h1']['e50'] if d['h1'] else '—'}</strong></div>
+      <div>RSI: <strong style="color:var(--blue)">{d['h1']['rsi'] if d['h1'] else '—'}</strong></div>
     </div>
   </div>
 </div>
@@ -1426,51 +1397,38 @@ tr:last-child td{{border-bottom:none;}}
 <!-- ENTRY MODEL + NEWS -->
 <div class="g2">
   <div class="card">
-    <div class="ct">v6 Proven Entry Model — Backtested System</div>
-    <div style="font-size:.66rem;line-height:1.8;color:var(--text)">
-      <div style="color:#4fc3f7;font-weight:700;margin-bottom:6px;font-size:.7rem">🔬 BACKTESTED RESEARCH RESULTS</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
-        <div style="background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.3);padding:6px;text-align:center">
-          <div style="font-size:.5rem;color:#b39ddb">S1 ICHIMOKU</div>
-          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">PF 4.18</div>
-          <div style="font-size:.5rem;color:var(--muted)">49% WR</div>
-        </div>
-        <div style="background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.3);padding:6px;text-align:center">
-          <div style="font-size:.5rem;color:#7c4dff">S2 KAUFMAN</div>
-          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">PF 4.34</div>
-          <div style="font-size:.5rem;color:var(--muted)">63% WR</div>
-        </div>
-        <div style="background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.3);padding:6px;text-align:center">
-          <div style="font-size:.5rem;color:#4fc3f7">S3 RSI</div>
-          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">77% WR</div>
-          <div style="font-size:.5rem;color:var(--muted)">PF 2.15</div>
-        </div>
+    <div class="ct">v6 Entry Model</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:8px">
+      <div style="background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.3);padding:5px;text-align:center">
+        <div style="font-size:.48rem;color:#b39ddb">ICHIMOKU</div>
+        <div style="font-size:.7rem;color:#00ff9d;font-weight:700">PF 4.18</div>
       </div>
-
-      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ ENTRY RULES:</div>
-      1. Need <strong style="color:var(--white)">2+ proven signals</strong> aligned in same direction<br>
-      2. Check <strong style="color:var(--yellow)">context filters</strong>: Brando bias ($180.34), SPY macro, volume<br>
-      3. <strong style="color:var(--green)">Power Window (1–2:30 PM CT)</strong> = highest conviction entries<br>
-      4. Position size scales with signal count: 2=$500, 3=$750, 4=$1000<br>
+      <div style="background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.3);padding:5px;text-align:center">
+        <div style="font-size:.48rem;color:#7c4dff">KAUFMAN</div>
+        <div style="font-size:.7rem;color:#00ff9d;font-weight:700">PF 4.34</div>
+      </div>
+      <div style="background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.3);padding:5px;text-align:center">
+        <div style="font-size:.48rem;color:#4fc3f7">RSI</div>
+        <div style="font-size:.7rem;color:#00ff9d;font-weight:700">77% WR</div>
+      </div>
     </div>
-    <div style="margin-top:9px;padding:9px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.65rem;color:var(--orange);line-height:1.6">
-      🚪 <strong>EXIT RULES (from backtest):</strong><br>
-      +60% → SELL ALL · −35% → HARD STOP · Trailing: Lock +30% at +50% · Max hold: ~1 day<br>
-      MACD flips → HALF OUT · RSI divergence opposes → EXIT WARNING<br>
-      Day 3 → EXIT regardless (theta decay accelerates)
+    <div style="font-size:.6rem;line-height:1.7;color:var(--text)">
+      <strong style="color:var(--green)">ENTRY:</strong> 2+ signals aligned · Check Brando bias + SPY + volume · Power Window 1–2:30 PM CT<br>
+      <strong style="color:var(--yellow)">SIZE:</strong> 2sig=$500 · 3=$750 · 4=$1000
+    </div>
+    <div style="margin-top:7px;padding:7px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.58rem;color:var(--orange);line-height:1.5">
+      <strong>EXIT:</strong> +60%→SELL · −35%→STOP · Trail +30% at +50% · MACD flip→HALF · Day 3→EXIT
     </div>
   </div>
   <div class="card">
-    <div class="ct">NVDA News — Live</div>
-    {news_html or '<div style="font-size:.68rem;color:var(--muted);padding:8px">No articles fetched.</div>'}
+    <div class="ct">NVDA News</div>
+    {news_html or '<div style="font-size:.65rem;color:var(--muted);padding:6px">No articles.</div>'}
   </div>
 </div>
 
-<div style="text-align:center;padding:10px;font-size:.54rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px;word-break:break-word">
-  🔬 v6 PROVEN SYSTEM · Ichimoku (PF 4.18) + Kaufman (PF 4.34) + RSI (77% WR) + MACD combo (68% WR)<br>
-  Auto-updated · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2<br>
-  ⚠️ Educational only — not financial advice. Verify all prices before trading.<br>
-  Last update: <strong style="color:var(--text)">{ct_now.strftime("%Y-%m-%d %H:%M:%S CT")}</strong>
+<div style="text-align:center;padding:8px;font-size:.52rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.8;word-break:break-word">
+  🔬 v6 PROVEN · Ichimoku (PF 4.18) + Kaufman (PF 4.34) + RSI (77% WR) + MACD (68% WR) · Chicago time · @EliteOptions2<br>
+  ⚠️ Educational only — not financial advice · Last update: <strong style="color:var(--text)">{ct_now.strftime("%Y-%m-%d %H:%M:%S CT")}</strong>
 </div>
 </div>
 </body></html>"""
