@@ -1,13 +1,14 @@
 """
-NVDA Options Command Center v4 — Elite Options / Brando Levels Edition
-New in v4:
-  - Brando's full S/R map (Monthly + Weekly + Daily from TrendSpider charts)
-  - Scenario engine: price position relative to Brando's key levels
-  - On-level alert when within $3 of a starred level
-  - Build_alignment gates now reference Brando levels ($180.34, $184.58, $191)
-  - Full "Brando Level Map" panel in dashboard
-  - Two-scenario trade plan (Scenario A / Scenario B) auto-generated
-Runs 12x/day via GitHub Actions at key NVDA liquidity windows (Chicago time)
+NVDA Options Command Center v5 — Elite Options / Brando Levels Edition
+New in v5:
+  - Two-layer RSI architecture: 4H setup filter + 1H entry trigger (G5 + G6)
+  - Expanded to 8 gates (was 7): need 6+/8 to enter
+  - RSI divergence (G9 bonus): eemani123-style detector, period=5 lookback=3
+    - Regular Bull / Hidden Bull / Regular Bear / Hidden Bear
+    - +1 bonus when divergence confirms direction
+    - Exit warning when divergence opposes open position
+  - Verdict thresholds updated: 6+/8 = high confidence
+  - Score display updated in all UI panels
 """
 
 import yfinance as yf
@@ -24,8 +25,6 @@ ET = pytz.timezone("America/New_York")
 # Source: @EliteOptions2 TrendSpider (Monthly + Weekly + Daily charts)
 # ─────────────────────────────────────────────
 BRANDO = [
-    # (price, tf, short_label, note, is_key)
-    # ── MONTHLY ──
     (288.00,"MO","$7T MCAP TARGET",   "Brando's mega bull target — $7 trillion market cap",         True),
     (225.00,"MO","MAJOR RESISTANCE",  "Monthly supply zone",                                         False),
     (200.00,"MO","KEY WALL $200",     "Tested 2x on monthly — major resistance",                     True),
@@ -37,7 +36,6 @@ BRANDO = [
     (98.43, "MO","SUPPORT",           "Monthly level",                                                False),
     (76.46, "MO","DEEP DEMAND",       "Lower monthly demand zone",                                    True),
     (50.95, "MO","DEEP SUPPORT",      "Monthly floor",                                                False),
-    # ── WEEKLY ──
     (250.00,"WK","RESISTANCE",        "Weekly purple line",                                           False),
     (225.30,"WK","MAJOR RESISTANCE",  "Weekly supply",                                                False),
     (212.32,"WK","PRIOR ATH ZONE",    "Prior all-time high area",                                     True),
@@ -51,7 +49,6 @@ BRANDO = [
     (107.50,"WK","SUPPORT",           "Weekly level",                                                 False),
     (95.27, "WK","SUPPORT",           "Weekly level",                                                 False),
     (88.19, "WK","DOUBLE BOTTOM",     "Double bottom base — entire 2024-25 rally launched here",      True),
-    # ── DAILY ──
     (200.60,"DY","RESISTANCE",        "Daily red line",                                               False),
     (196.05,"DY","RESISTANCE",        "Daily red line",                                               False),
     (190.40,"DY","RESISTANCE",        "Daily red line",                                               False),
@@ -72,52 +69,41 @@ TF_COLOR = {"MO": "#b39ddb", "WK": "#7c4dff", "DY": "#4fc3f7"}
 TF_LABEL = {"MO": "MONTHLY", "WK": "WEEKLY",  "DY": "DAILY"}
 
 def get_brando_context(price):
-    """Returns scenario, nearest key level, next resistance, next support."""
     res = sorted([(p,tf,l,n,k) for (p,tf,l,n,k) in BRANDO if p > price],  key=lambda x: x[0])
     sup = sorted([(p,tf,l,n,k) for (p,tf,l,n,k) in BRANDO if p <= price], key=lambda x: x[0], reverse=True)
+    nearest  = min(BRANDO, key=lambda x: abs(x[0]-price))
+    on_level = abs(nearest[0]-price) <= 3.0 and nearest[4]
+    key_res  = next((l for l in res if l[4]), res[0]  if res else None)
+    key_sup  = next((l for l in sup if l[4]), sup[0]  if sup else None)
 
-    nearest     = min(BRANDO, key=lambda x: abs(x[0]-price))
-    on_level    = abs(nearest[0]-price) <= 3.0 and nearest[4]  # within $3 of a KEY level
-
-    key_res = next((l for l in res if l[4]), res[0]  if res else None)
-    key_sup = next((l for l in sup if l[4]), sup[0]  if sup else None)
-
-    # Scenario engine
     if price >= 200.00:
-        scen_label = "🚀 ABOVE $200 WALL"
-        scen_color = "#00ff9d"
-        scen_a = f"Hold calls. Target $212 (ATH zone) then $225. Trail stop to $196."
-        scen_b = f"Rejection at $200-$212 → take profit on calls. Watch for reversal."
+        scen_label = "🚀 ABOVE $200 WALL";    scen_color = "#00ff9d"
+        scen_a = "Hold calls. Target $212 (ATH zone) then $225. Trail stop to $196."
+        scen_b = "Rejection at $200-$212 → take profit on calls. Watch for reversal."
     elif price >= 191.00:
-        scen_label = "🔥 ABOVE YELLOW LINE"
-        scen_color = "#00ff9d"
-        scen_a = f"Bullish. Next wall: $200.08. Buy pullbacks to $191 on 1H."
-        scen_b = f"Loses $191 → drops back to $184.58. Calls become risky."
+        scen_label = "🔥 ABOVE YELLOW LINE";  scen_color = "#00ff9d"
+        scen_a = "Bullish. Next wall: $200.08. Buy pullbacks to $191 on 1H."
+        scen_b = "Loses $191 → drops back to $184.58. Calls become risky."
     elif price >= 184.58:
-        scen_label = "📈 BETWEEN $184 AND $191"
-        scen_color = "#ffd700"
-        scen_a = f"Break + close above $184.58 with vol → call target $191 yellow line."
-        scen_b = f"Rejection at $184.58 → pullback to $180.34. Reassess."
+        scen_label = "📈 BETWEEN $184 AND $191"; scen_color = "#ffd700"
+        scen_a = "Break + close above $184.58 with vol → call target $191 yellow line."
+        scen_b = "Rejection at $184.58 → pullback to $180.34. Reassess."
     elif price >= 180.34:
-        scen_label = "⚠️ ON $180.34 — DECISION"
-        scen_color = "#ff8c42"
-        scen_a = f"CALL: Holds $180.34, reclaims $184.58 → April $190C or $195C. Target $191."
-        scen_b = f"PUT: Breaks $180.34 on volume → April $175P. Target $175 weekly support."
+        scen_label = "⚠️ ON $180.34 — DECISION"; scen_color = "#ff8c42"
+        scen_a = "CALL: Holds $180.34, reclaims $184.58 → April $190C or $195C. Target $191."
+        scen_b = "PUT: Breaks $180.34 on volume → April $175P. Target $175 weekly support."
     elif price >= 175.00:
-        scen_label = "🔴 BELOW $180 — BEARISH"
-        scen_color = "#ff3a5e"
-        scen_a = f"PUT active. Target $175 weekly purple line. Stop above $180.34."
-        scen_b = f"Bounce to $180.34 and fails (lower high) → add to puts."
+        scen_label = "🔴 BELOW $180 — BEARISH"; scen_color = "#ff3a5e"
+        scen_a = "PUT active. Target $175 weekly purple line. Stop above $180.34."
+        scen_b = "Bounce to $180.34 and fails (lower high) → add to puts."
     elif price >= 153.37:
-        scen_label = "🔴 APPROACHING DEMAND"
-        scen_color = "#ff3a5e"
-        scen_a = f"Puts still valid targeting $153-$141 monthly demand zone."
-        scen_b = f"Watch for volume reversal candle AT $153.37 — potential call entry."
+        scen_label = "🔴 APPROACHING DEMAND"; scen_color = "#ff3a5e"
+        scen_a = "Puts still valid targeting $153-$141 monthly demand zone."
+        scen_b = "Watch for volume reversal candle AT $153.37 — potential call entry."
     else:
-        scen_label = "🆘 INSIDE MONTHLY DEMAND"
-        scen_color = "#ffd700"
-        scen_a = f"Monthly demand zone $141-$153 — institutional buyers expected here."
-        scen_b = f"Watch for weekly reversal candle before entering calls. High risk zone."
+        scen_label = "🆘 INSIDE MONTHLY DEMAND"; scen_color = "#ffd700"
+        scen_a = "Monthly demand zone $141-$153 — institutional buyers expected here."
+        scen_b = "Watch for weekly reversal candle before entering calls. High risk zone."
 
     return {
         "res": res[:8], "sup": sup[:8],
@@ -154,6 +140,7 @@ def get_session(ct_now):
         if s["start"][0]*60+s["start"][1] <= t < s["end"][0]*60+s["end"][1]:
             return s
     return SESSIONS[-1]
+
 
 # ─────────────────────────────────────────────
 # INDICATOR HELPERS
@@ -199,6 +186,108 @@ def higher_highs_lows(hist, lookback=10):
     return hh and hl
 
 # ─────────────────────────────────────────────
+# RSI DIVERGENCE DETECTOR (eemani123 style)
+# period=5, lookback=3 bars
+# Returns: type string + direction + strength label
+# ─────────────────────────────────────────────
+def detect_rsi_divergence(hist, rsi_period=5, lookback=3):
+    """
+    Detects RSI divergence on most recent bars.
+    Returns dict with keys:
+      divergence_type: None | "regular_bull" | "hidden_bull" | "regular_bear" | "hidden_bear"
+      label:           Human-readable label
+      strength:        "strong" | "moderate" | "weak"
+      confirms_bull:   bool — divergence supports call entry
+      confirms_bear:   bool — divergence supports put entry
+      exit_warning_bull: bool — divergence warns against holding calls
+      exit_warning_bear: bool — divergence warns against holding puts
+    """
+    c = hist["Close"]
+    if len(c) < rsi_period + lookback + 5:
+        return _div_none()
+
+    rsi_series = rsi(c, rsi_period)
+    prices     = c.values
+    rsi_vals   = rsi_series.values
+
+    # We compare the last bar against `lookback` bars ago
+    n          = len(prices)
+    curr_price = prices[-1]
+    prev_price = prices[-(lookback+1)]
+    curr_rsi   = rsi_vals[-1]
+    prev_rsi   = rsi_vals[-(lookback+1)]
+
+    price_up  = curr_price > prev_price
+    price_dn  = curr_price < prev_price
+    rsi_up    = curr_rsi   > prev_rsi
+    rsi_dn    = curr_rsi   < prev_rsi
+
+    # Magnitude of RSI divergence — more spread = stronger signal
+    rsi_spread = abs(curr_rsi - prev_rsi)
+    if rsi_spread >= 8:   strength = "strong"
+    elif rsi_spread >= 4: strength = "moderate"
+    else:                  strength = "weak"
+
+    # Regular Bull: price makes lower low, RSI makes higher low → bullish reversal
+    if price_dn and rsi_up and curr_rsi < 50:
+        return {
+            "divergence_type": "regular_bull",
+            "label": f"📈 REGULAR BULL DIV ({strength.upper()})",
+            "detail": f"Price ↓ ${prev_price:.2f}→${curr_price:.2f} · RSI ↑ {prev_rsi:.1f}→{curr_rsi:.1f}",
+            "strength": strength,
+            "color": "#00ff9d",
+            "confirms_bull": True, "confirms_bear": False,
+            "exit_warning_bull": False, "exit_warning_bear": True,
+        }
+
+    # Hidden Bull: price makes higher low, RSI makes lower low → trend continuation (bull)
+    if price_up and rsi_dn and curr_rsi < 55:
+        return {
+            "divergence_type": "hidden_bull",
+            "label": f"🔷 HIDDEN BULL DIV ({strength.upper()})",
+            "detail": f"Price ↑ ${prev_price:.2f}→${curr_price:.2f} · RSI ↓ {prev_rsi:.1f}→{curr_rsi:.1f}",
+            "strength": strength,
+            "color": "#4fc3f7",
+            "confirms_bull": True, "confirms_bear": False,
+            "exit_warning_bull": False, "exit_warning_bear": True,
+        }
+
+    # Regular Bear: price makes higher high, RSI makes lower high → bearish reversal
+    if price_up and rsi_dn and curr_rsi > 50:
+        return {
+            "divergence_type": "regular_bear",
+            "label": f"📉 REGULAR BEAR DIV ({strength.upper()})",
+            "detail": f"Price ↑ ${prev_price:.2f}→${curr_price:.2f} · RSI ↓ {prev_rsi:.1f}→{curr_rsi:.1f}",
+            "strength": strength,
+            "color": "#ff3a5e",
+            "confirms_bull": False, "confirms_bear": True,
+            "exit_warning_bull": True, "exit_warning_bear": False,
+        }
+
+    # Hidden Bear: price makes lower high, RSI makes higher high → trend continuation (bear)
+    if price_dn and rsi_up and curr_rsi > 45:
+        return {
+            "divergence_type": "hidden_bear",
+            "label": f"🔻 HIDDEN BEAR DIV ({strength.upper()})",
+            "detail": f"Price ↓ ${prev_price:.2f}→${curr_price:.2f} · RSI ↑ {prev_rsi:.1f}→{curr_rsi:.1f}",
+            "strength": strength,
+            "color": "#ff8c42",
+            "confirms_bull": False, "confirms_bear": True,
+            "exit_warning_bull": True, "exit_warning_bear": False,
+        }
+
+    return _div_none()
+
+def _div_none():
+    return {
+        "divergence_type": None, "label": "No divergence detected",
+        "detail": "", "strength": None, "color": "#5a7a99",
+        "confirms_bull": False, "confirms_bear": False,
+        "exit_warning_bull": False, "exit_warning_bear": False,
+    }
+
+
+# ─────────────────────────────────────────────
 # 1. FETCH ALL DATA
 # ─────────────────────────────────────────────
 def fetch_all():
@@ -206,12 +295,12 @@ def fetch_all():
     spy  = yf.Ticker("SPY")
     info = nvda.info
 
-    d1   = nvda.history(period="1y",  interval="1d")
-    h4   = nvda.history(period="60d", interval="4h")
-    h1   = nvda.history(period="30d", interval="1h")
-    m5   = nvda.history(period="2d",  interval="5m")
-    d1_3m= nvda.history(period="3mo", interval="1d")
-    spy_d= spy.history( period="6mo", interval="1d")
+    d1    = nvda.history(period="1y",  interval="1d")
+    h4    = nvda.history(period="60d", interval="4h")
+    h1    = nvda.history(period="30d", interval="1h")
+    m5    = nvda.history(period="2d",  interval="5m")
+    d1_3m = nvda.history(period="3mo", interval="1d")
+    spy_d = spy.history(  period="6mo", interval="1d")
 
     price      = float(info.get("currentPrice") or info.get("regularMarketPrice") or d1["Close"].iloc[-1])
     prev_close = float(info.get("previousClose") or d1["Close"].iloc[-2])
@@ -221,78 +310,97 @@ def fetch_all():
     week52l    = float(info.get("fiftyTwoWeekLow")    or d1["Low"].min())
 
     def tf_ind(h, label):
-        c    = h["Close"]
-        e8   = round(float(ema(c,8).iloc[-1]),  2)
-        e21  = round(float(ema(c,21).iloc[-1]), 2)
-        e50  = round(float(ema(c,50).iloc[-1]), 2)
-        r    = round(float(rsi(c).iloc[-1]),    1)
-        mh   = macd_histogram(c)
-        mh_n = round(float(mh.iloc[-1]), 3)
-        mh_p = round(float(mh.iloc[-2]), 3)
+        c     = h["Close"]
+        e8    = round(float(ema(c,8).iloc[-1]),  2)
+        e21   = round(float(ema(c,21).iloc[-1]), 2)
+        e50   = round(float(ema(c,50).iloc[-1]), 2)
+        r     = round(float(rsi(c).iloc[-1]),    1)
+        # Previous RSI bar — needed for 1H cross detection
+        rsi_series = rsi(c)
+        r_prev = round(float(rsi_series.iloc[-2]), 1) if len(rsi_series) >= 2 else r
+        mh    = macd_histogram(c)
+        mh_n  = round(float(mh.iloc[-1]), 3)
+        mh_p  = round(float(mh.iloc[-2]), 3)
         vol_n  = int(h["Volume"].iloc[-1])
         vol_ma = float(h["Volume"].rolling(20).mean().iloc[-1]) or 1
         vr     = round(vol_n/vol_ma, 2)
         hh_hl  = higher_highs_lows(h)
         return {
-            "label":label,"e8":e8,"e21":e21,"e50":e50,"rsi":r,
-            "macd_h":mh_n,"macd_h_prev":mh_p,"vol_ratio":vr,"hh_hl":hh_hl,
-            "price_vs_e8":  price>e8,
-            "price_vs_e21": price>e21,
-            "price_vs_e50": price>e50,
-            "fast_bull":    e8>e21,
-            "above_cloud":  price>max(e21,e50),
-            "below_cloud":  price<min(e21,e50),
-            "macd_bull":    mh_n>0,
-            "macd_turning": mh_n>0 and mh_p<0,
-            "macd_turning_bear": mh_n<0 and mh_p>0,
-            "rsi_pullback_bull":  45<=r<=55,
-            "rsi_expansion_bull": r>60,
-            "rsi_pullback_bear": 45<=r<=55,
-            "rsi_expansion_bear": r<40,
-            "vol_expanded": vr>=1.5,
-            "vol_ok":       vr>=1.0,
+            "label": label, "e8": e8, "e21": e21, "e50": e50,
+            "rsi": r, "rsi_prev": r_prev,
+            "macd_h": mh_n, "macd_h_prev": mh_p,
+            "vol_ratio": vr, "hh_hl": hh_hl,
+            "price_vs_e8":   price > e8,
+            "price_vs_e21":  price > e21,
+            "price_vs_e50":  price > e50,
+            "fast_bull":     e8 > e21,
+            "above_cloud":   price > max(e21, e50),
+            "below_cloud":   price < min(e21, e50),
+            "macd_bull":     mh_n > 0,
+            "macd_turning":      mh_n > 0 and mh_p < 0,
+            "macd_turning_bear": mh_n < 0 and mh_p > 0,
+            # ── G5: 4H SETUP FILTER ──────────────────────────────────────────
+            # 40–60 = healthy pullback zone. Setup valid. Premium discounted.
+            # NOT overbought/oversold logic — NVDA trends hard.
+            "rsi_pullback_bull": 40 <= r <= 60,
+            "rsi_pullback_bear": 40 <= r <= 60,
+            # ── G6: 1H ENTRY TRIGGER ─────────────────────────────────────────
+            # RSI crossing above 50 = momentum resuming upward  → call entry
+            # RSI crossing below 50 = momentum resuming downward → put entry
+            # Cross = prev bar on one side, current bar on other side of 50
+            "rsi_cross_above_50": r_prev < 50 and r >= 50,
+            "rsi_cross_below_50": r_prev > 50 and r <= 50,
+            # Legacy expansion flags (used in MTF bias table)
+            "rsi_expansion_bull": r > 60,
+            "rsi_expansion_bear": r < 40,
+            "vol_expanded": vr >= 1.5,
+            "vol_ok":       vr >= 1.0,
         }
 
     daily = tf_ind(d1,  "DAILY")
-    h4_tf = tf_ind(h4,  "4-HOUR") if len(h4)>=50 else None
-    h1_tf = tf_ind(h1,  "1-HOUR") if len(h1)>=50 else None
+    h4_tf = tf_ind(h4,  "4-HOUR") if len(h4) >= 50 else None
+    h1_tf = tf_ind(h1,  "1-HOUR") if len(h1) >= 50 else None
 
-    spy_e50   = float(ema(spy_d["Close"],50).iloc[-1])
+    spy_e50   = float(ema(spy_d["Close"], 50).iloc[-1])
     spy_price = float(spy_d["Close"].iloc[-1])
     spy_bull  = spy_price > spy_e50
 
-    comp    = compression_score(d1_3m) if len(d1_3m)>=50 else 0
+    comp    = compression_score(d1_3m) if len(d1_3m) >= 50 else 0
     atr_val = round(float(atr(d1).iloc[-1]), 2)
     vol20ma = float(d1["Volume"].rolling(20).mean().iloc[-1])
 
+    # RSI divergence on 1H (primary entry timeframe)
+    h1_div = detect_rsi_divergence(h1, rsi_period=5, lookback=3) if len(h1) >= 20 else _div_none()
+
     recent_candles = []
-    if len(m5)>=4:
+    if len(m5) >= 4:
         for idx, row in m5.tail(8).iterrows():
             try:    ts = idx.tz_convert(CT).strftime("%I:%M %p")
             except: ts = str(idx)[-8:-3]
             co, cc = float(row["Open"]), float(row["Close"])
             recent_candles.append({
-                "time":ts,"open":round(co,2),"high":round(float(row["High"]),2),
-                "low":round(float(row["Low"]),2),"close":round(cc,2),
-                "volume":int(row["Volume"]),"bull":cc>=co,
+                "time": ts, "open": round(co,2), "high": round(float(row["High"]),2),
+                "low":  round(float(row["Low"]),2), "close": round(cc,2),
+                "volume": int(row["Volume"]), "bull": cc >= co,
             })
 
     id_high = round(float(m5["High"].max()),2) if len(m5) else price
     id_low  = round(float(m5["Low"].min()),2)  if len(m5) else price
 
     return {
-        "price":price,"prev_close":round(prev_close,2),
-        "change":round(price-prev_close,2),
-        "change_pct":round((price-prev_close)/prev_close*100,2),
-        "volume":volume,"avg_vol":avg_vol,
-        "vol_ratio":round(volume/avg_vol,2) if avg_vol else 1.0,
-        "vol_20ma":round(vol20ma/1e6,1),
-        "week52h":week52h,"week52l":week52l,
-        "atr":atr_val,"compression":comp,
-        "daily":daily,"h4":h4_tf,"h1":h1_tf,
-        "spy_bull":spy_bull,"spy_price":round(spy_price,2),"spy_e50":round(spy_e50,2),
-        "recent_candles":recent_candles,"id_high":id_high,"id_low":id_low,
-        "d1":d1,"d1_3m":d1_3m,
+        "price": price, "prev_close": round(prev_close,2),
+        "change":     round(price - prev_close, 2),
+        "change_pct": round((price - prev_close) / prev_close * 100, 2),
+        "volume": volume, "avg_vol": avg_vol,
+        "vol_ratio": round(volume / avg_vol, 2) if avg_vol else 1.0,
+        "vol_20ma":  round(vol20ma / 1e6, 1),
+        "week52h": week52h, "week52l": week52l,
+        "atr": atr_val, "compression": comp,
+        "daily": daily, "h4": h4_tf, "h1": h1_tf,
+        "h1_div": h1_div,
+        "spy_bull":  spy_bull, "spy_price": round(spy_price,2), "spy_e50": round(spy_e50,2),
+        "recent_candles": recent_candles, "id_high": id_high, "id_low": id_low,
+        "d1": d1, "d1_3m": d1_3m,
     }
 
 
@@ -312,42 +420,42 @@ def fetch_options(price):
 
     for _, r in chain.calls.iterrows():
         s = float(r["strike"])
-        if abs(s-price)<=25:
+        if abs(s-price) <= 25:
             calls_raw.append({
-                "strike":s,
-                "price": round(float(r.get("lastPrice",0) or r.get("ask",0) or 0),2),
-                "bid":   round(float(r.get("bid",0) or 0),2),
-                "ask":   round(float(r.get("ask",0) or 0),2),
-                "delta": round(float(r.get("delta",0) or 0),2),
-                "theta": round(float(r.get("theta",0) or 0),3),
-                "iv":    round(float(r.get("impliedVolatility",0.5) or 0.5)*100,1),
-                "volume":int(r.get("volume",0) or 0),
-                "oi":    int(r.get("openInterest",0) or 0),
+                "strike": s,
+                "price":  round(float(r.get("lastPrice",0) or r.get("ask",0) or 0), 2),
+                "bid":    round(float(r.get("bid",0) or 0), 2),
+                "ask":    round(float(r.get("ask",0) or 0), 2),
+                "delta":  round(float(r.get("delta",0) or 0), 2),
+                "theta":  round(float(r.get("theta",0) or 0), 3),
+                "iv":     round(float(r.get("impliedVolatility",0.5) or 0.5)*100, 1),
+                "volume": int(r.get("volume",0) or 0),
+                "oi":     int(r.get("openInterest",0) or 0),
             })
     for _, r in chain.puts.iterrows():
         s = float(r["strike"])
-        if abs(s-price)<=20 and s<=price+5:
+        if abs(s-price) <= 20 and s <= price+5:
             puts_raw.append({
-                "strike":s,
-                "price": round(float(r.get("lastPrice",0) or r.get("ask",0) or 0),2),
-                "bid":   round(float(r.get("bid",0) or 0),2),
-                "ask":   round(float(r.get("ask",0) or 0),2),
-                "delta": round(float(r.get("delta",0) or 0),2),
-                "theta": round(float(r.get("theta",0) or 0),3),
-                "iv":    round(float(r.get("impliedVolatility",0.5) or 0.5)*100,1),
-                "volume":int(r.get("volume",0) or 0),
-                "oi":    int(r.get("openInterest",0) or 0),
+                "strike": s,
+                "price":  round(float(r.get("lastPrice",0) or r.get("ask",0) or 0), 2),
+                "bid":    round(float(r.get("bid",0) or 0), 2),
+                "ask":    round(float(r.get("ask",0) or 0), 2),
+                "delta":  round(float(r.get("delta",0) or 0), 2),
+                "theta":  round(float(r.get("theta",0) or 0), 3),
+                "iv":     round(float(r.get("impliedVolatility",0.5) or 0.5)*100, 1),
+                "volume": int(r.get("volume",0) or 0),
+                "oi":     int(r.get("openInterest",0) or 0),
             })
 
-    atm_c = [c for c in calls_raw if abs(c["strike"]-price)<5]
-    if atm_c: iv_atm = atm_c[0]["iv"]/100
+    atm_c = [c for c in calls_raw if abs(c["strike"]-price) < 5]
+    if atm_c: iv_atm = atm_c[0]["iv"] / 100
 
     calls_raw.sort(key=lambda x: x["strike"])
     puts_raw.sort(key=lambda x: x["strike"], reverse=True)
     exp_move = round(price * iv_atm * math.sqrt(dte/365), 2)
 
-    return {"expiry":chosen,"calls":calls_raw[:7],"puts":puts_raw[:4],
-            "iv_30":round(iv_atm*100,1),"dte":dte,"exp_move":exp_move}
+    return {"expiry": chosen, "calls": calls_raw[:7], "puts": puts_raw[:4],
+            "iv_30": round(iv_atm*100,1), "dte": dte, "exp_move": exp_move}
 
 
 def fetch_news():
@@ -374,23 +482,36 @@ def fetch_news():
 
 # ─────────────────────────────────────────────
 # 2. ALIGNMENT + SIGNAL ENGINE
+# Now 8 gates: need 6+/8 to enter
+# G1  Daily cloud
+# G2  Daily HH/HL
+# G3  SPY macro
+# G4  Brando $180.34 pivot
+# G5  4H RSI 40–60 SETUP FILTER
+# G6  1H RSI cross above/below 50 ENTRY TRIGGER  ← NEW
+# G7  1H MACD direction
+# G8  Volume conviction
+# G9  RSI Divergence (bonus +1, does NOT block entry)
 # ─────────────────────────────────────────────
+MAX_GATES = 8
+
 def build_alignment(d, opts, session, bctx):
     daily = d["daily"]; h4 = d["h4"]; h1 = d["h1"]; price = d["price"]
+    h1_div = d["h1_div"]
 
     def tf_bias(tf):
         if not tf: return "N/A","#5a7a99","—","—","—","—","N/A","#5a7a99",0,False
         if tf["above_cloud"] and tf["hh_hl"]: trend,tc="BULLISH","#00ff9d"
-        elif tf["below_cloud"]:               trend,tc="BEARISH","#ff3a5e"
-        else:                                  trend,tc="NEUTRAL","#ffd700"
-        if tf["rsi_expansion_bull"]:  rsi_l,rc=f"{tf['rsi']} ↑","#00ff9d"
+        elif tf["below_cloud"]:                trend,tc="BEARISH","#ff3a5e"
+        else:                                   trend,tc="NEUTRAL","#ffd700"
+        if tf["rsi_expansion_bull"]:   rsi_l,rc=f"{tf['rsi']} ↑","#00ff9d"
         elif tf["rsi_expansion_bear"]: rsi_l,rc=f"{tf['rsi']} ↓","#ff3a5e"
         else:                           rsi_l,rc=f"{tf['rsi']} ~","#ffd700"
-        if tf["macd_turning"]:        macd_l,mc="TURNING ↑","#00ff9d"
-        elif tf["macd_bull"]:         macd_l,mc="EXPANDING","#00c87a"
-        elif tf["macd_turning_bear"]: macd_l,mc="TURNING ↓","#ff3a5e"
-        else:                          macd_l,mc="NEGATIVE","#ff3a5e"
-        score=sum([tf["above_cloud"],tf["fast_bull"],tf["macd_bull"],tf["hh_hl"],tf["rsi_expansion_bull"]])
+        if tf["macd_turning"]:         macd_l,mc="TURNING ↑","#00ff9d"
+        elif tf["macd_bull"]:          macd_l,mc="EXPANDING","#00c87a"
+        elif tf["macd_turning_bear"]:  macd_l,mc="TURNING ↓","#ff3a5e"
+        else:                           macd_l,mc="NEGATIVE","#ff3a5e"
+        score = sum([tf["above_cloud"],tf["fast_bull"],tf["macd_bull"],tf["hh_hl"],tf["rsi_expansion_bull"]])
         if score>=4:   bias,bc="LONG","#00ff9d"
         elif score<=1: bias,bc="SHORT","#ff3a5e"
         else:           bias,bc="WATCH","#ffd700"
@@ -406,155 +527,244 @@ def build_alignment(d, opts, session, bctx):
     bull_count=sum(1 for r in rows if r["bias"]=="LONG")
     bear_count=sum(1 for r in rows if r["bias"]=="SHORT")
 
-    # ── CALL SIGNAL (7 gates, now includes Brando level awareness) ──
+    # ── CALL SIGNAL — 8 gates ──────────────────────────────────────────────
     call_score=0; call_reasons=[]
+
+    # G1: Daily cloud
     if daily["above_cloud"]:
-        call_score+=1; call_reasons.append("✅ Daily above 21/50 EMA cloud")
+        call_score+=1; call_reasons.append("✅ G1 Daily above 21/50 EMA cloud — bullish structure")
     else:
-        call_reasons.append(f"❌ Daily below cloud (${max(daily['e21'],daily['e50']):.2f}) — bias bearish")
+        call_reasons.append(f"❌ G1 Daily below cloud (${max(daily['e21'],daily['e50']):.2f}) — bias bearish")
+
+    # G2: Daily HH/HL
     if daily["hh_hl"]:
-        call_score+=1; call_reasons.append("✅ Daily HH/HL structure intact")
+        call_score+=1; call_reasons.append("✅ G2 Daily HH/HL structure intact — uptrend confirmed")
     else:
-        call_reasons.append("❌ Daily HH/HL broken — trend not confirmed")
+        call_reasons.append("❌ G2 Daily HH/HL broken — trend not confirmed")
+
+    # G3: SPY macro
     if d["spy_bull"]:
-        call_score+=1; call_reasons.append(f"✅ SPY above 50 EMA — macro bull regime")
+        call_score+=1; call_reasons.append(f"✅ G3 SPY above 50 EMA — macro bull regime")
     else:
-        call_reasons.append(f"❌ SPY below 50 EMA (${d['spy_price']} vs ${d['spy_e50']}) — macro headwind")
-    # Brando gate: price must be above $180.34 for calls
+        call_reasons.append(f"❌ G3 SPY below 50 EMA (${d['spy_price']} vs ${d['spy_e50']}) — macro headwind")
+
+    # G4: Brando $180.34
     if price >= 180.34:
-        call_score+=1; call_reasons.append(f"✅ Above Brando $180.34 critical pivot — call bias valid")
+        call_score+=1; call_reasons.append(f"✅ G4 Above Brando $180.34 — call bias valid")
     else:
-        call_reasons.append(f"❌ Below Brando $180.34 — not valid for calls until reclaimed")
+        call_reasons.append(f"❌ G4 Below Brando $180.34 (${price:.2f}) — not valid for calls")
+
+    # G5: 4H RSI SETUP FILTER — is the setup even valid?
+    # 40–60 = healthy pullback, premium discounted, setup valid
+    # NVDA trends hard. Overbought stays overbought. This is NOT a reversal filter.
     if h4 and h4["rsi_pullback_bull"]:
-        call_score+=1; call_reasons.append(f"✅ 4H RSI in pullback zone ({h4['rsi']}) — premium discounted")
+        call_score+=1; call_reasons.append(f"✅ G5 4H RSI {h4['rsi']} in 40–60 — pullback healthy, setup valid")
     elif h4:
-        call_reasons.append(f"❌ 4H RSI not in pullback zone ({h4['rsi']}) — wait for cooling")
+        if h4["rsi"] > 60:
+            call_reasons.append(f"⚠️ G5 4H RSI {h4['rsi']} above 60 — momentum extended, wait for cooling")
+        else:
+            call_reasons.append(f"❌ G5 4H RSI {h4['rsi']} below 40 — oversold, not a clean call setup")
+    else:
+        call_reasons.append("❌ G5 4H RSI unavailable")
+
+    # G6: 1H RSI ENTRY TRIGGER — is this the right candle right now?
+    # Cross above 50 = momentum resuming upward = PULL THE TRIGGER
+    if h1 and h1["rsi_cross_above_50"]:
+        call_score+=1; call_reasons.append(f"✅ G6 1H RSI crossed above 50 ({h1['rsi_prev']}→{h1['rsi']}) — entry trigger firing")
+    elif h1 and h1["rsi"] >= 50:
+        call_reasons.append(f"⚠️ G6 1H RSI above 50 ({h1['rsi']}) but no fresh cross — may have missed entry")
+    elif h1:
+        call_reasons.append(f"❌ G6 1H RSI below 50 ({h1['rsi']}) — momentum not confirmed, wait for cross")
+    else:
+        call_reasons.append("❌ G6 1H RSI unavailable")
+
+    # G7: 1H MACD
     if h1 and (h1["macd_turning"] or h1["macd_bull"]):
-        call_score+=1; call_reasons.append(f"✅ 1H MACD positive ({h1['macd_h']:+.3f}) — momentum up")
+        call_score+=1; call_reasons.append(f"✅ G7 1H MACD positive ({h1['macd_h']:+.3f}) — momentum up")
+    elif h1:
+        call_reasons.append(f"❌ G7 1H MACD not positive yet ({h1['macd_h']:+.3f})")
     else:
-        call_reasons.append(f"❌ 1H MACD not positive yet ({h1['macd_h'] if h1 else 'N/A'})")
-    # Volume for CALLS: needs expansion confirming UP move
-    # Low volume on a DOWN day is actually fine (pullback not distribution)
-    # High volume on an UP day = institutional accumulation = ideal entry
+        call_reasons.append("❌ G7 1H MACD unavailable")
+
+    # G8: Volume conviction
     price_up_today = d["change"] >= 0
-    vol_ok = d["vol_ratio"] >= 1.0 or (h1 and h1["vol_expanded"])
     if price_up_today and d["vol_ratio"] >= 1.5:
-        call_score+=1; call_reasons.append(f"✅ Volume expanding on UP day ({d['vol_ratio']}x) — institutional accumulation")
-    elif price_up_today and vol_ok:
-        call_score+=1; call_reasons.append(f"✅ Volume OK on UP day ({d['vol_ratio']}x) — participation confirmed")
+        call_score+=1; call_reasons.append(f"✅ G8 Volume expanding on UP day ({d['vol_ratio']}x) — institutional accumulation")
+    elif price_up_today and d["vol_ratio"] >= 1.0:
+        call_score+=1; call_reasons.append(f"✅ G8 Volume OK on UP day ({d['vol_ratio']}x) — participation confirmed")
     elif not price_up_today and d["vol_ratio"] < 1.0:
-        call_score+=1; call_reasons.append(f"✅ Low-volume pullback ({d['vol_ratio']}x) — healthy dip, sellers lack conviction")
+        call_score+=1; call_reasons.append(f"✅ G8 Low-volume pullback ({d['vol_ratio']}x) — healthy dip, sellers lack conviction")
     elif not price_up_today and d["vol_ratio"] >= 1.5:
-        call_reasons.append(f"❌ HIGH volume selling ({d['vol_ratio']}x) on down day — distribution, avoid calls")
+        call_reasons.append(f"❌ G8 HIGH volume selling ({d['vol_ratio']}x) on down day — distribution, avoid calls")
     else:
-        call_reasons.append(f"❌ Volume not confirming ({d['vol_ratio']}x) — wait for clearer signal")
+        call_reasons.append(f"❌ G8 Volume not confirming ({d['vol_ratio']}x) — wait for clearer signal")
+
+    # G9 BONUS: RSI Divergence (does not block — adds +1 when confirming)
+    if h1_div["confirms_bull"]:
+        call_score+=1
+        call_reasons.append(f"✅ G9 BONUS {h1_div['label']} — divergence confirms call entry · {h1_div['detail']}")
+    elif h1_div["exit_warning_bull"]:
+        call_reasons.append(f"⚠️ G9 CAUTION {h1_div['label']} — divergence OPPOSES calls · EXIT WARNING · {h1_div['detail']}")
+    elif h1_div["divergence_type"]:
+        call_reasons.append(f"ℹ️ G9 {h1_div['label']} — neutral for calls · {h1_div['detail']}")
+
+    # Session penalty
     if not session["trade"]:
-        call_score=max(0,call_score-1)
+        call_score = max(0, call_score - 1)
         call_reasons.append(f"⚠️ Wrong session ({session['name']}) — wait for Power Window 1PM CT")
 
-    # ── PUT SIGNAL ──
+    # ── PUT SIGNAL — 8 gates ───────────────────────────────────────────────
     put_score=0; put_reasons=[]
+
+    # G1
     if daily["below_cloud"]:
-        put_score+=1; put_reasons.append("✅ Daily below 21/50 EMA cloud — bearish structure")
+        put_score+=1; put_reasons.append("✅ G1 Daily below 21/50 EMA cloud — bearish structure")
     else:
-        put_reasons.append("❌ Daily above cloud — bearish setup weak")
+        put_reasons.append("❌ G1 Daily above cloud — bearish setup weak")
+
+    # G2
     if not daily["hh_hl"]:
-        put_score+=1; put_reasons.append("✅ Daily HH/HL structure broken — downtrend confirmed")
+        put_score+=1; put_reasons.append("✅ G2 Daily HH/HL structure broken — downtrend confirmed")
     else:
-        put_reasons.append("❌ Daily HH/HL still intact — avoid puts")
+        put_reasons.append("❌ G2 Daily HH/HL still intact — avoid puts")
+
+    # G3
     if not d["spy_bull"]:
-        put_score+=1; put_reasons.append("✅ SPY below 50 EMA — macro bear regime")
+        put_score+=1; put_reasons.append("✅ G3 SPY below 50 EMA — macro bear regime")
     else:
-        put_reasons.append("❌ SPY above 50 EMA — macro headwind against puts")
-    # Brando gate: price must be below $180.34 for puts
+        put_reasons.append("❌ G3 SPY above 50 EMA — macro headwind against puts")
+
+    # G4
     if price < 180.34:
-        put_score+=1; put_reasons.append(f"✅ Below Brando $180.34 — put bias valid")
+        put_score+=1; put_reasons.append(f"✅ G4 Below Brando $180.34 — put bias valid")
     else:
-        put_reasons.append(f"❌ Above Brando $180.34 — wait for break + retest as resistance")
+        put_reasons.append(f"❌ G4 Above Brando $180.34 (${price:.2f}) — wait for break + retest")
+
+    # G5: 4H RSI SETUP FILTER — is the put setup valid?
+    # 40–60 = a bounce into resistance has occurred, setup valid for rejection entry
     if h4 and h4["rsi_pullback_bear"]:
-        put_score+=1; put_reasons.append(f"✅ 4H RSI in bounce zone ({h4['rsi']}) — put entry on rejection")
+        put_score+=1; put_reasons.append(f"✅ G5 4H RSI {h4['rsi']} in 40–60 — bounce valid, put entry on rejection")
     elif h4:
-        put_reasons.append(f"❌ 4H RSI not in range ({h4['rsi']})")
-    if h1 and (h1["macd_turning_bear"] or not h1["macd_bull"]):
-        put_score+=1; put_reasons.append(f"✅ 1H MACD negative ({h1['macd_h']:+.3f}) — momentum down")
+        if h4["rsi"] < 40:
+            put_reasons.append(f"⚠️ G5 4H RSI {h4['rsi']} below 40 — already oversold, chasing puts is dangerous")
+        else:
+            put_reasons.append(f"❌ G5 4H RSI {h4['rsi']} above 60 — momentum too strong, not a clean put setup")
     else:
-        put_reasons.append(f"❌ 1H MACD not negative")
-    # Volume for PUTS: HIGH volume on declining price = real selling = puts valid
-    # LOW volume on declining price = dead cat bounce territory = AVOID puts (no conviction)
+        put_reasons.append("❌ G5 4H RSI unavailable")
+
+    # G6: 1H RSI ENTRY TRIGGER — cross below 50 = pull the trigger on puts
+    if h1 and h1["rsi_cross_below_50"]:
+        put_score+=1; put_reasons.append(f"✅ G6 1H RSI crossed below 50 ({h1['rsi_prev']}→{h1['rsi']}) — put entry trigger firing")
+    elif h1 and h1["rsi"] <= 50:
+        put_reasons.append(f"⚠️ G6 1H RSI below 50 ({h1['rsi']}) but no fresh cross — may have missed entry")
+    elif h1:
+        put_reasons.append(f"❌ G6 1H RSI above 50 ({h1['rsi']}) — momentum not bearish, wait for cross")
+    else:
+        put_reasons.append("❌ G6 1H RSI unavailable")
+
+    # G7: 1H MACD
+    if h1 and (h1["macd_turning_bear"] or not h1["macd_bull"]):
+        put_score+=1; put_reasons.append(f"✅ G7 1H MACD negative ({h1['macd_h']:+.3f}) — momentum down")
+    elif h1:
+        put_reasons.append(f"❌ G7 1H MACD not negative ({h1['macd_h']:+.3f})")
+    else:
+        put_reasons.append("❌ G7 1H MACD unavailable")
+
+    # G8: Volume conviction
+    # High volume decline = real selling = puts valid
+    # Low volume decline  = dead cat    = AVOID puts
     price_down_today = d["change"] < 0
     if price_down_today and d["vol_ratio"] >= 1.5:
-        put_score+=1; put_reasons.append(f"✅ HIGH volume selling ({d['vol_ratio']}x) on down day — real distribution, puts valid")
+        put_score+=1; put_reasons.append(f"✅ G8 HIGH volume selling ({d['vol_ratio']}x) on down day — real distribution, puts valid")
     elif price_down_today and d["vol_ratio"] >= 1.0:
-        put_score+=1; put_reasons.append(f"✅ Volume confirming decline ({d['vol_ratio']}x) — sellers in control")
+        put_score+=1; put_reasons.append(f"✅ G8 Volume confirming decline ({d['vol_ratio']}x) — sellers in control")
     elif price_down_today and d["vol_ratio"] < 1.0:
-        put_reasons.append(f"❌ LOW volume on decline ({d['vol_ratio']}x) — possible dead cat, no conviction from sellers. AVOID puts.")
+        put_reasons.append(f"❌ G8 LOW volume decline ({d['vol_ratio']}x) — dead cat territory, NO conviction. AVOID puts.")
     elif not price_down_today and d["vol_ratio"] >= 1.5:
-        put_reasons.append(f"❌ High volume on UP day ({d['vol_ratio']}x) — buyers stepping in, puts risky")
+        put_reasons.append(f"❌ G8 High volume on UP day ({d['vol_ratio']}x) — buyers stepping in, puts risky")
     else:
-        put_reasons.append(f"❌ Volume not confirming bearish move ({d['vol_ratio']}x) — wait for high-vol breakdown")
+        put_reasons.append(f"❌ G8 Volume not confirming bearish ({d['vol_ratio']}x) — wait for high-vol breakdown")
+
+    # G9 BONUS: RSI Divergence
+    if h1_div["confirms_bear"]:
+        put_score+=1
+        put_reasons.append(f"✅ G9 BONUS {h1_div['label']} — divergence confirms put entry · {h1_div['detail']}")
+    elif h1_div["exit_warning_bear"]:
+        put_reasons.append(f"⚠️ G9 CAUTION {h1_div['label']} — divergence OPPOSES puts · EXIT WARNING · {h1_div['detail']}")
+    elif h1_div["divergence_type"]:
+        put_reasons.append(f"ℹ️ G9 {h1_div['label']} — neutral for puts · {h1_div['detail']}")
+
+    # Session penalty
+    if not session["trade"]:
+        put_score = max(0, put_score - 1)
+        put_reasons.append(f"⚠️ Wrong session ({session['name']}) — wait for Power Window 1PM CT")
 
     call_t = next((c for c in opts["calls"] if 3.50<=c["price"]<=6.50), None)
     put_t  = next((p for p in opts["puts"]  if 3.50<=p["price"]<=6.50), None)
 
     def rr_calc(opt):
         if not opt: return None
-        entry=opt["price"]
-        stop   = round(entry * 0.50, 2)   # -50% hard stop
-        target = round(entry * 1.80, 2)   # +80% profit target
-        risk   = round(entry - stop,   2)
-        reward = round(target - entry, 2)
-        rr     = round(reward / risk, 1) if risk else 0
-        budget = 500                       # $5 target option = ~$500/contract
+        entry     = opt["price"]
+        stop      = round(entry * 0.50, 2)
+        target    = round(entry * 1.80, 2)
+        risk      = round(entry - stop, 2)
+        reward    = round(target - entry, 2)
+        rr        = round(reward / risk, 1) if risk else 0
+        budget    = 500
         contracts = max(1, int(budget / (entry * 100)))
         max_loss  = round(contracts * entry * 100 * 0.50, 0)
         return {"entry":entry,"stop":stop,"target":target,"risk":risk,"reward":reward,
-                "rr":rr,"contracts":contracts,"max_risk":int(max_loss),
-                "budget":budget}
+                "rr":rr,"contracts":contracts,"max_risk":int(max_loss),"budget":budget}
 
     return {
-        "rows":rows,"bull_count":bull_count,"bear_count":bear_count,
-        "call_score":call_score,"call_reasons":call_reasons,
-        "put_score":put_score,"put_reasons":put_reasons,
-        "call_t":call_t,"put_t":put_t,
-        "call_rr":rr_calc(call_t),"put_rr":rr_calc(put_t),
+        "rows": rows, "bull_count": bull_count, "bear_count": bear_count,
+        "call_score": call_score, "call_reasons": call_reasons,
+        "put_score":  put_score,  "put_reasons":  put_reasons,
+        "call_t": call_t, "put_t": put_t,
+        "call_rr": rr_calc(call_t), "put_rr": rr_calc(put_t),
+        "h1_div": h1_div,
     }
 
 
 def get_verdict(al, d, session, opts, bctx):
     cs=al["call_score"]; ps=al["put_score"]; price=d["price"]
+    div=al["h1_div"]
+
     if not session["trade"]:
         return {"verdict":f"💤 {session['name']} — NO NEW TRADES",
                 "color":"#ff3a5e","bias":"WAIT","bias_color":"#ff8c42",
                 "explanation":session["advice"],
                 "trade_idea":"Hold existing if profitable. Next window: Power Window 1:00 PM CT."}
-    if cs>=6:
+    if cs >= 6:
         ct=al["call_t"]; rr=al["call_rr"]
-        return {"verdict":"✅ CALL — HIGH CONFIDENCE (6-7/7)","color":"#00ff9d","bias":"STRONG BULL","bias_color":"#00ff9d",
-                "explanation":f"All gates pass. Price above Brando $180.34. Daily+4H+1H aligned. Next wall: ${bctx['key_res'][0] if bctx['key_res'] else '—'}.",
-                "trade_idea":f"Buy ${ct['strike']:.0f}C {opts['expiry']} (~${ct['price']:.2f}) | Stop ${rr['stop']} | Target ${rr['target']} | R:R {rr['rr']}:1" if ct and rr else "Check chain for $3 ATM call."}
-    elif cs>=5:
+        div_note = f" · {div['label']}" if div["confirms_bull"] else ""
+        return {"verdict":f"✅ CALL — HIGH CONFIDENCE ({cs}/{MAX_GATES})","color":"#00ff9d","bias":"STRONG BULL","bias_color":"#00ff9d",
+                "explanation":f"6+ gates pass. Price above $180.34. 1H RSI crossed 50. Next wall: ${bctx['key_res'][0] if bctx['key_res'] else '—'}.{div_note}",
+                "trade_idea":f"Buy ${ct['strike']:.0f}C {opts['expiry']} (~${ct['price']:.2f}) | Stop ${rr['stop']} | Target ${rr['target']} | R:R {rr['rr']}:1" if ct and rr else "Check chain for $3-5 ATM call."}
+    elif cs >= 5:
         ct=al["call_t"]; rr=al["call_rr"]
-        return {"verdict":"🟢 CALL SETUP — Good (5/7)","color":"#00c87a","bias":"BULLISH","bias_color":"#00ff9d",
-                "explanation":f"Strong setup. {7-cs} gate(s) pending. Wait for 1H pullback to EMA8 (${d['h1']['e8'] if d['h1'] else '—'}) for optimal entry.",
-                "trade_idea":f"Buy ${ct['strike']:.0f}C {opts['expiry']} (~${ct['price']:.2f}) on pullback to 1H EMA8 | Stop ${rr['stop']} | Target ${rr['target']} | R:R {rr['rr']}:1" if ct and rr else "Check chain."}
-    elif ps>=6:
+        return {"verdict":f"🟢 CALL SETUP — Good ({cs}/{MAX_GATES})","color":"#00c87a","bias":"BULLISH","bias_color":"#00ff9d",
+                "explanation":f"Strong setup. {MAX_GATES-cs} gate(s) pending. Watch for 1H RSI to cross above 50 (currently {d['h1']['rsi'] if d['h1'] else '—'}).",
+                "trade_idea":f"Buy ${ct['strike']:.0f}C {opts['expiry']} (~${ct['price']:.2f}) on 1H RSI cross above 50 | Stop ${rr['stop']} | Target ${rr['target']}" if ct and rr else "Check chain."}
+    elif ps >= 6:
         pt=al["put_t"]; rr=al["put_rr"]
-        return {"verdict":"🔴 PUT — HIGH CONFIDENCE (6-7/7)","color":"#ff3a5e","bias":"STRONG BEAR","bias_color":"#ff3a5e",
-                "explanation":f"All bear gates pass. Price below Brando $180.34. Next support: ${bctx['key_sup'][0] if bctx['key_sup'] else '—'}.",
+        div_note = f" · {div['label']}" if div["confirms_bear"] else ""
+        return {"verdict":f"🔴 PUT — HIGH CONFIDENCE ({ps}/{MAX_GATES})","color":"#ff3a5e","bias":"STRONG BEAR","bias_color":"#ff3a5e",
+                "explanation":f"6+ gates pass. Price below $180.34. 1H RSI crossed below 50. Next support: ${bctx['key_sup'][0] if bctx['key_sup'] else '—'}.{div_note}",
                 "trade_idea":f"Buy ${pt['strike']:.0f}P {opts['expiry']} (~${pt['price']:.2f}) on bounce fail at EMA8 | Stop ${rr['stop']} | Target ${rr['target']} | R:R {rr['rr']}:1" if pt and rr else "Check chain for $3 OTM put."}
-    elif ps>=5:
+    elif ps >= 5:
         pt=al["put_t"]; rr=al["put_rr"]
-        return {"verdict":"🟠 PUT SETUP — Building (5/7)","color":"#ff8c42","bias":"BEARISH","bias_color":"#ff3a5e",
-                "explanation":f"Bear setup building. Wait for bounce to 1H EMA8 (${d['h1']['e8'] if d['h1'] else '—'}) then failure.",
-                "trade_idea":f"Buy ${pt['strike']:.0f}P on rejection at 1H EMA8 | R:R {rr['rr']}:1" if pt and rr else "Watch for bounce failure."}
-    elif cs==ps:
+        return {"verdict":f"🟠 PUT SETUP — Building ({ps}/{MAX_GATES})","color":"#ff8c42","bias":"BEARISH","bias_color":"#ff3a5e",
+                "explanation":f"Bear setup building. Watch for 1H RSI to cross below 50 (currently {d['h1']['rsi'] if d['h1'] else '—'}).",
+                "trade_idea":f"Buy ${pt['strike']:.0f}P on 1H RSI cross below 50 | R:R {rr['rr']}:1" if pt and rr else "Watch for bounce failure."}
+    elif cs == ps:
         return {"verdict":"⏸ MIXED — WAIT","color":"#ff8c42","bias":"NEUTRAL","bias_color":"#ffd700",
-                "explanation":f"Call {cs}/7 vs Put {ps}/7 — tied. {bctx['scen_label']} — Price needs to pick a direction.",
+                "explanation":f"Call {cs}/{MAX_GATES} vs Put {ps}/{MAX_GATES} — tied. {bctx['scen_label']} — Price needs to pick a direction.",
                 "trade_idea":f"Scenario A: {bctx['scen_a']}  |  Scenario B: {bctx['scen_b']}"}
     else:
         leader="CALL" if cs>ps else "PUT"; ls=max(cs,ps)
-        return {"verdict":f"⏸ {leader} WATCH — Not Yet ({ls}/7)","color":"#ffd700","bias":"DEVELOPING","bias_color":"#ffd700",
-                "explanation":f"Signal {ls}/7 — need 5+ for entry. {bctx['scen_label']}.",
+        return {"verdict":f"⏸ {leader} WATCH — Not Yet ({ls}/{MAX_GATES})","color":"#ffd700","bias":"DEVELOPING","bias_color":"#ffd700",
+                "explanation":f"Signal {ls}/{MAX_GATES} — need 6+ for entry. {bctx['scen_label']}.",
                 "trade_idea":f"Scenario A: {bctx['scen_a']}  |  Scenario B: {bctx['scen_b']}"}
 
 
@@ -566,16 +776,25 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
     chg_c="#00ff9d" if chg>=0 else "#ff3a5e"
     arrow="▲" if chg>=0 else "▼"
     vol_m=d["volume"]/1e6; avg_m=d["avg_vol"]/1e6
-    vol_c="#00ff9d" if d["vol_ratio"]>1.2 else ("#ffd700" if d["vol_ratio"]>0.8 else "#ff3a5e")
-    iv_c ="#00ff9d" if opts["iv_30"]<35 else ("#ffd700" if opts["iv_30"]<55 else "#ff3a5e")
-    yr   =min(100,(price-d["week52l"])/(d["week52h"]-d["week52l"])*100) if d["week52h"]!=d["week52l"] else 50
-    v    =verdict
-    spy_c="#00ff9d" if d["spy_bull"] else "#ff3a5e"
-    spy_l="BULL ✓" if d["spy_bull"] else "BEAR ✗"
+    vol_c ="#00ff9d" if d["vol_ratio"]>1.2 else ("#ffd700" if d["vol_ratio"]>0.8 else "#ff3a5e")
+    iv_c  ="#00ff9d" if opts["iv_30"]<35 else ("#ffd700" if opts["iv_30"]<55 else "#ff3a5e")
+    yr    =min(100,(price-d["week52l"])/(d["week52h"]-d["week52l"])*100) if d["week52h"]!=d["week52l"] else 50
+    v     =verdict
+    spy_c ="#00ff9d" if d["spy_bull"] else "#ff3a5e"
+    spy_l ="BULL ✓" if d["spy_bull"] else "BEAR ✗"
     date_str=ct_now.strftime("%a %b %d, %Y")
     time_str=ct_now.strftime("%I:%M %p CT")
     comp=d["compression"]
     comp_c="#00ff9d" if comp>70 else ("#ffd700" if comp>40 else "#5a7a99")
+    h1_div=al["h1_div"]
+
+    # ── RSI state helpers for display ──
+    h4_rsi   = d["h4"]["rsi"] if d["h4"] else None
+    h1_rsi   = d["h1"]["rsi"] if d["h1"] else None
+    h1_rsi_p = d["h1"]["rsi_prev"] if d["h1"] else None
+    h4_setup_ok = d["h4"] and 40 <= d["h4"]["rsi"] <= 60
+    h1_cross_bull = d["h1"] and d["h1"]["rsi_cross_above_50"]
+    h1_cross_bear = d["h1"] and d["h1"]["rsi_cross_below_50"]
 
     # Session timeline
     tl=""
@@ -593,20 +812,27 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
         ve=f'<span style="color:#00ff9d;font-size:.6rem">▲{r["vol_ratio"]}x</span>' if r["vol_expanded"] else f'<span style="color:{"#ffd700" if r["vol_ratio"]>=1.0 else "#ff3a5e"};font-size:.6rem">{r["vol_ratio"]}x</span>'
         mtf_rows+=f'<tr><td style="color:var(--white);font-weight:700">{r["tf"]}</td><td style="color:{r["tc"]};font-weight:700">{r["trend"]}</td><td style="color:{r["rc"]}">{r["rsi"]}</td><td style="color:{r["mc"]}">{r["macd"]}</td><td style="color:{r["bc"]};font-weight:700">{r["bias"]}</td><td>{ve}</td></tr>'
 
-    # Signal reason lists
+    # Signal reason list
     def reason_list(reasons, score, max_s):
         html=""
         for r in reasons:
-            col="#00ff9d" if r.startswith("✅") else ("#ff3a5e" if r.startswith("❌") else "#ffd700")
+            if r.startswith("✅"):    col="#00ff9d"
+            elif r.startswith("❌"):  col="#ff3a5e"
+            elif r.startswith("⚠️"): col="#ffd700"
+            elif r.startswith("ℹ️"): col="#4fc3f7"
+            else:                      col="#ffd700"
             html+=f'<div style="font-size:.63rem;color:{col};padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3)">{r}</div>'
-        pct=round(score/max_s*100)
-        bc="#00ff9d" if pct>=70 else ("#ffd700" if pct>=50 else "#ff3a5e")
-        html+=f'<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: {score}/{max_s} ({pct}%)</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{pct}%;background:{bc};border-radius:3px"></div></div></div>'
+        # Score bar — denominator shows MAX_GATES (not inflated by bonus)
+        base_score = min(score, MAX_GATES)
+        pct = round(base_score / MAX_GATES * 100)
+        bc  = "#00ff9d" if pct >= 70 else ("#ffd700" if pct >= 50 else "#ff3a5e")
+        bonus_html = f' <span style="color:#ffd700;font-size:.56rem">(+1 div bonus)</span>' if score > MAX_GATES else ""
+        html+=f'<div style="margin-top:8px"><div style="font-size:.58rem;color:var(--muted);margin-bottom:3px">SIGNAL STRENGTH: {score}/{MAX_GATES} ({pct}%){bonus_html}</div><div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px"><div style="height:100%;width:{pct}%;background:{bc};border-radius:3px"></div></div></div>'
         return html
 
     # R:R box
     def rr_box(rr, direction):
-        if not rr: return '<div style="font-size:.65rem;color:var(--muted);padding:10px">No $3 option near ATM</div>'
+        if not rr: return '<div style="font-size:.65rem;color:var(--muted);padding:10px">No $3-5 option near ATM</div>'
         bc="#00ff9d" if direction=="call" else "#ff3a5e"
         rc="#00ff9d" if rr["rr"]>=2 else ("#ffd700" if rr["rr"]>=1.5 else "#ff3a5e")
         return f'''<div style="background:var(--surface2);border:1px solid {bc};padding:11px">
@@ -641,10 +867,8 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
         lbl="BULLISH" if n["sentiment"]=="bull" else ("BEARISH" if n["sentiment"]=="bear" else "NEUTRAL")
         news_html+=f'<div style="padding:7px 0;border-bottom:1px solid rgba(30,58,95,.4);display:grid;grid-template-columns:7px 1fr;gap:7px"><div style="width:6px;height:6px;border-radius:50%;background:{dc};margin-top:4px"></div><div><div style="font-size:.65rem;line-height:1.4"><a href="{n["link"]}" target="_blank" style="color:inherit;text-decoration:none">{n["title"]}</a><span style="font-size:.57rem;font-weight:700;margin-left:5px;color:{dc}">[{lbl}]</span></div><div style="font-size:.56rem;color:var(--muted);margin-top:1px">{n["published"]}</div></div></div>'
 
-    # ── BRANDO LEVEL MAP ──────────────────────────────────
-    # Full level table grouped by timeframe, showing distance from price
+    # Brando level table
     def brando_table():
-        # Show 5 resistance above + 5 support below in a combined table
         res5 = bctx["res"][:5]
         sup5 = bctx["sup"][:5]
         rows=""
@@ -654,7 +878,6 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
             tf_c=TF_COLOR.get(tf,"#aaa")
             bg='background:rgba(255,215,0,.05);' if key else ""
             rows+=f'<tr style="{bg}"><td style="color:{tf_c};font-size:.58rem">{TF_LABEL[tf]}</td><td style="color:{"#ffd700" if key else "#ff3a5e"};font-weight:700">${p:.2f}</td><td style="color:var(--muted);font-size:.6rem">{key_marker}{lbl}</td><td style="color:var(--muted);font-size:.58rem;text-align:right">+${dist:.2f}</td></tr>'
-        # Current price row
         on_str=f' ⚡ ON LEVEL: {bctx["nearest"][2]}' if bctx["on_level"] else ""
         rows+=f'<tr style="background:rgba(255,215,0,.08)"><td style="color:#ffd700;font-size:.6rem">NOW</td><td style="color:#ffd700;font-weight:700;font-size:.8rem">▶ ${price:.2f}</td><td style="color:#ffd700;font-size:.6rem" colspan="2">H:{d["id_high"]} L:{d["id_low"]}{on_str}</td></tr>'
         for (p,tf,lbl,note,key) in sup5:
@@ -676,13 +899,32 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
         cc="#00ff9d" if c["bull"] else "#ff3a5e"
         candle_rows+=f'<tr><td style="color:var(--muted);font-size:.6rem">{c["time"]}</td><td style="color:{cc};font-weight:700">${c["close"]:.2f}</td><td style="color:{cc}">{"▲" if c["bull"] else "▼"}</td><td style="color:var(--muted)">${c["high"]:.2f}</td><td style="color:var(--muted)">${c["low"]:.2f}</td><td style="color:var(--green-dim);font-size:.6rem">{c["volume"]//1000}K</td></tr>'
 
+    # ── RSI TWO-LAYER STATUS PANEL ─────────────────────────────────────────
+    h4_rsi_color = "#00ff9d" if h4_setup_ok else "#ff3a5e"
+    h4_rsi_label = "✅ SETUP VALID" if h4_setup_ok else "❌ SETUP NOT READY"
+    h1_cross_color = "#00ff9d" if h1_cross_bull else ("#ff3a5e" if h1_cross_bear else "#ffd700")
+    h1_cross_label = ("✅ CROSS ABOVE 50 — CALL TRIGGER" if h1_cross_bull
+                      else ("✅ CROSS BELOW 50 — PUT TRIGGER" if h1_cross_bear
+                            else f"⏳ RSI {h1_rsi or '—'} · WAITING FOR 50 CROSS"))
+
+    # Divergence panel html
+    div_color  = h1_div["color"]
+    div_border = f"1px solid {div_color}40"
+    div_bg     = f"rgba({int(div_color[1:3],16)},{int(div_color[3:5],16)},{int(div_color[5:7],16)},.07)" if h1_div["divergence_type"] else "rgba(255,255,255,.02)"
+    if h1_div["confirms_bull"] or h1_div["confirms_bear"]:
+        div_action = f'<div style="font-size:.6rem;color:#ffd700;font-weight:700;margin-top:4px">⚡ CONFIRMS ENTRY — add to conviction score</div>'
+    elif h1_div["exit_warning_bull"] or h1_div["exit_warning_bear"]:
+        div_action = f'<div style="font-size:.6rem;color:#ff3a5e;font-weight:700;margin-top:4px">🚨 EXIT WARNING — divergence opposes open position</div>'
+    else:
+        div_action = '<div style="font-size:.6rem;color:var(--muted);margin-top:4px">Monitor. No action required.</div>'
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="refresh" content="300">
-<title>Research Notes — NVDA</title>
+<title>NVDA Options Command Center v5</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{{--bg:#070b12;--surface:#0d1520;--surface2:#111d2e;--border:#1e3a5f;
@@ -732,7 +974,6 @@ tr:last-child td{{border-bottom:none;}}
 
 <div class="main">
 
-<!-- ON-LEVEL ALERT (shows when price within $3 of a starred Brando level) -->
 {on_level_banner}
 
 <!-- SESSION TIMELINE -->
@@ -751,19 +992,19 @@ tr:last-child td{{border-bottom:none;}}
     <div>
       <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px">
         <span style="color:var(--muted)">CALL</span>
-        <span style="color:#00ff9d;font-weight:700">{al['call_score']}/7</span>
+        <span style="color:#00ff9d;font-weight:700">{al['call_score']}/{MAX_GATES}</span>
       </div>
       <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px">
-        <div style="height:100%;width:{round(al['call_score']/7*100)}%;background:linear-gradient(90deg,#00c87a,#00ff9d);border-radius:3px"></div>
+        <div style="height:100%;width:{round(min(al['call_score'],MAX_GATES)/MAX_GATES*100)}%;background:linear-gradient(90deg,#00c87a,#00ff9d);border-radius:3px"></div>
       </div>
     </div>
     <div>
       <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px">
         <span style="color:var(--muted)">PUT</span>
-        <span style="color:#ff3a5e;font-weight:700">{al['put_score']}/7</span>
+        <span style="color:#ff3a5e;font-weight:700">{al['put_score']}/{MAX_GATES}</span>
       </div>
       <div style="height:6px;background:rgba(255,255,255,.05);border-radius:3px">
-        <div style="height:100%;width:{round(al['put_score']/7*100)}%;background:linear-gradient(90deg,#cc1f40,#ff3a5e);border-radius:3px"></div>
+        <div style="height:100%;width:{round(min(al['put_score'],MAX_GATES)/MAX_GATES*100)}%;background:linear-gradient(90deg,#cc1f40,#ff3a5e);border-radius:3px"></div>
       </div>
     </div>
     <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:3px">
@@ -774,11 +1015,52 @@ tr:last-child td{{border-bottom:none;}}
 </div>
 
 <!-- ═══════════════════════════════════════════════════
-     BRANDO / ELITE OPTIONS LEVEL MAP + SCENARIO ENGINE
+     TWO-LAYER RSI STATUS + DIVERGENCE PANEL
      ═══════════════════════════════════════════════════ -->
-<div class="g2">
+<div class="card">
+  <div class="ct">Two-Layer RSI System — G5 Setup Filter + G6 Entry Trigger</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
 
-  <!-- BRANDO LEVEL TABLE -->
+    <!-- Layer 1: 4H RSI Setup Filter -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid {h4_rsi_color}40;padding:10px">
+      <div style="font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">G5 · 4H RSI — SETUP FILTER</div>
+      <div style="font-size:1.6rem;font-weight:700;color:{h4_rsi_color}">{h4_rsi if h4_rsi else "—"}</div>
+      <div style="font-size:.6rem;color:{h4_rsi_color};font-weight:700;margin-top:2px">{h4_rsi_label}</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:5px;line-height:1.5">
+        40–60 = healthy pullback<br>Premium discounted, setup valid<br>
+        {"✅ In range — proceed to G6" if h4_setup_ok else "❌ Wait for 4H RSI to reach 40–60"}
+      </div>
+    </div>
+
+    <!-- Layer 2: 1H RSI Entry Trigger -->
+    <div style="background:rgba(255,255,255,.02);border:1px solid {h1_cross_color}40;padding:10px">
+      <div style="font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">G6 · 1H RSI — ENTRY TRIGGER</div>
+      <div style="font-size:1.6rem;font-weight:700;color:{h1_cross_color}">{h1_rsi if h1_rsi else "—"}</div>
+      <div style="font-size:.6rem;color:{h1_cross_color};font-weight:700;margin-top:2px">{h1_cross_label}</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:5px;line-height:1.5">
+        Cross ↑ above 50 = CALL trigger<br>Cross ↓ below 50 = PUT trigger<br>
+        Prev bar: {h1_rsi_p or "—"} → Now: {h1_rsi or "—"}
+      </div>
+    </div>
+
+    <!-- G9: RSI Divergence -->
+    <div style="background:{div_bg};border:{div_border};padding:10px">
+      <div style="font-size:.55rem;color:var(--muted);letter-spacing:1px;margin-bottom:4px">G9 · 1H RSI DIV — BONUS +1</div>
+      <div style="font-size:.75rem;font-weight:700;color:{div_color};line-height:1.3">{h1_div['label']}</div>
+      <div style="font-size:.58rem;color:var(--muted);margin-top:4px">{h1_div['detail'] or "No divergence on current 1H bars"}</div>
+      {div_action}
+      <div style="font-size:.56rem;color:var(--muted);margin-top:5px;line-height:1.5;border-top:1px solid rgba(255,255,255,.06);padding-top:5px">
+        RegBull: price LL + RSI HL → reversal<br>
+        HidBull: price HL + RSI LL → continuation<br>
+        RegBear: price HH + RSI LH → reversal<br>
+        HidBear: price LH + RSI HH → continuation
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BRANDO MAP + SCENARIO -->
+<div class="g2">
   <div class="card">
     <div class="ct">Brando · Elite Options S/R Map (Monthly + Weekly + Daily)</div>
     <div style="font-size:.6rem;color:var(--muted);margin-bottom:8px">
@@ -794,7 +1076,6 @@ tr:last-child td{{border-bottom:none;}}
     </table>
   </div>
 
-  <!-- SCENARIO ENGINE -->
   <div class="card">
     <div class="ct">Scenario Engine — Two-Path Trade Plan</div>
     <div style="background:{bctx['scen_color']}15;border:1px solid {bctx['scen_color']};padding:10px;margin-bottom:11px">
@@ -816,22 +1097,20 @@ tr:last-child td{{border-bottom:none;}}
       </div>
     </div>
     <div style="margin-top:9px;background:var(--surface2);border:1px solid var(--border);padding:9px">
-      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">BRANDO'S KEY GATES (must watch)</div>
+      <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">BRANDO'S KEY GATES</div>
       <div style="font-size:.65rem;line-height:1.8">
-        {"✅" if price>=191 else "❌"} <strong style="color:#ffd700">$191.00</strong> — Yellow line (MO+WK) · Clears = target $200 wall<br>
-        {"✅" if price>=184.58 else "❌"} <strong style="color:#4fc3f7">$184.58</strong> — Daily key resistance · 200MA cluster zone<br>
-        {"✅" if price>=180.34 else "❌"} <strong style="color:#ff8c42">$180.34</strong> — Critical daily pivot · MOST WATCHED LEVEL<br>
-        {"✅" if price>=175.00 else "❌"} <strong style="color:#7c4dff">$175.00</strong> — Weekly purple support · Last bull defense<br>
-        {"✅" if price>=153.37 else "❌"} <strong style="color:#b39ddb">$153.37</strong> — Monthly demand zone top · Institutional buy zone
+        {"✅" if price>=191 else "❌"} <strong style="color:#ffd700">$191.00</strong> — Yellow line (MO+WK)<br>
+        {"✅" if price>=184.58 else "❌"} <strong style="color:#4fc3f7">$184.58</strong> — Daily key resistance<br>
+        {"✅" if price>=180.34 else "❌"} <strong style="color:#ff8c42">$180.34</strong> — Critical daily pivot ★<br>
+        {"✅" if price>=175.00 else "❌"} <strong style="color:#7c4dff">$175.00</strong> — Weekly purple support<br>
+        {"✅" if price>=153.37 else "❌"} <strong style="color:#b39ddb">$153.37</strong> — Monthly demand zone top
       </div>
     </div>
   </div>
 </div>
 
-<!-- ROW: MTF ALIGNMENT + REGIME + COMPRESSION + CANDLES -->
+<!-- MTF + REGIME + CANDLES -->
 <div class="g3">
-
-  <!-- MTF ALIGNMENT -->
   <div class="card">
     <div class="ct">Multi-Timeframe Alignment</div>
     <table>
@@ -844,13 +1123,14 @@ tr:last-child td{{border-bottom:none;}}
       {"🟢 ALL BULL — Max conviction" if al['bull_count']==3 else ("🔴 ALL BEAR — Max conviction" if al['bear_count']==3 else f"⚠️ MIXED ({al['bull_count']} bull / {al['bear_count']} bear)")}
       </span>
     </div>
-    <div style="margin-top:7px;font-size:.6rem;color:var(--muted);line-height:1.5">
-      RSI RULE: 4H in <strong style="color:var(--white)">45–55</strong> = ideal pullback zone → entry.<br>
-      NOT 30/70. NVDA trends. Overbought stays overbought.
+    <div style="margin-top:7px;font-size:.6rem;color:var(--muted);line-height:1.6;background:rgba(0,0,0,.15);padding:7px;border:1px solid var(--border)">
+      <strong style="color:var(--white)">RSI TWO-LAYER RULE:</strong><br>
+      G5 · 4H 40–60 = setup valid (big picture pullback healthy)<br>
+      G6 · 1H cross above/below 50 = pull the trigger (right candle, right now)<br>
+      NVDA trends hard — overbought stays overbought. Not a reversal filter.
     </div>
   </div>
 
-  <!-- REGIME + COMPRESSION -->
   <div class="card">
     <div class="ct">Market Regime · ATR · Compression</div>
     <div style="background:rgba(0,0,0,.2);border:1px solid {spy_c};padding:9px;margin-bottom:9px">
@@ -883,7 +1163,6 @@ tr:last-child td{{border-bottom:none;}}
     </div>
   </div>
 
-  <!-- 5-MIN CANDLES + RANGE -->
   <div class="card">
     <div class="ct">Recent 5-Min Candles (Chicago time)</div>
     <table>
@@ -903,7 +1182,11 @@ tr:last-child td{{border-bottom:none;}}
         <div>EMA8:  <strong style="color:var(--blue)">${d['h1']['e8']  if d['h1'] else '—'}</strong></div>
         <div>EMA21: <strong style="color:var(--blue)">${d['h1']['e21'] if d['h1'] else '—'}</strong></div>
         <div>EMA50: <strong style="color:var(--blue)">${d['h1']['e50'] if d['h1'] else '—'}</strong></div>
-        <div>4H RSI: <strong style="color:{"#00ff9d" if d['h4'] and 40<=d['h4']['rsi']<=60 else "#ffd700"}">{d['h4']['rsi'] if d['h4'] else '—'} {"✅" if d['h4'] and 40<=d['h4']['rsi']<=60 else ""}</strong></div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <span>4H RSI:</span>
+          <strong style="color:{h4_rsi_color}">{h4_rsi or '—'} {' ✅' if h4_setup_ok else ''}</strong>
+        </div>
+        <div style="grid-column:span 2;font-size:.58rem;color:{h1_cross_color}">1H: {h1_cross_label}</div>
       </div>
     </div>
   </div>
@@ -912,16 +1195,16 @@ tr:last-child td{{border-bottom:none;}}
 <!-- SIGNAL BREAKDOWN + OPTIONS -->
 <div class="g3">
   <div class="card">
-    <div class="ct">Call Signal ({al['call_score']}/7)</div>
-    {reason_list(al['call_reasons'], al['call_score'], 7)}
+    <div class="ct">Call Signal ({al['call_score']}/{MAX_GATES})</div>
+    {reason_list(al['call_reasons'], al['call_score'], MAX_GATES)}
     <div style="margin-top:10px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">CALL R:R CALCULATOR</div>
       {rr_box(al['call_rr'],"call")}
     </div>
   </div>
   <div class="card">
-    <div class="ct">Put Signal ({al['put_score']}/7)</div>
-    {reason_list(al['put_reasons'], al['put_score'], 7)}
+    <div class="ct">Put Signal ({al['put_score']}/{MAX_GATES})</div>
+    {reason_list(al['put_reasons'], al['put_score'], MAX_GATES)}
     <div style="margin-top:10px">
       <div style="font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-bottom:5px">PUT R:R CALCULATOR</div>
       {rr_box(al['put_rr'],"put")}
@@ -949,24 +1232,28 @@ tr:last-child td{{border-bottom:none;}}
 <!-- ENTRY MODEL + NEWS -->
 <div class="g2">
   <div class="card">
-    <div class="ct">Institutional Entry Model — Brando + Pullback Method</div>
+    <div class="ct">Institutional Entry Model — Two-Layer RSI + Pullback Method</div>
     <div style="font-size:.66rem;line-height:1.8;color:var(--text)">
-      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ CALL ENTRY (Pullback, NOT breakout):</div>
-      1. Daily + 4H above cloud · HH/HL intact · Above Brando $180.34<br>
-      2. 4H RSI cools to <strong style="color:var(--white)">45–55</strong> (tight zone = premium discounted, best entries)<br>
-      3. Price pulls to <strong style="color:var(--white)">1H EMA8 (${d['h1']['e8'] if d['h1'] else '—'})</strong> and holds<br>
-      4. 1H MACD histogram flips positive → re-acceleration signal<br>
-      5. Volume ≥ <strong style="color:var(--white)">1.5x</strong> on confirming expansion candle<br>
-      6. Enter on break of prior 1H high · Stop under pullback low<br>
-      7. First target: next Brando resistance above (${bctx['res'][0][0] if bctx['res'] else '—'})
+      <div style="color:var(--green);font-weight:700;margin-bottom:4px">✅ CALL ENTRY — Step by Step:</div>
+      1. G1–G4: Daily + 4H above cloud · HH/HL intact · Above Brando $180.34<br>
+      2. G5: 4H RSI cools to <strong style="color:var(--white)">40–60</strong> — setup valid, pullback healthy<br>
+      3. G6: 1H RSI <strong style="color:var(--green)">crosses above 50</strong> — momentum resuming → PULL TRIGGER<br>
+      4. G7: 1H MACD histogram flips positive → confirms re-acceleration<br>
+      5. G8: Volume ≥ <strong style="color:var(--white)">1.5x</strong> on confirming candle → institutional participation<br>
+      6. G9: If RSI divergence confirms bull → highest conviction entry<br>
+      7. Entry on break of prior 1H high · Stop under pullback low · Target next Brando level
     </div>
     <div style="margin-top:9px;font-size:.66rem;line-height:1.8;color:var(--text)">
-      <div style="color:var(--red);font-weight:700;margin-bottom:4px">❌ WHAT DESTROYS 30 DTE:</div>
-      Buying breakouts (premium euphoric) · Midday 10:30–1:00 PM CT ·
-      MACD already extended · Inside prior day range · Ignoring volume · Holding losers
+      <div style="color:var(--red);font-weight:700;margin-bottom:4px">❌ PUT ENTRY — Step by Step:</div>
+      1. G1–G4: Daily below cloud · HH/HL broken · Below Brando $180.34<br>
+      2. G5: 4H RSI bounces to <strong style="color:var(--white)">40–60</strong> — bounce into resistance, setup valid<br>
+      3. G6: 1H RSI <strong style="color:var(--red)">crosses below 50</strong> — momentum turning down → PULL TRIGGER<br>
+      4. G8: HIGH volume on declining price → real distribution, puts valid<br>
+      4b: LOW volume decline = <strong style="color:var(--yellow)">dead cat</strong> → SKIP puts regardless of other gates
     </div>
     <div style="margin-top:9px;padding:9px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.65rem;color:var(--orange);line-height:1.6">
-      🚪 <strong>EXIT:</strong> +80% → SELL ALL · −50% → HARD STOP · Day 3 → EXIT · IMACD flips → HALF OUT
+      🚪 <strong>EXIT RULES:</strong> +80% → SELL ALL · −50% → HARD STOP · Day 3 → EXIT regardless · MACD flips → HALF OUT<br>
+      🚨 <strong>RSI DIV EXIT:</strong> If G9 fires divergence opposing your position → treat as EXIT warning, scale out
     </div>
   </div>
   <div class="card">
@@ -976,7 +1263,7 @@ tr:last-child td{{border-bottom:none;}}
 </div>
 
 <div style="text-align:center;padding:10px;font-size:.56rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px">
-  🤖 Auto-updated 12× daily · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2 TrendSpider · Page reloads every 5 min<br>
+  🤖 v5 · Two-Layer RSI · 8 Gates · Auto-updated · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2<br>
   ⚠️ Educational only — not financial advice. Verify all prices before trading.<br>
   Last update: <strong style="color:var(--text)">{ct_now.strftime("%Y-%m-%d %H:%M:%S CT")}</strong>
 </div>
@@ -996,13 +1283,17 @@ if __name__ == "__main__":
     d = fetch_all()
     print(f"   ${d['price']} | {d['change_pct']:+.2f}% | Vol {d['vol_ratio']}x | ATR ${d['atr']} | Compression {d['compression']}/100")
     print(f"   SPY {'BULL' if d['spy_bull'] else 'BEAR'} | Daily RSI {d['daily']['rsi']} | MACD {d['daily']['macd_h']:+.3f}")
-    if d["h4"]: print(f"   4H RSI {d['h4']['rsi']} {'✅ pullback zone' if 40<=d['h4']['rsi']<=60 else ''} | MACD {d['h4']['macd_h']:+.3f}")
-    if d["h1"]: print(f"   1H EMA8 ${d['h1']['e8']} | MACD {d['h1']['macd_h']:+.3f}")
+    if d["h4"]:
+        h4_ok = 40 <= d["h4"]["rsi"] <= 60
+        print(f"   4H RSI {d['h4']['rsi']} {'✅ G5 setup valid' if h4_ok else '❌ G5 out of range'} | MACD {d['h4']['macd_h']:+.3f}")
+    if d["h1"]:
+        cross = "↑ CALL TRIGGER" if d["h1"]["rsi_cross_above_50"] else ("↓ PUT TRIGGER" if d["h1"]["rsi_cross_below_50"] else "no cross")
+        print(f"   1H RSI {d['h1']['rsi']} (prev {d['h1']['rsi_prev']}) — G6 {cross} | EMA8 ${d['h1']['e8']}")
+    print(f"   1H Divergence: {d['h1_div']['label']}")
 
     print("🗺️  Building Brando level context...")
     bctx = get_brando_context(d["price"])
     print(f"   {bctx['scen_label']} | On level: {bctx['on_level']}")
-    print(f"   Next key res: ${bctx['key_res'][0] if bctx['key_res'] else '—'} | Next key sup: ${bctx['key_sup'][0] if bctx['key_sup'] else '—'}")
 
     print("📋 Fetching options chain...")
     opts = fetch_options(d["price"])
@@ -1012,9 +1303,9 @@ if __name__ == "__main__":
     news = fetch_news()
     print(f"   {len(news)} articles")
 
-    print("🧠 Building signals...")
+    print("🧠 Building signals (8 gates)...")
     al = build_alignment(d, opts, session, bctx)
-    print(f"   Call {al['call_score']}/7 | Put {al['put_score']}/7 | TF: {al['bull_count']} bull / {al['bear_count']} bear")
+    print(f"   Call {al['call_score']}/{MAX_GATES} | Put {al['put_score']}/{MAX_GATES} | TF: {al['bull_count']} bull / {al['bear_count']} bear")
 
     verdict = get_verdict(al, d, session, opts, bctx)
     print(f"   {verdict['verdict']}")
