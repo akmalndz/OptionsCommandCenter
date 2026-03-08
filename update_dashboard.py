@@ -1024,16 +1024,17 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
         if not rr: return '<div style="font-size:.65rem;color:var(--muted);padding:10px">No $3-6 option near ATM</div>'
         bc="#00ff9d" if direction=="call" else "#ff3a5e"
         rc="#00ff9d" if rr["rr"]>=2 else ("#ffd700" if rr["rr"]>=1.5 else "#ff3a5e")
-        return f'''<div style="background:var(--surface2);border:1px solid {bc};padding:11px">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;text-align:center">
-            <div><div style="font-size:.54rem;color:var(--muted)">ENTRY</div><div style="font-size:.9rem;color:var(--white);font-weight:700">${rr["entry"]:.2f}</div></div>
-            <div><div style="font-size:.54rem;color:var(--muted)">STOP −35%</div><div style="font-size:.9rem;color:var(--red);font-weight:700">${rr["stop"]:.2f}</div></div>
-            <div><div style="font-size:.54rem;color:var(--muted)">TARGET +60%</div><div style="font-size:.9rem;color:var(--green);font-weight:700">${rr["target"]:.2f}</div></div>
-            <div><div style="font-size:.54rem;color:var(--muted)">R:R</div><div style="font-size:.9rem;font-weight:700;color:{rc}">{rr["rr"]}:1</div></div>
+        return f'''<div style="background:var(--surface2);border:1px solid {bc};padding:10px">
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;text-align:center">
+            <div><div style="font-size:.52rem;color:var(--muted)">ENTRY</div><div style="font-size:.85rem;color:var(--white);font-weight:700">${rr["entry"]:.2f}</div></div>
+            <div><div style="font-size:.52rem;color:var(--muted)">R:R</div><div style="font-size:.85rem;font-weight:700;color:{rc}">{rr["rr"]}:1</div></div>
+            <div><div style="font-size:.52rem;color:var(--muted)">STOP −35%</div><div style="font-size:.85rem;color:var(--red);font-weight:700">${rr["stop"]:.2f}</div></div>
+            <div><div style="font-size:.52rem;color:var(--muted)">TARGET +60%</div><div style="font-size:.85rem;color:var(--green);font-weight:700">${rr["target"]:.2f}</div></div>
           </div>
-          <div style="margin-top:7px;border-top:1px solid rgba(255,255,255,.06);padding-top:7px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.61rem">
-            <div>Budget: <strong style="color:var(--white)">${rr["budget"]}</strong> · Contracts: <strong style="color:var(--white)">{rr["contracts"]}</strong></div>
-            <div>Max loss at stop: <strong style="color:var(--red)">${rr["max_risk"]}</strong></div>
+          <div style="margin-top:6px;border-top:1px solid rgba(255,255,255,.06);padding-top:6px;font-size:.58rem">
+            <span>Budget: <strong style="color:var(--white)">${rr["budget"]}</strong></span> ·
+            <span>Contracts: <strong style="color:var(--white)">{rr["contracts"]}</strong></span> ·
+            <span>Max loss: <strong style="color:var(--red)">${rr["max_risk"]}</strong></span>
           </div></div>'''
 
     # Options chain
@@ -1081,7 +1082,7 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
     on_level_banner=""
     if bctx["on_level"]:
         nl=bctx["nearest"]
-        on_level_banner=f'<div style="background:rgba(255,215,0,.1);border:1px solid #ffd700;padding:9px 14px;font-size:.7rem;color:#ffd700;font-weight:700;text-align:center;margin-bottom:0">⚡ PRICE ON BRANDO LEVEL: ${nl[0]:.2f} — {nl[2]} ({TF_LABEL[nl[1]]}) · {nl[3]}</div>'
+        on_level_banner=f'<div style="background:rgba(255,215,0,.1);border:1px solid #ffd700;padding:9px 14px;font-size:.68rem;color:#ffd700;font-weight:700;text-align:center;margin-bottom:0;word-break:break-word">⚡ ON BRANDO LEVEL: ${nl[0]:.2f} — {nl[2]} ({TF_LABEL[nl[1]]})</div>'
 
     candle_rows=""
     for c in d["recent_candles"]:
@@ -1099,29 +1100,29 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
         extra = ""
         if "tenkan" in sig_data and sig_data["tenkan"]:
             cloud_color = "#00ff9d" if sig_data["cloud_bull"] else "#ff3a5e"
-            extra = f'''<div style="font-size:.56rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
-              T: ${sig_data["tenkan"]} · K: ${sig_data["kijun"]} · Cloud: <span style="color:{cloud_color}">${sig_data["cloud_bottom"]}–${sig_data["cloud_top"]}</span>
+            extra = f'''<div style="font-size:.52rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);word-break:break-word">
+              T:${sig_data["tenkan"]} K:${sig_data["kijun"]} Cloud:<span style="color:{cloud_color}">${sig_data["cloud_bottom"]}–${sig_data["cloud_top"]}</span>
             </div>'''
         elif "kama_val" in sig_data and sig_data["kama_val"]:
-            extra = f'''<div style="font-size:.56rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
-              KAMA: ${sig_data["kama_val"]} · ER: {sig_data["er"]} · Dir: <span style="color:{sig_data["dir_color"]}">{sig_data["direction"]}</span>
+            extra = f'''<div style="font-size:.52rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06);word-break:break-word">
+              KAMA:${sig_data["kama_val"]} ER:{sig_data["er"]} <span style="color:{sig_data["dir_color"]}">{sig_data["direction"]}</span>
             </div>'''
         elif "rsi_val" in sig_data and sig_data["rsi_val"] and "cross_type" in sig_data:
-            extra = f'''<div style="font-size:.56rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
-              RSI: {sig_data["rsi_val"]} (prev {sig_data["rsi_prev"]}) · Trigger: {sig_data["cross_type"] or "None"}
+            extra = f'''<div style="font-size:.52rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
+              RSI:{sig_data["rsi_val"]} (prev {sig_data["rsi_prev"]}) {sig_data["cross_type"] or "—"}
             </div>'''
         elif "macd_h" in sig_data and sig_data["macd_h"] is not None and "rsi_val" in sig_data:
-            extra = f'''<div style="font-size:.56rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
-              MACD Hist: {sig_data["macd_h"]:+.3f} · RSI: {sig_data["rsi_val"]}
+            extra = f'''<div style="font-size:.52rem;color:var(--muted);margin-top:5px;padding-top:5px;border-top:1px solid rgba(255,255,255,.06)">
+              MACD:{sig_data["macd_h"]:+.3f} RSI:{sig_data["rsi_val"]}
             </div>'''
 
-        return f'''<div style="background:{bg};border:{border};padding:10px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <div style="font-size:.55rem;color:var(--muted);letter-spacing:1px">{icon} {sig_name} · {tf_label}</div>
-            <div style="font-size:.52rem;color:{color_accent};font-weight:700;background:rgba(255,255,255,.05);padding:2px 6px">{pf_label}</div>
+        return f'''<div style="background:{bg};border:{border};padding:9px;min-width:0;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:4px">
+            <div style="font-size:.53rem;color:var(--muted);letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{icon} {sig_name} · {tf_label}</div>
+            <div style="font-size:.5rem;color:{color_accent};font-weight:700;background:rgba(255,255,255,.05);padding:2px 5px;white-space:nowrap;flex-shrink:0">{pf_label}</div>
           </div>
-          <div style="font-size:.78rem;font-weight:700;color:{status_color}">{sig_data["label"]}</div>
-          <div style="font-size:.6rem;color:var(--text);margin-top:3px;line-height:1.5">{sig_data["detail"]}</div>
+          <div style="font-size:.73rem;font-weight:700;color:{status_color}">{sig_data["label"]}</div>
+          <div style="font-size:.57rem;color:var(--text);margin-top:3px;line-height:1.5;word-break:break-word">{sig_data["detail"]}</div>
           {extra}
         </div>'''
 
@@ -1148,31 +1149,34 @@ def render(d, opts, news, al, verdict, session, bctx, ct_now):
   --green:#00ff9d;--green-dim:#00c87a;--red:#ff3a5e;--red-dim:#cc1f40;
   --yellow:#ffd700;--orange:#ff8c42;--blue:#4fc3f7;--white:#e8f4ff;--muted:#5a7a99;--text:#c8ddf0;}}
 *{{margin:0;padding:0;box-sizing:border-box;}}
+html{{overflow-x:hidden;}}
 body{{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;
+  overflow-x:hidden;max-width:100vw;
   background-image:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(0,80,160,.12) 0%,transparent 70%),
   repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(30,58,95,.1) 39px,rgba(30,58,95,.1) 40px),
   repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(30,58,95,.06) 39px,rgba(30,58,95,.06) 40px);}}
-.hdr{{border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;
+.hdr{{border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;
   justify-content:space-between;background:rgba(13,21,32,.97);backdrop-filter:blur(10px);
   position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px;}}
-.main{{max-width:1280px;margin:0 auto;padding:14px 16px;display:grid;gap:11px;}}
-.g4{{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;}}
-.g3{{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}}
-.g2{{display:grid;grid-template-columns:1fr 1fr;gap:11px;}}
-.card{{background:var(--surface);border:1px solid var(--border);padding:13px;}}
+.main{{max-width:100%;width:100%;margin:0 auto;padding:12px 12px;display:grid;gap:10px;}}
+.g4{{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
+.g3{{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
+.g2{{display:grid;grid-template-columns:1fr 1fr;gap:10px;}}
+.card{{background:var(--surface);border:1px solid var(--border);padding:11px;overflow:hidden;word-break:break-word;min-width:0;}}
 .ct{{font-size:.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px;
   padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px;}}
-.ct::before{{content:'';width:4px;height:4px;background:var(--blue);display:block;border-radius:50%;}}
-.vb{{padding:14px 18px;border:1px solid var(--border);border-left:4px solid {v["color"]};
-  background:linear-gradient(135deg,#0a1929,#0d2035);display:grid;grid-template-columns:1fr 200px;gap:16px;align-items:center;}}
-table{{width:100%;border-collapse:collapse;}}
-th,td{{padding:5px;font-size:.66rem;border-bottom:1px solid rgba(30,58,95,.35);}}
-th{{color:var(--muted);font-size:.58rem;letter-spacing:1px;text-align:left;}}
+.ct::before{{content:'';width:4px;height:4px;background:var(--blue);display:block;border-radius:50%;flex-shrink:0;}}
+.vb{{padding:13px 16px;border:1px solid var(--border);border-left:4px solid {v["color"]};
+  background:linear-gradient(135deg,#0a1929,#0d2035);display:grid;grid-template-columns:1fr 170px;gap:14px;align-items:center;}}
+table{{width:100%;border-collapse:collapse;table-layout:fixed;}}
+th,td{{padding:4px 3px;font-size:.62rem;border-bottom:1px solid rgba(30,58,95,.35);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}}
+th{{color:var(--muted);font-size:.56rem;letter-spacing:1px;text-align:left;}}
 tr:last-child td{{border-bottom:none;}}
+.sess-grid{{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;}}
 @keyframes pulse{{0%,100%{{opacity:1}}50%{{opacity:.4}}}}
 .dot{{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;animation:pulse 1.5s infinite;}}
-@media(max-width:1100px){{.g4{{grid-template-columns:1fr 1fr;}} .g3,.g2{{grid-template-columns:1fr;}}}}
-@media(max-width:700px){{.g4{{grid-template-columns:1fr;}}}}
+@media(max-width:1100px){{.g3{{grid-template-columns:1fr 1fr;}}}}
+@media(max-width:900px){{.g4,.g3,.g2{{grid-template-columns:1fr;}} .vb{{grid-template-columns:1fr;}} .sess-grid{{grid-template-columns:repeat(3,1fr);}}}}
 </style>
 </head>
 <body>
@@ -1197,7 +1201,7 @@ tr:last-child td{{border-bottom:none;}}
 {on_level_banner}
 
 <!-- SESSION TIMELINE -->
-<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">{tl}</div>
+<div class="sess-grid">{tl}</div>
 
 <!-- VERDICT -->
 <div class="vb">
@@ -1248,20 +1252,16 @@ tr:last-child td{{border-bottom:none;}}
 <!-- DIVERGENCE CONTEXT -->
 <div class="card">
   <div class="ct">RSI Divergence Monitor — Bonus Context</div>
-  <div style="display:grid;grid-template-columns:1fr 2fr;gap:12px;align-items:center">
-    <div style="background:{div_bg};border:1px solid {div_color}40;padding:10px;text-align:center">
-      <div style="font-size:.8rem;font-weight:700;color:{div_color}">{h1_div['label']}</div>
-      <div style="font-size:.58rem;color:var(--muted);margin-top:4px">{h1_div['detail'] or "No divergence on current 1H bars"}</div>
-      {div_action}
-    </div>
-    <div style="font-size:.6rem;color:var(--muted);line-height:1.7;padding:6px">
-      <strong style="color:var(--white)">RSI Divergence Types (eemani123 detector · period 5, lookback 3):</strong><br>
-      <span style="color:#00ff9d">Regular Bull:</span> Price lower low + RSI higher low → bullish reversal signal<br>
-      <span style="color:#4fc3f7">Hidden Bull:</span> Price higher low + RSI lower low → uptrend continuation<br>
-      <span style="color:#ff3a5e">Regular Bear:</span> Price higher high + RSI lower high → bearish reversal signal<br>
-      <span style="color:#ff8c42">Hidden Bear:</span> Price lower high + RSI higher high → downtrend continuation<br>
-      <em>Divergence is context, not a signal gate. Confirms entry or warns to exit.</em>
-    </div>
+  <div style="background:{div_bg};border:1px solid {div_color}40;padding:10px;margin-bottom:8px">
+    <div style="font-size:.78rem;font-weight:700;color:{div_color}">{h1_div['label']}</div>
+    <div style="font-size:.58rem;color:var(--muted);margin-top:4px">{h1_div['detail'] or "No divergence on current 1H bars"}</div>
+    {div_action}
+  </div>
+  <div style="font-size:.58rem;color:var(--muted);line-height:1.7;padding:4px">
+    <span style="color:#00ff9d">Reg Bull:</span> Price LL + RSI HL → reversal &nbsp;·&nbsp;
+    <span style="color:#4fc3f7">Hid Bull:</span> Price HL + RSI LL → continuation<br>
+    <span style="color:#ff3a5e">Reg Bear:</span> Price HH + RSI LH → reversal &nbsp;·&nbsp;
+    <span style="color:#ff8c42">Hid Bear:</span> Price LH + RSI HH → continuation
   </div>
 </div>
 
@@ -1429,21 +1429,21 @@ tr:last-child td{{border-bottom:none;}}
     <div class="ct">v6 Proven Entry Model — Backtested System</div>
     <div style="font-size:.66rem;line-height:1.8;color:var(--text)">
       <div style="color:#4fc3f7;font-weight:700;margin-bottom:6px;font-size:.7rem">🔬 BACKTESTED RESEARCH RESULTS</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
-        <div style="background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.3);padding:8px;text-align:center">
-          <div style="font-size:.56rem;color:#b39ddb">S1 · ICHIMOKU 15m</div>
-          <div style="font-size:.85rem;color:#00ff9d;font-weight:700">PF 4.18</div>
-          <div style="font-size:.55rem;color:var(--muted)">49% WR · Best PF</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.3);padding:6px;text-align:center">
+          <div style="font-size:.5rem;color:#b39ddb">S1 ICHIMOKU</div>
+          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">PF 4.18</div>
+          <div style="font-size:.5rem;color:var(--muted)">49% WR</div>
         </div>
-        <div style="background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.3);padding:8px;text-align:center">
-          <div style="font-size:.56rem;color:#7c4dff">S2 · KAUFMAN 45m</div>
-          <div style="font-size:.85rem;color:#00ff9d;font-weight:700">PF 4.34</div>
-          <div style="font-size:.55rem;color:var(--muted)">63% WR · Highest PF</div>
+        <div style="background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.3);padding:6px;text-align:center">
+          <div style="font-size:.5rem;color:#7c4dff">S2 KAUFMAN</div>
+          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">PF 4.34</div>
+          <div style="font-size:.5rem;color:var(--muted)">63% WR</div>
         </div>
-        <div style="background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.3);padding:8px;text-align:center">
-          <div style="font-size:.56rem;color:#4fc3f7">S3 · RSI 1H</div>
-          <div style="font-size:.85rem;color:#00ff9d;font-weight:700">77% WR</div>
-          <div style="font-size:.55rem;color:var(--muted)">PF 2.15 · Best WR</div>
+        <div style="background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.3);padding:6px;text-align:center">
+          <div style="font-size:.5rem;color:#4fc3f7">S3 RSI</div>
+          <div style="font-size:.75rem;color:#00ff9d;font-weight:700">77% WR</div>
+          <div style="font-size:.5rem;color:var(--muted)">PF 2.15</div>
         </div>
       </div>
 
@@ -1466,9 +1466,9 @@ tr:last-child td{{border-bottom:none;}}
   </div>
 </div>
 
-<div style="text-align:center;padding:10px;font-size:.56rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px">
+<div style="text-align:center;padding:10px;font-size:.54rem;color:var(--muted);border-top:1px solid var(--border);line-height:1.9;margin-top:2px;word-break:break-word">
   🔬 v6 PROVEN SYSTEM · Ichimoku (PF 4.18) + Kaufman (PF 4.34) + RSI (77% WR) + MACD combo (68% WR)<br>
-  📊 Auto-updated · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2 (Brando)<br>
+  Auto-updated · Chicago time · Data: Yahoo Finance · S/R: @EliteOptions2<br>
   ⚠️ Educational only — not financial advice. Verify all prices before trading.<br>
   Last update: <strong style="color:var(--text)">{ct_now.strftime("%Y-%m-%d %H:%M:%S CT")}</strong>
 </div>
