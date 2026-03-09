@@ -1,33 +1,31 @@
 name: Options Command Center — Auto Update
 # ─────────────────────────────────────────────────────────────────
-# Chicago = CST (UTC-6) year-round entries only.
-# GitHub Actions cron runs in UTC — CST = UTC-6, so add 6 hours.
+# CT = CST (UTC-6) year-round
+# UTC = CT + 6 hours
 #
-# SCHEDULE (15 refreshes during market hours)
+# SCHEDULE (12 runs — mirrors your proven trading windows)
 #
-#  PREMARKET BIAS      7:00, 7:30, 8:20 AM CT
-#  OPENING EXPANSION   8:35, 9:00, 9:45 AM CT
-#  CONTINUATION        10:00, 10:20 AM CT
-#  MIDDAY              11:00 AM, 12:00 PM CT
-#  POWER WINDOW        1:00, 1:30, 2:00, 2:30, 3:00 PM CT
+#  PRE-MARKET        7:50 AM CT
+#  OPEN CLUSTER      8:30, 8:35, 8:45 AM CT
+#  CONTINUATION      9:00, 9:20 AM CT
+#  DEAD ZONE OPEN    10:30 AM CT  (monitor only)
+#  MIDDAY            12:15 PM CT
+#  POWER WINDOW      1:00, 1:30, 2:00, 2:30 PM CT
 # ─────────────────────────────────────────────────────────────────
 on:
   schedule:
-    - cron: '0  13 * * 1-5'   # 7:00 AM CT
-    - cron: '30 13 * * 1-5'   # 7:30 AM CT
-    - cron: '20 14 * * 1-5'   # 8:20 AM CT
-    - cron: '35 14 * * 1-5'   # 8:35 AM CT
-    - cron: '0  15 * * 1-5'   # 9:00 AM CT
-    - cron: '45 15 * * 1-5'   # 9:45 AM CT
-    - cron: '0  16 * * 1-5'   # 10:00 AM CT
-    - cron: '20 16 * * 1-5'   # 10:20 AM CT
-    - cron: '0  17 * * 1-5'   # 11:00 AM CT
-    - cron: '0  18 * * 1-5'   # 12:00 PM CT
-    - cron: '0  19 * * 1-5'   # 1:00 PM CT
-    - cron: '30 19 * * 1-5'   # 1:30 PM CT
-    - cron: '0  20 * * 1-5'   # 2:00 PM CT
-    - cron: '30 20 * * 1-5'   # 2:30 PM CT
-    - cron: '0  21 * * 1-5'   # 3:00 PM CT
+    - cron: '50 13 * * 1-5'   #  7:50 AM CT  — pre-market bias
+    - cron: '30 14 * * 1-5'   #  8:30 AM CT  — open watch
+    - cron: '35 14 * * 1-5'   #  8:35 AM CT  — open confirmation
+    - cron: '45 14 * * 1-5'   #  8:45 AM CT  — open follow-through
+    - cron: '0  15 * * 1-5'   #  9:00 AM CT  — continuation
+    - cron: '20 15 * * 1-5'   #  9:20 AM CT  — continuation
+    - cron: '30 16 * * 1-5'   # 10:30 AM CT  — dead zone open
+    - cron: '15 18 * * 1-5'   # 12:15 PM CT  — midday check
+    - cron: '0  19 * * 1-5'   #  1:00 PM CT  — POWER WINDOW open
+    - cron: '30 19 * * 1-5'   #  1:30 PM CT  — POWER WINDOW
+    - cron: '0  20 * * 1-5'   #  2:00 PM CT  — POWER WINDOW
+    - cron: '30 20 * * 1-5'   #  2:30 PM CT  — POWER WINDOW close
   workflow_dispatch:
 
 permissions:
@@ -55,7 +53,6 @@ jobs:
       - name: Install dependencies
         run: pip install --quiet yfinance feedparser numpy pytz
 
-      # 3 attempts with 30s wait — handles yfinance/Yahoo rate limits
       - name: Run dashboard updater (with retry)
         run: |
           for attempt in 1 2 3; do
@@ -89,5 +86,5 @@ jobs:
     steps:
       - name: Log failure
         run: |
-          echo "❌ DASHBOARD UPDATE FAILED at $(TZ='America/Chicago' date '+%I:%M %p CT')"
+          echo "❌ DASHBOARD FAILED at $(TZ='America/Chicago' date '+%I:%M %p CT')"
           echo "🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
