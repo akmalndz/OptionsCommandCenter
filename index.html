@@ -3,282 +3,659 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="300">
-<title>NVDA · OCC v6</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<title>NVDA · OCC</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06090f;--s1:#0b1420;--s2:#0f1a2e;--bd:#192e4a;
-  --green:#00ff9d;--green-dim:#00c87a;--red:#ff3a5e;--yellow:#ffd700;
-  --orange:#ff8c42;--blue:#4fc3f7;--white:#e8f4ff;--muted:#4a6888;--text:#b0c8e4;}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;overflow-x:hidden;
-  background-image:radial-gradient(ellipse 60% 35% at 50% 0%,rgba(0,70,160,.09) 0%,transparent 65%)}
-.hdr{border-bottom:1px solid var(--bd);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;
-  background:rgba(6,9,15,.97);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:5px}
-.main{max-width:1440px;margin:0 auto;padding:6px 8px;display:flex;flex-direction:column;gap:5px}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;align-items:start}
-.card{background:var(--s1);border:1px solid var(--bd);padding:7px 9px}
-.ct{font-size:.56rem;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding-bottom:5px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:3px}
-.ct::before{content:'';width:3px;height:3px;background:var(--blue);display:block;border-radius:50%;flex-shrink:0}
-table{width:100%;border-collapse:collapse;table-layout:fixed}
-th,td{padding:3px 3px;font-size:.64rem;border-bottom:1px solid rgba(25,46,74,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-th{color:var(--muted);font-size:.55rem;letter-spacing:.5px;text-align:left}
-tr:last-child td{border-bottom:none}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.dot{width:5px;height:5px;border-radius:50%;display:inline-block;animation:pulse 1.5s infinite}
-@media(max-width:1100px){.g4{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.g4{grid-template-columns:1fr}}
+/* ── Office palette — muted slate, no neon ── */
+:root {
+  --bg:     #0e1117;
+  --s1:     #141820;
+  --s2:     #1a2030;
+  --bd:     #252e3f;
+  --bd2:    #1e2738;
+
+  /* text */
+  --tx:     #94a3b8;   /* main text — slate-400 */
+  --tx2:    #64748b;   /* muted — slate-500 */
+  --tx3:    #475569;   /* very muted */
+  --white:  #cbd5e1;   /* headings — slate-300 */
+
+  /* signal colors — desaturated */
+  --bull:   #4ade80;   /* soft green — NOT neon */
+  --bull2:  #166534;   /* dark green bg */
+  --bear:   #f87171;   /* soft red */
+  --bear2:  #7f1d1d;   /* dark red bg */
+  --warn:   #fbbf24;   /* amber */
+  --warn2:  #78350f;   /* dark amber bg */
+  --blue:   #60a5fa;   /* soft blue */
+  --blue2:  #1e3a5f;   /* dark blue bg */
+  --mute:   #4b5563;   /* gray-600 */
+
+  --pass:   #4ade80;
+  --fail:   #f87171;
+  --neutral:#fbbf24;
+}
+* { margin:0; padding:0; box-sizing:border-box }
+html { font-size: 13px }
+body { background:var(--bg); color:var(--tx); font-family:'IBM Plex Mono',monospace; line-height:1.4 }
+a { color:inherit; text-decoration:none }
+
+/* layout */
+.wrap  { max-width:1600px; margin:0 auto; padding:8px 10px; display:flex; flex-direction:column; gap:6px }
+.row   { display:grid; gap:6px }
+.r2    { grid-template-columns:1fr 1fr }
+.r3    { grid-template-columns:1fr 1fr 1fr }
+.r4    { grid-template-columns:1fr 1fr 1fr 1fr }
+.r5    { grid-template-columns:2fr 1.2fr 1.2fr 1fr 1fr }
+.r6    { grid-template-columns:1.6fr 1fr 1fr 1.4fr 1fr 1fr }
+.col   { display:flex; flex-direction:column; gap:6px }
+
+/* cards */
+.card  { background:var(--s1); border:1px solid var(--bd); padding:8px 10px; border-radius:3px }
+.card.bull-tint { border-color:#166534; background:linear-gradient(135deg,#141820,#0d1f12) }
+.card.bear-tint { border-color:#7f1d1d; background:linear-gradient(135deg,#141820,#1f0d0d) }
+
+/* labels */
+.lbl   { font-size:.65rem; color:var(--tx2); letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px }
+.val   { font-size:.78rem; color:var(--white); font-weight:600 }
+.val-lg{ font-size:1.1rem; color:var(--white); font-weight:600 }
+.dim   { font-size:.65rem; color:var(--tx2) }
+.note  { font-size:.65rem; color:var(--tx) }
+
+/* header */
+header { background:var(--s1); border-bottom:1px solid var(--bd); padding:7px 12px;
+         display:flex; align-items:center; justify-content:space-between; gap:12px }
+.h-price { font-size:1.25rem; font-weight:600; letter-spacing:.02em }
+.h-chg   { font-size:.72rem; font-weight:500 }
+.h-meta  { font-size:.62rem; color:var(--tx2) }
+
+/* verdict strip */
+.verdict { padding:8px 12px; border-radius:3px; border-left:3px solid var(--bd);
+           display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start }
+.v-title { font-size:.88rem; font-weight:600; letter-spacing:.04em }
+.v-idea  { font-size:.68rem; color:var(--tx); margin-top:4px; padding:5px 8px;
+           background:rgba(255,255,255,.03); border-left:2px solid var(--bd); line-height:1.5 }
+.v-expl  { font-size:.67rem; color:var(--tx2); margin-top:3px }
+.v-stats { display:flex; flex-direction:column; gap:5px; min-width:130px }
+
+/* session bar */
+.sess-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:4px }
+.sess-cell { padding:4px 6px; border:1px solid var(--bd); border-radius:2px; text-align:center }
+.sess-cell.active { border-color:var(--blue) }
+.sess-name { font-size:.58rem; font-weight:600 }
+.sess-time { font-size:.55rem; color:var(--tx2) }
+.sess-now  { font-size:.52rem; color:var(--blue) }
+
+/* signal rows */
+.sig-row  { display:flex; align-items:baseline; justify-content:space-between;
+            padding:3px 0; border-bottom:1px solid var(--bd2); gap:6px }
+.sig-name { font-size:.63rem; color:var(--tx2); min-width:60px }
+.sig-lbl  { font-size:.68rem; font-weight:600 }
+.sig-det  { font-size:.6rem; color:var(--tx2); text-align:right }
+
+/* check list */
+.chk-row  { display:flex; align-items:baseline; gap:6px; padding:2px 0; font-size:.63rem }
+.chk-dot  { font-size:.55rem; min-width:10px }
+
+/* table */
+table  { width:100%; border-collapse:collapse }
+th     { font-size:.58rem; color:var(--tx2); font-weight:500; padding:3px 4px;
+         text-align:left; border-bottom:1px solid var(--bd) }
+td     { font-size:.63rem; padding:3px 4px; border-bottom:1px solid var(--bd2) }
+tr:hover td { background:rgba(255,255,255,.015) }
+.num   { text-align:right; font-variant-numeric:tabular-nums }
+
+/* bar */
+.bar-wrap { height:2px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden }
+.bar-fill { height:100%; border-radius:2px }
+
+/* analytics card — the key naked options panel */
+.ana-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 12px }
+.ana-cell { padding:4px 0; border-bottom:1px solid var(--bd2) }
+.ana-lbl  { font-size:.58rem; color:var(--tx3) }
+.ana-val  { font-size:.72rem; font-weight:600; color:var(--white) }
+.ana-sub  { font-size:.58rem; color:var(--tx2) }
+
+/* iv quality badge */
+.iq-badge { display:inline-block; padding:2px 7px; border-radius:2px;
+            font-size:.6rem; font-weight:600; letter-spacing:.04em }
+
+/* brando levels */
+.br-price { font-size:.7rem; font-weight:600 }
+.br-now   { background:rgba(251,191,36,.08); border-color:rgba(251,191,36,.3) }
+
+/* loading / error */
+.loading { text-align:center; padding:80px; color:var(--tx2); font-size:.8rem }
+.errmsg  { text-align:center; padding:40px; color:var(--bear); font-size:.75rem; line-height:1.8 }
+
+/* tiny dot */
+.dot { width:5px; height:5px; border-radius:50%; display:inline-block; margin-right:4px }
+.dot-live { background:var(--bull) }
+
+/* theta danger indicator */
+.theta-ok   { color:var(--bull) }
+.theta-warn { color:var(--warn) }
+.theta-bad  { color:var(--bear) }
 </style>
 </head>
 <body>
-<header class="hdr">
-  <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap">
-    <span style="font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:var(--white);letter-spacing:3px">NVDA</span>
-    <span style="font-size:1.1rem;color:#00ff9d;font-weight:700">$182.65</span>
-    <span style="font-size:.78rem;color:#00ff9d">▲ +4.77 (+2.68%)</span>
-    <span style="font-size:.58rem;color:var(--muted)">H182.91·L175.56·ATR$6.21</span>
-    <span style="font-size:.55rem;background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.3);color:#4fc3f7;padding:2px 6px;font-weight:700">v6 PROVEN</span>
-  </div>
-  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
-    <span style="font-size:.66rem;color:#ff8c42;font-weight:700">⚠️ $180.34 DECISION</span>
-    <span style="font-size:.64rem;color:#5a7a99"><span class="dot" style="background:#5a7a99;margin-right:2px"></span>🌙 AFTER HOURS</span>
-    <span style="color:#ff3a5e;font-size:.62rem;font-weight:700">SPY BEAR✗</span>
-    <span style="font-size:.6rem;color:var(--muted)">Mar 09·04:53 PM CT</span>
-  </div>
-</header>
+<div id="root"><div class="loading">loading data.json…</div></div>
+<script>
+// ── palette helpers ───────────────────────────────────────────
+const C = {
+  bull:'#4ade80', bear:'#f87171', warn:'#fbbf24',
+  blue:'#60a5fa', tx:'#94a3b8',  tx2:'#64748b', white:'#cbd5e1', mute:'#4b5563'
+};
 
-<div class="main">
-<div style="background:rgba(255,215,0,.1);border:1px solid #ffd700;padding:5px 14px;font-size:.68rem;color:#ffd700;font-weight:700;text-align:center">⚡ ON LEVEL: $184.58 — KEY RESISTANCE (DY)</div>
+function bar(pct, color, h=2) {
+  return `<div class="bar-wrap" style="height:${h}px">
+    <div class="bar-fill" style="width:${Math.min(100,Math.max(0,pct))}%;background:${color}"></div>
+  </div>`;
+}
 
-<!-- SESSION BAR -->
-<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px"><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">07:00</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">🌅 PRE-MKT</div></div><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">08:30</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">⚠️ FAKE-OUT</div></div><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">09:15</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">📈 CONTINUATION</div></div><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">10:30</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">💤 DEAD ZONE</div></div><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">13:00</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">🏆 POWER WINDOW</div></div><div style="background:rgba(255,255,255,.018);border:1px solid var(--bd);padding:3px 5px;text-align:center"><div style="font-size:.54rem;color:var(--muted)">14:30</div><div style="font-size:.6rem;font-weight:700;color:var(--muted);white-space:nowrap">🔔 CLOSING PUSH</div></div></div>
+function chkDot(pass) {
+  if (pass === true)  return `<span class="chk-dot" style="color:${C.bull}">+</span>`;
+  if (pass === false) return `<span class="chk-dot" style="color:${C.bear}">–</span>`;
+  return `<span class="chk-dot" style="color:${C.tx2}">·</span>`;
+}
 
-<!-- VERDICT -->
-<div style="padding:9px 13px;border:1px solid var(--bd);border-left:4px solid #ff3a5e;background:linear-gradient(135deg,rgba(11,20,32,.97),rgba(15,26,46,.97));display:grid;grid-template-columns:1fr 140px;gap:10px;align-items:center">
-  <div>
-    <div style="font-size:.53rem;color:var(--muted);letter-spacing:1px;margin-bottom:2px">VERDICT · 04:53 PM CT</div>
-    <div style="font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:#ff3a5e;line-height:1.2">💤 AFTER HOURS — NO NEW TRADES</div>
-    <div style="font-size:.66rem;color:var(--text);margin-top:3px;line-height:1.45">Market closed. Plan tomorrow.</div>
-    <div style="margin-top:4px;padding:5px 7px;background:rgba(255,255,255,.025);border-left:2px solid #ff3a5e;font-size:.68rem;color:var(--white)">Next: Power Window 1:00 PM CT.</div>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:4px">
-    <div style="border:1px solid #ff8c42;color:#ff8c42;padding:4px 8px;font-size:.7rem;letter-spacing:1px;font-weight:700;text-align:center">WAIT</div>
+function biasColor(bias) {
+  if (!bias) return C.tx2;
+  const b = bias.toUpperCase();
+  if (b==='BULL'||b==='STRONG BULL') return C.bull;
+  if (b==='BEAR'||b==='STRONG BEAR') return C.bear;
+  if (b==='WAIT'||b==='FLAT')        return C.mute;
+  return C.warn;
+}
+
+function levelColor(sc) {
+  if (sc==='bull') return C.bull;
+  if (sc==='bear') return C.bear;
+  if (sc==='warn') return C.warn;
+  return C.tx2;
+}
+
+const TF_COL = {MO:C.tx2, WK:C.blue, DY:C.tx};
+
+// ── main render ───────────────────────────────────────────────
+function render(D) {
+  const m   = D.market, spy = D.spy, sig = D.signals;
+  const tf  = D.timeframes, br = D.brando, al = D.alignment;
+  const v   = D.verdict, opts = D.options, news = D.news;
+  const div = sig.divergence, ms = al.max_signals;
+  const price = m.price;
+  const vc = m.change >= 0 ? C.bull : C.bear;
+  const arrow = m.change >= 0 ? '▲' : '▼';
+  const ivs = opts.iv_stats || {};
+  const ca = opts.call_analytics, pa = opts.put_analytics;
+  const vbias = biasColor(v.bias);
+
+  // ── HEADER ────────────────────────────────────────────────
+  const hdr = `<header>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="font-size:.65rem;color:var(--tx2);letter-spacing:.12em">NVDA · OCC</div>
+      <div>
+        <span class="h-price" style="color:${vc}">${price.toFixed(2)}</span>
+        <span class="h-chg" style="color:${vc};margin-left:8px">${arrow} ${m.change>0?'+':''}${m.change.toFixed(2)} (${m.change_pct>0?'+':''}${m.change_pct.toFixed(2)}%)</span>
+      </div>
+      <div style="padding:2px 9px;border:1px solid ${vbias}44;color:${vbias};font-size:.62rem;font-weight:600;letter-spacing:.08em">${v.bias}</div>
+      <div class="h-meta">ATR $${m.atr.toFixed(2)} · Vol ${m.vol_ratio}x · ${(m.volume/1e6).toFixed(1)}M / ${(m.avg_vol/1e6).toFixed(1)}M avg</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="h-meta">SPY $${spy.price} vs E50 $${spy.e50} — <span style="color:${spy.bull?C.bull:C.bear}">${spy.bull?'above':'below'}</span></span>
+      <span class="h-meta"><span class="dot dot-live"></span>${D.generated_at}</span>
+    </div>
+  </header>`;
+
+  // ── SESSION BAR ───────────────────────────────────────────
+  const SESS = [
+    {n:'PRE-MKT',t:'07:00'},{n:'FAKE-OUT',t:'08:30'},{n:'CONT.',t:'09:15'},
+    {n:'DEAD ZONE',t:'10:30'},{n:'POWER WIN',t:'13:00'},{n:'CLOSING',t:'14:30'}
+  ];
+  const sessHtml = `<div class="sess-grid">
+    ${SESS.map(s=>{
+      const act = D.session_name.startsWith(s.n.split(' ')[0]) || D.session_name===s.n;
+      return `<div class="sess-cell${act?' active':''}">
+        <div class="sess-time">${s.t}</div>
+        <div class="sess-name" style="color:${act?C.blue:'var(--tx2)'}">${s.n}</div>
+        ${act?'<div class="sess-now">NOW</div>':''}
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // ── VERDICT ───────────────────────────────────────────────
+  const verdictHtml = `<div class="verdict" style="border-left-color:${vbias};background:var(--s1)">
     <div>
-      <div style="display:flex;justify-content:space-between;font-size:.55rem;margin-bottom:2px"><span style="color:var(--muted)">CALL</span><span style="color:#00ff9d;font-weight:700">1/4</span></div>
-      <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:25%;background:linear-gradient(90deg,#00c87a,#00ff9d);border-radius:2px"></div></div>
+      <div class="v-title" style="color:${vbias}">${v.verdict}</div>
+      <div class="v-expl">${v.explanation}</div>
+      <div class="v-idea">${v.trade_idea}</div>
     </div>
-    <div>
-      <div style="display:flex;justify-content:space-between;font-size:.55rem;margin-bottom:2px"><span style="color:var(--muted)">PUT</span><span style="color:#ff3a5e;font-weight:700">1/4</span></div>
-      <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:25%;background:linear-gradient(90deg,#cc1f40,#ff3a5e);border-radius:2px"></div></div>
-    </div>
-    <div style="font-size:.54rem;color:var(--muted);text-align:center;border-top:1px solid var(--bd);padding-top:3px">IV42.4%·DTE32·±$22.93</div>
-  </div>
-</div>
-
-<!-- MAIN GRID -->
-<div class="g4">
-
-  <!-- COL 1: Signals + Divergence -->
-  <div style="display:flex;flex-direction:column;gap:4px">
-    <div style="font-size:.55rem;color:var(--muted);letter-spacing:1.5px;padding:2px 0">PROVEN SIGNALS</div>
-    <div style="background:rgba(0,255,157,.06);border:1px solid rgba(0,255,157,.35);padding:6px 7px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-            <span style="font-size:.56rem;color:#b39ddb;font-weight:700">S1 ICHIMOKU</span>
-            <span style="font-size:.52rem;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 4px">15M PF4.18</span>
-          </div>
-          <div style="font-size:.73rem;font-weight:700;color:#00ff9d">✅ BULL</div>
-          <div style="font-size:.6rem;color:var(--text);margin-top:1px;line-height:1.35;opacity:.9">Above cloud·T>179.2</div>
+    <div class="v-stats">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:3px">
+          <span style="color:var(--tx2)">CALL</span>
+          <span style="color:${C.bull};font-weight:600">${al.call_count}/${ms}</span>
         </div>
-    <div style="background:rgba(255,58,94,.06);border:1px solid rgba(255,58,94,.35);padding:6px 7px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-            <span style="font-size:.56rem;color:#7c4dff;font-weight:700">S2 KAUFMAN</span>
-            <span style="font-size:.52rem;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 4px">4H PF4.34</span>
-          </div>
-          <div style="font-size:.73rem;font-weight:700;color:#ff3a5e">✅ BEAR</div>
-          <div style="font-size:.6rem;color:var(--text);margin-top:1px;line-height:1.35;opacity:.9">HLC3<185.0·KAMA↓·ER0.05</div>
-        </div>
-    <div style="background:rgba(90,122,153,.06);border:1px solid rgba(90,122,153,.35);padding:6px 7px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-            <span style="font-size:.56rem;color:#4fc3f7;font-weight:700">S3 RSI</span>
-            <span style="font-size:.52rem;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 4px">1H 77%WR</span>
-          </div>
-          <div style="font-size:.73rem;font-weight:700;color:#5a7a99">⏸ MID</div>
-          <div style="font-size:.6rem;color:var(--text);margin-top:1px;line-height:1.35;opacity:.9">RSI48 wait 45/55</div>
-        </div>
-    <div style="background:rgba(90,122,153,.06);border:1px solid rgba(90,122,153,.35);padding:6px 7px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-            <span style="font-size:.56rem;color:#ff8c42;font-weight:700">S4 MACD+RSI</span>
-            <span style="font-size:.52rem;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 4px">1H 68%WR</span>
-          </div>
-          <div style="font-size:.73rem;font-weight:700;color:#5a7a99">⏸ WAIT</div>
-          <div style="font-size:.6rem;color:var(--text);margin-top:1px;line-height:1.35;opacity:.9">MACD+0.326·RSI48</div>
-        </div>
-    <div style="background:rgba(90,122,153,.06);border:1px solid rgba(90,122,153,.3);padding:6px 7px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-        <span style="font-size:.55rem;color:var(--muted);letter-spacing:.5px">DIV BONUS</span><span style="color:var(--muted);font-size:.58rem">No action</span>
+        ${bar(al.call_count/ms*100, C.bull, 3)}
       </div>
-      <div style="font-size:.7rem;font-weight:700;color:#5a7a99">No divergence</div>
-      <div style="font-size:.58rem;color:var(--text);margin-top:1px">No divergence on 1H</div>
-    </div>
-  </div>
-
-  <!-- COL 2: Brando + Scenario -->
-  <div style="display:flex;flex-direction:column;gap:4px">
-    <div class="card" style="padding:7px">
-      <div class="ct">Brando S/R</div>
-      <table style="table-layout:fixed">
-        <colgroup><col style="width:20px"><col style="width:38px"><col><col style="width:32px"></colgroup>
-        <tr><th>TF</th><th>$</th><th>LABEL</th><th style="text-align:right">DIST</th></tr>
-        <tr style="background:rgba(255,215,0,.04);"><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#ffd700;font-weight:700;font-size:.65rem">$185</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis">★KEY RESISTANCE</td><td style="color:var(--muted);font-size:.56rem;text-align:right">+1.9</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#ff6b6b;font-weight:700;font-size:.65rem">$190</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis"> RESISTANCE</td><td style="color:var(--muted);font-size:.56rem;text-align:right">+7.8</td></tr><tr style="background:rgba(255,215,0,.04);"><td style="color:#b39ddb;font-size:.56rem">MO</td><td style="color:#ffd700;font-weight:700;font-size:.65rem">$191</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis">★YELLOW LINE $191</td><td style="color:var(--muted);font-size:.56rem;text-align:right">+8.3</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#ff6b6b;font-weight:700;font-size:.65rem">$196</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis"> RESISTANCE</td><td style="color:var(--muted);font-size:.56rem;text-align:right">+13.4</td></tr><tr style="background:rgba(255,215,0,.09)"><td colspan="2" style="color:#ffd700;font-weight:700;font-size:.7rem">▶$182.65</td><td colspan="2" style="color:#ffd700;font-size:.55rem;text-align:right">⚡KEY RESIST</td></tr><tr style="background:rgba(255,215,0,.04);"><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#ffd700;font-weight:700;font-size:.65rem">$180</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis">★CRITICAL PIVOT</td><td style="color:var(--muted);font-size:.56rem;text-align:right">-2.3</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#00c87a;font-weight:700;font-size:.65rem">$175</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis"> SUPPORT</td><td style="color:var(--muted);font-size:.56rem;text-align:right">-7.5</td></tr><tr style="background:rgba(255,215,0,.04);"><td style="color:#7c4dff;font-size:.56rem">WK</td><td style="color:#ffd700;font-weight:700;font-size:.65rem">$175</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis">★CRITICAL SUPPORT</td><td style="color:var(--muted);font-size:.56rem;text-align:right">-7.7</td></tr><tr style=""><td style="color:#4fc3f7;font-size:.56rem">DY</td><td style="color:#00c87a;font-weight:700;font-size:.65rem">$169</td><td style="color:var(--muted);font-size:.56rem;overflow:hidden;text-overflow:ellipsis"> SUPPORT</td><td style="color:var(--muted);font-size:.56rem;text-align:right">-14.0</td></tr>
-      </table>
-    </div>
-    <div class="card" style="padding:7px">
-      <div class="ct">Scenario</div>
-      <div style="background:#ff8c4210;border:1px solid #ff8c4255;padding:5px;margin-bottom:5px">
-        <div style="font-size:.73rem;font-weight:700;color:#ff8c42">⚠️ $180.34 DECISION</div>
-        <div style="font-size:.55rem;color:var(--muted);margin-top:2px">R <strong style="color:#ff6b6b">$184.58</strong>+1.9 · S <strong style="color:#00ff9d">$180.34</strong>-2.3</div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:4px">
-        <div style="background:rgba(0,255,157,.04);border:1px solid rgba(0,255,157,.22);padding:4px">
-          <div style="font-size:.52rem;color:#00ff9d;font-weight:700;margin-bottom:2px">A BULL</div>
-          <div style="font-size:.6rem;color:var(--text);line-height:1.35">CALL: Holds $180.34, reclaims $184.58 → $190C target $191.</div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:3px">
+          <span style="color:var(--tx2)">PUT</span>
+          <span style="color:${C.bear};font-weight:600">${al.put_count}/${ms}</span>
         </div>
-        <div style="background:rgba(255,58,94,.04);border:1px solid rgba(255,58,94,.22);padding:4px">
-          <div style="font-size:.52rem;color:#ff3a5e;font-weight:700;margin-bottom:2px">B BEAR</div>
-          <div style="font-size:.6rem;color:var(--text);line-height:1.35">PUT: Breaks $180.34 volume → $175P target $175.</div>
-        </div>
+        ${bar(al.put_count/ms*100, C.bear, 3)}
       </div>
-      <div style="font-size:.6rem;line-height:1.6;background:rgba(0,0,0,.15);padding:4px;border:1px solid var(--bd)">
-        ❌ <strong style="color:#ffd700">$191</strong>
-        ❌ <strong style="color:#4fc3f7">$184</strong>
-        ✅ <strong style="color:#ff8c42">$180★</strong>
-        ✅ <strong style="color:#7c4dff">$175</strong>
-        ✅ <strong style="color:#b39ddb">$153</strong>
+      <div class="dim" style="padding-top:4px;border-top:1px solid var(--bd)">
+        IV ${opts.iv_30}% · DTE ${opts.dte} · ±$${opts.exp_move}
       </div>
     </div>
-  </div>
+  </div>`;
 
-  <!-- COL 3: Call + Put -->
-  <div style="display:grid;grid-template-rows:auto auto;gap:4px">
-    <div class="card" style="padding:7px">
-      <div class="ct">Call (1/4)</div>
-      <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--muted);margin-bottom:2px"><span>SIGNALS</span><span style="color:#00ff9d;font-weight:700">1/4</span></div><div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:25%;background:#00ff9d;border-radius:2px"></div></div></div><div style="font-size:.62rem;color:#00ff9d;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">✅ S1 ICHI: Above cloud·T>179.2</div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S2 KAMA: HLC3<185.0·KAMA↓·ER0.05</div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S3 RSI: RSI48 wait 45/55</div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S4 MACD: MACD+0.326·RSI48</div><div style="font-size:.54rem;color:var(--muted);letter-spacing:.5px;margin:5px 0 2px">CONTEXT</div><div style="font-size:.6rem;color:#00ff9d;padding:1px 0;line-height:1.3">✅ Above $180.34 bias</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ SPY headwind</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ Vol 1.0x neutral</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ AFTER HOURS</div>
-      <div style="background:rgba(255,255,255,.02);border:1px solid #00ff9d44;padding:6px;margin-top:5px">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;text-align:center;margin-bottom:4px">
-            <div><div style="font-size:.52rem;color:var(--muted)">ENTRY</div><div style="font-size:.76rem;color:var(--white);font-weight:700">$5.45</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">STOP</div><div style="font-size:.76rem;color:var(--red);font-weight:700">$3.54</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">TARGET</div><div style="font-size:.76rem;color:var(--green);font-weight:700">$8.72</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">R:R</div><div style="font-size:.76rem;font-weight:700;color:#ffd700">1.7:1</div></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:.56rem;color:var(--muted)">
-            <span>$500·1ct</span><span style="color:var(--red)">max $191</span>
-          </div></div>
+  // ── ON-LEVEL BANNER ───────────────────────────────────────
+  const onBanner = br.on_level
+    ? `<div style="padding:5px 10px;border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.05);
+        font-size:.65rem;color:${C.warn};text-align:center">
+        ON LEVEL — $${br.nearest.price.toFixed(2)} · ${br.nearest.label} (${br.nearest.tf})
+       </div>` : '';
+
+  // ── SIGNALS ───────────────────────────────────────────────
+  function sigRow(num, name, s) {
+    const c = s.bull ? C.bull : (s.bear ? C.bear : C.tx2);
+    return `<div class="sig-row">
+      <span class="sig-name">${num} ${name}</span>
+      <span class="sig-lbl" style="color:${c}">${s.label}</span>
+      <span class="sig-det">${s.detail||''}</span>
+    </div>`;
+  }
+  const divColor = div.confirms_bull||div.confirms_bear ? C.warn :
+                   (div.exit_warning_bull||div.exit_warning_bear ? C.bear : C.tx2);
+  const divNote  = div.confirms_bull||div.confirms_bear ? 'CONFIRMS' :
+                   (div.exit_warning_bull||div.exit_warning_bear ? 'EXIT WARNING' : '');
+
+  const sigsHtml = `<div class="card">
+    <div class="lbl">Signals</div>
+    ${sigRow('S1','ICHIMOKU', sig.ichimoku)}
+    ${sigRow('S2','KAUFMAN',  sig.kama)}
+    ${sigRow('S3','RSI',      sig.rsi)}
+    ${sigRow('S4','MACD+RSI', sig.macd_combo)}
+    <div class="sig-row" style="border-bottom:0">
+      <span class="sig-name" style="color:var(--tx3)">DIVERGENCE</span>
+      <span style="font-size:.65rem;color:${divColor}">${div.label} ${divNote?'· '+divNote:''}</span>
+      <span class="sig-det">${div.detail||''}</span>
     </div>
-    <div class="card" style="padding:7px">
-      <div class="ct">Put (1/4)</div>
-      <div style="margin-bottom:5px"><div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--muted);margin-bottom:2px"><span>SIGNALS</span><span style="color:#ff3a5e;font-weight:700">1/4</span></div><div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:25%;background:#ff3a5e;border-radius:2px"></div></div></div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S1 ICHI: Above cloud·T>179.2</div><div style="font-size:.62rem;color:#00ff9d;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">✅ S2 KAMA: HLC3<185.0·KAMA↓·ER0.05</div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S3 RSI: RSI48 wait 45/55</div><div style="font-size:.62rem;color:#ff3a5e;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04);line-height:1.3">❌ S4 MACD: MACD+0.326·RSI48</div><div style="font-size:.54rem;color:var(--muted);letter-spacing:.5px;margin:5px 0 2px">CONTEXT</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ Above $180.34 — vs Brando</div><div style="font-size:.6rem;color:#00ff9d;padding:1px 0;line-height:1.3">✅ SPY tailwind</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ Vol 1.0x neutral</div><div style="font-size:.6rem;color:#ffd700;padding:1px 0;line-height:1.3">⚠️ AFTER HOURS</div>
-      <div style="background:rgba(255,255,255,.02);border:1px solid #ff3a5e44;padding:6px;margin-top:5px">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:3px;text-align:center;margin-bottom:4px">
-            <div><div style="font-size:.52rem;color:var(--muted)">ENTRY</div><div style="font-size:.76rem;color:var(--white);font-weight:700">$5.51</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">STOP</div><div style="font-size:.76rem;color:var(--red);font-weight:700">$3.58</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">TARGET</div><div style="font-size:.76rem;color:var(--green);font-weight:700">$8.82</div></div>
-            <div><div style="font-size:.52rem;color:var(--muted)">R:R</div><div style="font-size:.76rem;font-weight:700;color:#ffd700">1.7:1</div></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:.56rem;color:var(--muted)">
-            <span>$500·1ct</span><span style="color:var(--red)">max $193</span>
-          </div></div>
+  </div>`;
+
+  // ── CHECK LISTS ───────────────────────────────────────────
+  function chkList(items) {
+    return items.map(i=>
+      `<div class="chk-row">${chkDot(i.pass)}<span style="color:${i.pass===true?'var(--tx)':i.pass===false?'var(--tx2)':'var(--tx2)'}">${i.text}</span></div>`
+    ).join('');
+  }
+  const callChks = `<div class="card ${al.call_count>=3?'bull-tint':''}">
+    <div class="lbl">Call checklist <span style="float:right;color:${C.bull}">${al.call_count}/${ms}</span></div>
+    ${chkList(al.call_reasons)}
+    <div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--bd2)">
+      ${chkList(al.call_context)}
     </div>
-  </div>
-
-  <!-- COL 4: Chain + News -->
-  <div style="display:flex;flex-direction:column;gap:4px">
-    <div class="card" style="padding:7px">
-      <div class="ct">Chain 2026-04-10 (32d) IV42.4%</div>
-      <div style="font-size:.55rem;color:var(--orange);letter-spacing:1px;margin-bottom:2px">CALLS</div>
-      <table style="table-layout:fixed">
-        <colgroup><col style="width:36px"><col style="width:34px"><col style="width:28px"><col style="width:28px"><col></colgroup>
-        <tr><th>STR</th><th>$</th><th>IV</th><th>SPR</th><th>VOL</th></tr>
-        <tr><td style="font-size:.6rem;color:var(--muted)">$160</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$25.45</td><td style="color:var(--orange);font-size:.6rem">51.8%</td><td style="color:#ffd700;font-size:.6rem">$0.25</td><td style="color:var(--green-dim);font-size:.56rem">0K⚠</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$165</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$21.08</td><td style="color:var(--orange);font-size:.6rem">49.5%</td><td style="color:#ffd700;font-size:.6rem">$0.20</td><td style="color:var(--green-dim);font-size:.56rem">0K⚠</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$170</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$17.27</td><td style="color:var(--orange);font-size:.6rem">46.9%</td><td style="color:#00ff9d;font-size:.6rem">$0.15</td><td style="color:var(--green-dim);font-size:.56rem">0K⚠</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$175</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$13.70</td><td style="color:var(--orange);font-size:.6rem">44.5%</td><td style="color:#00ff9d;font-size:.6rem">$0.15</td><td style="color:var(--green-dim);font-size:.56rem">0K</td></tr><tr style="background:rgba(255,215,0,.05)"><td style="font-size:.6rem;color:var(--muted)">$180</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$10.47</td><td style="color:var(--orange);font-size:.6rem">42.4%</td><td style="color:#00ff9d;font-size:.6rem">$0.10</td><td style="color:var(--green-dim);font-size:.56rem">1K</td></tr><tr style="background:rgba(255,215,0,.05)"><td style="font-size:.6rem;color:var(--muted)">$185</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$7.75</td><td style="color:var(--orange);font-size:.6rem">40.5%</td><td style="color:#00ff9d;font-size:.6rem">$0.10</td><td style="color:var(--green-dim);font-size:.56rem">5K</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$190🎯</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$5.45</td><td style="color:var(--orange);font-size:.6rem">38.6%</td><td style="color:#00ff9d;font-size:.6rem">$0.10</td><td style="color:var(--green-dim);font-size:.56rem">0K</td></tr>
-      </table>
-      <div style="font-size:.55rem;color:var(--red);letter-spacing:1px;margin:4px 0 2px">PUTS</div>
-      <table style="table-layout:fixed">
-        <colgroup><col style="width:36px"><col style="width:34px"><col style="width:28px"><col style="width:28px"><col></colgroup>
-        <tr><th>STR</th><th>$</th><th>IV</th><th>SPR</th><th>VOL</th></tr>
-        <tr style="background:rgba(255,215,0,.05)"><td style="font-size:.6rem;color:var(--muted)">$185</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$9.44</td><td style="color:var(--orange);font-size:.6rem">37.8%</td><td style="color:#00ff9d;font-size:.6rem">$0.15</td><td style="color:var(--green-dim);font-size:.56rem">0K</td></tr><tr style="background:rgba(255,215,0,.05)"><td style="font-size:.6rem;color:var(--muted)">$180</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$7.40</td><td style="color:var(--orange);font-size:.6rem">39.6%</td><td style="color:#00ff9d;font-size:.6rem">$0.15</td><td style="color:var(--green-dim);font-size:.56rem">0K</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$175🎯</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$5.51</td><td style="color:var(--orange);font-size:.6rem">41.3%</td><td style="color:#00ff9d;font-size:.6rem">$0.10</td><td style="color:var(--green-dim);font-size:.56rem">0K</td></tr><tr><td style="font-size:.6rem;color:var(--muted)">$170🎯</td><td style="color:var(--white);font-weight:700;font-size:.65rem">$4.16</td><td style="color:var(--orange);font-size:.6rem">43.4%</td><td style="color:#00ff9d;font-size:.6rem">$0.10</td><td style="color:var(--green-dim);font-size:.56rem">1K</td></tr>
-      </table>
-      <div style="margin-top:4px;font-size:.54rem;color:var(--muted)">🎯$3.5–6.5·V>500·OI>1K·Spr&lt;.20</div>
+  </div>`;
+  const putChks = `<div class="card ${al.put_count>=3?'bear-tint':''}">
+    <div class="lbl">Put checklist <span style="float:right;color:${C.bear}">${al.put_count}/${ms}</span></div>
+    ${chkList(al.put_reasons)}
+    <div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--bd2)">
+      ${chkList(al.put_context)}
     </div>
-    <div class="card" style="padding:7px">
-      <div class="ct">News</div>
-      <div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#00ff9d;font-weight:700;margin-right:3px">▲</span><a href="https://finance.yahoo.com/m/72bc694f-b3fd-3b52-affb-fba9fecbf287/nvidia-partner%2C-ibd-stock-of.html?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">Nvidia Partner, IBD Stock Of The Day, Surges To High On S&P 500 News, Trump's Iran War Hopes</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:41</div></div><div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#ffd700;font-weight:700;margin-right:3px">—</span><a href="https://finance.yahoo.com/m/dbc8242b-8ae9-343a-b883-4d12fc5d012e/dow-jones-futures%3A-trump%27s.html?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">Dow Jones Futures: Trump's Iran Comments Spark Stock Market Reversal As Oil Prices Tumble</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:31</div></div><div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#00ff9d;font-weight:700;margin-right:3px">▲</span><a href="https://finance.yahoo.com/news/why-ubs-bullish-corning-incorporated-212844709.html?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">Why UBS Is Bullish on Corning Incorporated (GLW) as AI and Fiber Demand Surge</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:28</div></div><div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#ffd700;font-weight:700;margin-right:3px">—</span><a href="https://www.fool.com/investing/2026/03/09/berkshire-hathaway-just-repurchased-stock-for-the/?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">Berkshire Hathaway Just Repurchased Stock for the First Time Since 2024 -- It's a Green Light for Sh</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:25</div></div><div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#00ff9d;font-weight:700;margin-right:3px">▲</span><a href="https://www.fool.com/investing/2026/03/09/the-agentic-ai-market-could-grow-10x-by-2030-this/?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">The Agentic AI Market Could Grow 10X by 2030. This Stock Is Leading the Charge.</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:20</div></div><div style="padding:4px 0;border-bottom:1px solid rgba(26,51,84,.35)"><div style="font-size:.64rem;line-height:1.3"><span style="color:#00ff9d;font-weight:700;margin-right:3px">▲</span><a href="https://www.fool.com/investing/2026/03/09/down-already-33-this-year-is-there-any-reason-to-r/?.tsrc=rss" target="_blank" style="color:var(--text);text-decoration:none">Down Already 33% This Year, Is There Any Reason to Remain Bullish on C3.ai Stock?</a></div><div style="font-size:.55rem;color:var(--muted);margin-top:1px">Mon, 09 Mar 2026 21:20</div></div>
+  </div>`;
+
+  // ── NAKED OPTION ANALYTICS ────────────────────────────────
+  function anaCard(a, direction) {
+    if (!a) return `<div class="card"><div class="lbl">${direction} analytics</div><div class="dim">No qualifying option found</div></div>`;
+    const dc = direction==='CALL' ? C.bull : C.bear;
+    const thetaClass = a.days_to_danger === 0 ? 'theta-bad' : (a.days_to_danger < 7 ? 'theta-warn' : 'theta-ok');
+
+    return `<div class="card">
+      <div class="lbl" style="color:${dc}">Naked ${direction} — $${a.strike} · ${opts.expiry}</div>
+      <div class="ana-grid">
+        <div class="ana-cell">
+          <div class="ana-lbl">Premium (ask)</div>
+          <div class="ana-val">$${a.premium.toFixed(2)}</div>
+          <div class="ana-sub">bid $${a.bid} / ask $${a.ask} · spread $${a.spread.toFixed(2)}</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Max loss</div>
+          <div class="ana-val" style="color:${C.bear}">$${a.max_loss.toFixed(0)}</div>
+          <div class="ana-sub">per contract (100 shares × premium)</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Breakeven at expiry</div>
+          <div class="ana-val">$${a.breakeven.toFixed(2)}</div>
+          <div class="ana-sub">${direction==='CALL'?'+':'-'}$${a.move_to_be.toFixed(2)} from here (${direction==='CALL'?'+':''}${(direction==='CALL'?1:-1)*a.move_to_be_pct}%)</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">2× target (+80% rule)</div>
+          <div class="ana-val" style="color:${dc}">$${a.target_prem.toFixed(2)}</div>
+          <div class="ana-sub">exit trigger — sell all at +80%</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Move needed to 2×</div>
+          <div class="ana-val">±$${a.move_for_2x ? a.move_for_2x.toFixed(2) : '—'}</div>
+          <div class="ana-sub">${a.move_for_2x_pct ? ('±'+a.move_for_2x_pct+'% · delta ~'+a.approx_delta) : '—'}</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Stop loss (–50% rule)</div>
+          <div class="ana-val" style="color:${C.bear}">$${a.stop_prem.toFixed(2)}</div>
+          <div class="ana-sub">hard exit if premium drops to this</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Daily theta (est.)</div>
+          <div class="ana-val ${thetaClass}">–$${(a.daily_theta*100).toFixed(2)}/day</div>
+          <div class="ana-sub">${a.days_to_danger===0?'past 21 DTE — theta accelerating':(a.days_to_danger<7?(a.days_to_danger+'d until 21-DTE danger'):(a.days_to_danger+'d until theta danger'))}</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Liquidity</div>
+          <div class="ana-val" style="color:${a.liq==='Tight'?C.bull:a.liq.includes('Wide')||a.liq.includes('avoid')?C.bear:C.warn}">${a.liq}</div>
+          <div class="ana-sub">vol ${a.volume.toLocaleString()} · OI ${a.oi.toLocaleString()}</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Option IV</div>
+          <div class="ana-val">${a.iv}%</div>
+          <div class="ana-sub">DTE ${opts.dte} · exp move ±$${opts.exp_move}</div>
+        </div>
+        <div class="ana-cell">
+          <div class="ana-lbl">Approx delta</div>
+          <div class="ana-val">${a.approx_delta}</div>
+          <div class="ana-sub">$1 NVDA move ≈ $${(a.approx_delta*100).toFixed(0)} P&L/contract</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── IV / VOLATILITY PANEL ────────────────────────────────
+  const ivRank = ivs.iv_rank != null ? ivs.iv_rank : null;
+  const ivColor = ivRank == null ? C.tx2 : (ivRank < 35 ? C.bull : ivRank < 60 ? C.warn : C.bear);
+  const ivHtml = `<div class="card">
+    <div class="lbl">IV Environment</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:6px">
+      <div class="ana-cell">
+        <div class="ana-lbl">ATM IV (30d)</div>
+        <div class="ana-val">${opts.iv_30}%</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">IV Rank (HV proxy)</div>
+        <div class="ana-val" style="color:${ivColor}">${ivRank != null ? ivRank+'th' : '—'}</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">IV Percentile</div>
+        <div class="ana-val">${ivs.iv_pct != null ? ivs.iv_pct+'%' : '—'}</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">HV 20-day</div>
+        <div class="ana-val">${ivs.hv_20 != null ? ivs.hv_20+'%' : '—'}</div>
+      </div>
+      <div class="ana-cell" style="grid-column:1/-1">
+        <div class="ana-lbl">IV vs HV</div>
+        <div class="ana-val">${ivs.iv_vs_hv != null ? (ivs.iv_vs_hv>0?'+':'')+ivs.iv_vs_hv+'pts' : '—'}</div>
+        <div class="ana-sub">${ivs.iv_quality||'—'}</div>
+      </div>
     </div>
-  </div>
+    ${ivRank != null ? bar(ivRank, ivColor, 3) : ''}
+    <div style="margin-top:6px;font-size:.6rem;color:var(--tx2);line-height:1.6">
+      Low rank (&lt;35) = IV cheap → buy premium. High rank (&gt;65) = IV rich → consider waiting or sizing down.
+    </div>
+  </div>`;
 
-</div>
+  // ── MTF TABLE ─────────────────────────────────────────────
+  function tfRow(t) {
+    if (!t) return '';
+    const tc = t.above_cloud&&t.hh_hl ? C.bull : t.below_cloud ? C.bear : C.warn;
+    const trend = t.above_cloud&&t.hh_hl ? 'BULL' : t.below_cloud ? 'BEAR' : 'NEUT';
+    const rc = t.rsi_expansion_bull ? C.bull : t.rsi_expansion_bear ? C.bear : C.warn;
+    const mc = t.macd_bull ? C.bull : C.bear;
+    const sc = [t.above_cloud,t.fast_bull,t.macd_bull,t.hh_hl,t.rsi_expansion_bull].filter(Boolean).length;
+    const [bias,bc] = sc>=4?['LONG',C.bull]:sc<=1?['SHORT',C.bear]:['WATCH',C.warn];
+    const vc2 = t.vol_expanded ? C.bull : t.vol_ratio>=1.0 ? C.warn : C.bear;
+    return `<tr>
+      <td style="color:var(--white);font-weight:500">${t.label}</td>
+      <td style="color:${tc};font-weight:500">${trend}</td>
+      <td style="color:${rc}">${t.rsi}</td>
+      <td style="color:${mc}">${t.macd_bull?'↑':'↓'} ${t.macd_h>0?'+':''}${t.macd_h.toFixed(2)}</td>
+      <td style="color:${bc};font-weight:500">${bias}</td>
+      <td style="color:${vc2}">${t.vol_ratio}x</td>
+    </tr>`;
+  }
+  const m15d = tf.m15;
+  const rsiOk = m15d?.rsi_above_50, macdOk = m15d?.macd_bull, volOk = m15d?.vol_expanded;
+  const timingChecks = [rsiOk,macdOk,volOk].filter(Boolean).length;
+  const timingColor = timingChecks===3 ? C.bull : timingChecks===2 ? C.warn : C.bear;
 
-<!-- BOTTOM GRID -->
-<div class="g4">
-
-  <div class="card" style="padding:7px">
-    <div class="ct">MTF Bias</div>
+  const mtfHtml = `<div class="card">
+    <div class="lbl">Multi-timeframe</div>
     <table>
       <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD</th><th>BIAS</th><th>VOL</th></tr>
-      <tr><td style="color:var(--white);font-weight:700;font-size:.62rem">DAILY</td><td style="color:#ff3a5e;font-weight:700;font-size:.62rem">BEAR</td><td style="color:#ffd700;font-size:.62rem">47.7</td><td style="color:#ff3a5e;font-size:.62rem">↓-0.79</td><td style="color:#ff3a5e;font-weight:700;font-size:.62rem">SHORT</td><td style="color:#ff3a5e;font-size:.6rem">0.91x</td></tr><tr><td style="color:var(--white);font-weight:700;font-size:.62rem">4H</td><td style="color:#ff3a5e;font-weight:700;font-size:.62rem">BEAR</td><td style="color:#ffd700;font-size:.62rem">47.0</td><td style="color:#ff3a5e;font-size:.62rem">↓-0.18</td><td style="color:#ff3a5e;font-weight:700;font-size:.62rem">SHORT</td><td style="color:#ff3a5e;font-size:.6rem">0.7x</td></tr><tr><td style="color:var(--white);font-weight:700;font-size:.62rem">1H</td><td style="color:#ffd700;font-weight:700;font-size:.62rem">NEUT</td><td style="color:#ffd700;font-size:.62rem">47.6</td><td style="color:#00ff9d;font-size:.62rem">↑+0.33</td><td style="color:#ffd700;font-weight:700;font-size:.62rem">WATCH</td><td style="color:#ff3a5e;font-size:.6rem">0.98x</td></tr>
+      ${tfRow(tf.daily)}${tfRow(tf.h4)}${tfRow(tf.h1)}${tfRow(tf.m15)}
     </table>
-    <div style="margin-top:4px;padding:4px;background:rgba(0,0,0,.15);border:1px solid var(--bd);font-size:.56rem;color:var(--muted)"><strong style="color:var(--yellow)">Size:</strong> 2=$500·3=$750·4=$1000</div>
-  </div>
-
-  <div class="card" style="padding:7px">
-    <div class="ct">Regime</div>
-    <div style="background:rgba(0,0,0,.2);border:1px solid #ff3a5e55;padding:5px;margin-bottom:5px">
-      <div style="font-size:.7rem;font-weight:700;color:#ff3a5e">SPY BEAR✗</div>
-      <div style="font-size:.56rem;color:var(--muted)">$678.27 vs 50EMA $684.73</div>
+    <div style="margin-top:7px;padding:5px 7px;border:1px solid var(--bd2);font-size:.62rem">
+      <div style="color:var(--tx2);margin-bottom:3px">15M ENTRY TIMING <span style="color:${timingColor};float:right">${timingChecks}/3</span></div>
+      <div style="color:${m15d?.rsi_above_50?C.bull:C.bear}">${chkDot(m15d?.rsi_above_50||false)} 15M RSI above 50</div>
+      <div style="color:${m15d?.macd_bull?C.bull:C.bear}">${chkDot(m15d?.macd_bull||false)} 15M MACD histogram positive</div>
+      <div style="color:${m15d?.vol_expanded?C.bull:C.bear}">${chkDot(m15d?.vol_expanded||false)} 15M volume ≥ 1.5× avg</div>
     </div>
-    <div style="margin-bottom:4px"><div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:2px"><span>Compression</span><span style="color:#5a7a99;font-weight:700">0.0/100</span></div><div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:0.0%;background:#5a7a99;border-radius:2px"></div></div></div>
-    <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:3px"><span>ATR(14)</span><span style="color:var(--orange);font-weight:700">$6.21</span></div>
-    <div style="display:flex;justify-content:space-between;font-size:.58rem;margin-bottom:2px"><span>Volume</span><span style="font-weight:700;color:#ffd700">1.0x·176M</span></div>
-    <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:50%;background:#ffd700;border-radius:2px"></div></div>
-    <div style="margin-top:5px;border-top:1px solid var(--bd);padding-top:4px"><div style="font-size:.55rem;color:var(--muted);margin-bottom:2px">1H EMA</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:.6rem">
-      <div>E8 <strong style="color:var(--blue)">$180.73</strong></div>
-      <div>E21 <strong style="color:var(--blue)">$180.74</strong></div>
-      <div>E50 <strong style="color:var(--blue)">$182.08</strong></div>
-      <div>RSI <strong style="color:var(--blue)">47.6</strong></div>
-    </div></div>
-  </div>
+  </div>`;
 
-  <div class="card" style="padding:7px">
-    <div class="ct">5m Candles</div>
+  // ── BRANDO LEVELS ─────────────────────────────────────────
+  function brRow(lv, side) {
+    const dist = side==='res' ? (lv.price-price).toFixed(1) : (price-lv.price).toFixed(1);
+    const lc = lv.key ? C.warn : C.tx2;
+    const tc = TF_COL[lv.tf]||C.tx2;
+    return `<tr class="${lv.key?'br-now':''}">
+      <td style="color:${tc}">${lv.tf}</td>
+      <td class="br-price" style="color:${lc}">$${lv.price.toFixed(2)}</td>
+      <td style="color:var(--tx2)">${lv.key?'★ ':' '}${lv.label.slice(0,18)}</td>
+      <td class="num" style="color:var(--tx2)">${side==='res'?'+':'-'}${dist}</td>
+    </tr>`;
+  }
+  const brandoHtml = `<div class="card">
+    <div class="lbl">Brando S/R · @EliteOptions2</div>
     <table>
-      <tr><th>TIME</th><th>$</th><th></th><th>H</th><th>L</th><th>VOL</th></tr>
-      <tr><td style="color:var(--muted);font-size:.58rem">02:20 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$181.52</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">181.9</td><td style="color:var(--muted);font-size:.58rem">180.6</td><td style="color:var(--green-dim);font-size:.56rem">4833K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:25 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$182.03</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">182.1</td><td style="color:var(--muted);font-size:.58rem">181.3</td><td style="color:var(--green-dim);font-size:.56rem">3213K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:30 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$182.27</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">182.4</td><td style="color:var(--muted);font-size:.58rem">181.4</td><td style="color:var(--green-dim);font-size:.56rem">3350K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:35 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$182.84</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">182.9</td><td style="color:var(--muted);font-size:.58rem">182.0</td><td style="color:var(--green-dim);font-size:.56rem">3784K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:40 PM</td><td style="color:#ff3a5e;font-weight:700;font-size:.64rem">$181.81</td><td style="color:#ff3a5e;font-size:.62rem">▼</td><td style="color:var(--muted);font-size:.58rem">182.8</td><td style="color:var(--muted);font-size:.58rem">181.6</td><td style="color:var(--green-dim);font-size:.56rem">3444K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:45 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$182.10</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">182.2</td><td style="color:var(--muted);font-size:.58rem">181.6</td><td style="color:var(--green-dim);font-size:.56rem">2377K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:50 PM</td><td style="color:#ff3a5e;font-weight:700;font-size:.64rem">$181.87</td><td style="color:#ff3a5e;font-size:.62rem">▼</td><td style="color:var(--muted);font-size:.58rem">182.1</td><td style="color:var(--muted);font-size:.58rem">181.5</td><td style="color:var(--green-dim);font-size:.56rem">3123K</td></tr><tr><td style="color:var(--muted);font-size:.58rem">02:55 PM</td><td style="color:#00ff9d;font-weight:700;font-size:.64rem">$182.64</td><td style="color:#00ff9d;font-size:.62rem">▲</td><td style="color:var(--muted);font-size:.58rem">182.8</td><td style="color:var(--muted);font-size:.58rem">181.9</td><td style="color:var(--green-dim);font-size:.56rem">6102K</td></tr>
+      <tr><th>TF</th><th>LEVEL</th><th>LABEL</th><th class="num">DIST</th></tr>
+      ${(br.res||[]).slice(0,4).map(l=>brRow(l,'res')).join('')}
+      <tr style="background:rgba(251,191,36,.05)">
+        <td colspan="2" style="color:${C.warn};font-weight:600">▶ $${price.toFixed(2)}</td>
+        <td colspan="2" style="color:var(--tx2);font-size:.6rem">H${m.id_high} · L${m.id_low}</td>
+      </tr>
+      ${(br.sup||[]).slice(0,4).map(l=>brRow(l,'sup')).join('')}
     </table>
-    <div style="margin-top:5px;border-top:1px solid var(--bd);padding-top:4px">
-      <div style="font-size:.55rem;color:var(--muted);margin-bottom:2px">52W (76th pct)</div>
-      <div style="display:flex;justify-content:space-between;font-size:.56rem;color:var(--muted);margin-bottom:2px"><span>$87</span><span style="color:var(--white)">$182.65</span><span>$212</span></div>
-      <div style="height:3px;background:rgba(255,255,255,.05);border-radius:2px"><div style="height:100%;width:76%;background:var(--blue);border-radius:2px"></div></div>
+    <div style="margin-top:6px;padding:5px 7px;background:rgba(0,0,0,.2);border:1px solid var(--bd2);font-size:.62rem">
+      <div style="color:${levelColor(br.scen_color)};font-weight:500;margin-bottom:2px">${br.scen_label}</div>
+      <div style="color:${C.bull};margin-bottom:2px">A: ${br.scen_a}</div>
+      <div style="color:${C.bear}">B: ${br.scen_b}</div>
     </div>
-  </div>
+  </div>`;
 
-  <div class="card" style="padding:7px">
-    <div class="ct">v6 Entry Rules</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-bottom:5px">
-      <div style="background:rgba(179,157,219,.08);border:1px solid rgba(179,157,219,.3);padding:3px 4px;text-align:center"><div style="font-size:.5rem;color:#b39ddb">ICHIMOKU</div><div style="font-size:.68rem;color:#00ff9d;font-weight:700">PF 4.18</div></div>
-      <div style="background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.3);padding:3px 4px;text-align:center"><div style="font-size:.5rem;color:#7c4dff">KAUFMAN</div><div style="font-size:.68rem;color:#00ff9d;font-weight:700">PF 4.34</div></div>
-      <div style="background:rgba(79,195,247,.08);border:1px solid rgba(79,195,247,.3);padding:3px 4px;text-align:center"><div style="font-size:.5rem;color:#4fc3f7">RSI</div><div style="font-size:.68rem;color:#00ff9d;font-weight:700">77%WR</div></div>
+  // ── OPTIONS CHAIN ─────────────────────────────────────────
+  function chainRows(items, direction) {
+    if (!items?.length) return `<tr><td colspan="5" style="color:var(--tx2)">—</td></tr>`;
+    return items.map(o => {
+      const atm = Math.abs(o.strike-price)<4;
+      const dc = direction==='call' ? C.bull : C.bear;
+      const inRange = o.price>=3.0 && o.price<=8.0;
+      const sp = (o.ask-o.bid).toFixed(2);
+      const spColor = sp<0.20 ? C.bull : sp<0.40 ? C.warn : C.bear;
+      return `<tr style="${atm?'background:rgba(251,191,36,.04)':''}">
+        <td style="color:${inRange?C.warn:C.tx2}">${inRange?'►':' '}$${o.strike.toFixed(0)}</td>
+        <td style="color:var(--white);font-weight:500">$${o.price.toFixed(2)}</td>
+        <td style="color:var(--tx2)">${o.iv}%</td>
+        <td style="color:${spColor}" class="num">$${sp}</td>
+        <td class="num" style="color:var(--tx2)">${(o.volume/1000).toFixed(1)}K</td>
+      </tr>`;
+    }).join('');
+  }
+  const chainHtml = `<div class="card">
+    <div class="lbl">Chain · ${opts.expiry} (${opts.dte}d)</div>
+    <div style="font-size:.6rem;color:${C.bull};margin-bottom:3px">CALLS <span style="color:var(--tx2);float:right">► = $3–$8 target range</span></div>
+    <table>
+      <tr><th>STRIKE</th><th>$</th><th>IV</th><th class="num">SPR</th><th class="num">VOL</th></tr>
+      ${chainRows(opts.calls,'call')}
+    </table>
+    <div style="font-size:.6rem;color:${C.bear};margin:6px 0 3px">PUTS</div>
+    <table>
+      <tr><th>STRIKE</th><th>$</th><th>IV</th><th class="num">SPR</th><th class="num">VOL</th></tr>
+      ${chainRows(opts.puts,'put')}
+    </table>
+    <div style="margin-top:5px;font-size:.58rem;color:var(--tx2)">Liquidity floor: spr &lt;$0.25 · vol &gt;300 · OI &gt;800</div>
+  </div>`;
+
+  // ── REGIME ────────────────────────────────────────────────
+  const compColor = m.compression>70?C.bull:m.compression>40?C.warn:C.tx2;
+  const yr = m.week52h!==m.week52l ? Math.min(100,(price-m.week52l)/(m.week52h-m.week52l)*100) : 50;
+  const regimeHtml = `<div class="card">
+    <div class="lbl">Regime</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px">
+      <div class="ana-cell">
+        <div class="ana-lbl">SPY bias</div>
+        <div class="ana-val" style="color:${spy.bull?C.bull:C.bear}">${spy.bull?'BULL':'BEAR'}</div>
+        <div class="ana-sub">$${spy.price} vs E50 $${spy.e50}</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">Compression</div>
+        <div class="ana-val" style="color:${compColor}">${m.compression}/100</div>
+        <div class="ana-sub">squeeze indicator</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">ATR 14</div>
+        <div class="ana-val">$${m.atr.toFixed(2)}</div>
+        <div class="ana-sub">daily expected range</div>
+      </div>
+      <div class="ana-cell">
+        <div class="ana-lbl">52W range</div>
+        <div class="ana-val">${yr.toFixed(0)}th pct</div>
+        <div class="ana-sub">$${m.week52l.toFixed(0)} – $${m.week52h.toFixed(0)}</div>
+      </div>
     </div>
-    <div style="font-size:.6rem;line-height:1.6;color:var(--text)">
-      <span style="color:var(--green)">ENTRY:</span> 2+sigs·Brando·SPY·vol·Power Win<br>
-      <span style="color:var(--yellow)">SIZE:</span> 2=$500·3=$750·4=$1000
+    <div style="margin-top:5px">
+      ${bar(yr, C.blue, 2)}
     </div>
-    <div style="margin-top:4px;padding:4px 6px;background:rgba(255,140,66,.07);border:1px solid rgba(255,140,66,.3);font-size:.58rem;color:var(--orange);line-height:1.5">EXIT +60%→SELL·-35%→STOP·Day3→OUT·MACD→HALF</div>
-    <div style="margin-top:3px;padding:4px 6px;background:rgba(255,58,94,.05);border:1px solid rgba(255,58,94,.2);font-size:.58rem;color:var(--red);line-height:1.5">NEVER: midday 10:30–1PM·chasing·ignoring vol</div>
-  </div>
+    <div style="margin-top:6px;border-top:1px solid var(--bd2);padding-top:5px">
+      <div class="lbl" style="margin-bottom:3px">1H EMA</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:.62rem">
+        <div>E8 <span style="color:var(--white)">$${tf.h1?.e8||'—'}</span></div>
+        <div>E21 <span style="color:var(--white)">$${tf.h1?.e21||'—'}</span></div>
+        <div>E50 <span style="color:var(--white)">$${tf.h1?.e50||'—'}</span></div>
+        <div>RSI <span style="color:var(--white)">${tf.h1?.rsi||'—'}</span></div>
+      </div>
+    </div>
+  </div>`;
 
-</div>
+  // ── CANDLES ───────────────────────────────────────────────
+  const candlesHtml = `<div class="card">
+    <div class="lbl">5m candles</div>
+    <table>
+      <tr><th>TIME</th><th>CLOSE</th><th></th><th class="num">H</th><th class="num">L</th><th class="num">VOL</th></tr>
+      ${(D.candles||[]).map(c=>'<tr>'
+        +'<td style="color:var(--tx2)">'+c.time+'</td>'
+        +'<td style="color:'+(c.bull?C.bull:C.bear)+';font-weight:500">$'+c.close.toFixed(2)+'</td>'
+        +'<td style="color:'+(c.bull?C.bull:C.bear)+'">'+(c.bull?'▲':'▼')+'</td>'
+        +'<td class="num" style="color:var(--tx2)">'+c.high.toFixed(1)+'</td>'
+        +'<td class="num" style="color:var(--tx2)">'+c.low.toFixed(1)+'</td>'
+        +'<td class="num" style="color:var(--tx2)">'+(c.volume/1000).toFixed(0)+'K</td>'
+        +'</tr>'
+      ).join('')||'<tr><td colspan="6" style="color:var(--tx2)">No data</td></tr>'}
+    </table>
+  </div>`;
 
-<div style="text-align:center;padding:5px;font-size:.54rem;color:var(--muted);border-top:1px solid var(--bd)">
-  v6·Ichimoku PF4.18·Kaufman PF4.34·RSI 77%WR·@EliteOptions2·⚠️Educational only·Updated <strong style="color:var(--text)">2026-03-09 16:53 CT</strong>
-</div>
-</div>
-</body></html>
+  // ── NEWS ─────────────────────────────────────────────────
+  const newsHtml = `<div class="card">
+    <div class="lbl">News</div>
+    ${(news||[]).map(n=>{
+      const dc = n.sentiment==='bull'?C.bull:n.sentiment==='bear'?C.bear:C.tx2;
+      const sym = n.sentiment==='bull'?'▲':n.sentiment==='bear'?'▼':'·';
+      return `<div style="padding:4px 0;border-bottom:1px solid var(--bd2)">
+        <div style="font-size:.63rem;line-height:1.35">
+          <span style="color:${dc};margin-right:5px">${sym}</span>
+          <a href="${n.link}" target="_blank" style="color:var(--tx)">${n.title}</a>
+        </div>
+        <div class="dim" style="margin-top:1px">${n.published}</div>
+      </div>`;
+    }).join('')||`<div class="dim">No articles</div>`}
+  </div>`;
+
+  // ── EXIT RULES (naked options) ────────────────────────────
+  const rulesHtml = `<div class="card">
+    <div class="lbl">Exit rules · naked options</div>
+    <div style="font-size:.63rem;line-height:2;color:var(--tx)">
+      <div><span style="color:${C.bull}">+80%</span> premium gain → sell all · no exceptions</div>
+      <div><span style="color:${C.bear}">–50%</span> premium loss → hard stop · no averaging</div>
+      <div><span style="color:${C.warn}">Day 3</span> → exit regardless of P&L</div>
+      <div><span style="color:${C.warn}">MACD flip</span> → exit half position</div>
+      <div><span style="color:${C.bear}">Dead cat</span> → no puts on low-vol decline</div>
+    </div>
+    <div style="margin-top:6px;padding:4px 7px;background:rgba(0,0,0,.2);border:1px solid var(--bd2);font-size:.6rem;color:var(--tx2);line-height:1.8">
+      Never enter: 10:30–13:00 CT · never chase mid-candle · no entry without volume confirm
+    </div>
+  </div>`;
+
+  // ── LAYOUT ASSEMBLY ───────────────────────────────────────
+  return `${hdr}<div class="wrap">
+    ${onBanner}
+    ${sessHtml}
+    ${verdictHtml}
+
+    <!-- ROW 1: Signals + Checklists + IV + Analytics -->
+    <div class="row r4">
+      ${sigsHtml}
+      ${callChks}
+      ${putChks}
+      ${ivHtml}
+    </div>
+
+    <!-- ROW 2: Call analytics + Put analytics -->
+    <div class="row r2">
+      ${anaCard(ca,'CALL')}
+      ${anaCard(pa,'PUT')}
+    </div>
+
+    <!-- ROW 3: MTF + Brando + Chain + Regime + Candles + News -->
+    <div class="row r6">
+      ${mtfHtml}
+      ${brandoHtml}
+      ${chainHtml}
+      ${regimeHtml}
+      ${candlesHtml}
+      ${newsHtml}
+    </div>
+
+    <!-- ROW 4: Rules -->
+    <div class="row" style="grid-template-columns:1fr 3fr">
+      ${rulesHtml}
+      <div class="card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div><div class="lbl">Entry model</div><div class="note">S1 Ichimoku (15M) · S2 KAMA (4H) · S3 RSI cross (1H) · S4 MACD+RSI (1H)</div></div>
+        <div><div class="lbl">Signal threshold</div><div class="note">2+ = watch · 3+ = trade · 4 = max size</div></div>
+        <div><div class="lbl">Size</div><div class="note">2 sig = $500 · 3 sig = $750 · 4 sig = $1,000</div></div>
+        <div><div class="lbl">Hold period</div><div class="note">Target 1–3 days · max Day 3 exit</div></div>
+        <div><div class="lbl">DTE target</div><div class="note">~30 DTE · theta danger below 21 DTE</div></div>
+      </div>
+    </div>
+
+    <div style="text-align:right;font-size:.58rem;color:var(--tx2);padding:4px 0;border-top:1px solid var(--bd2)">
+      OCC v6 · @EliteOptions2 · educational use only · refreshes every 5 min · ${D.generated_at}
+    </div>
+  </div>`;
+}
+
+// ── fetch loop ────────────────────────────────────────────────
+async function load() {
+  try {
+    const r = await fetch(`data.json?t=${Date.now()}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const D = await r.json();
+    document.getElementById('root').innerHTML = render(D);
+  } catch(e) {
+    document.getElementById('root').innerHTML =
+      `<div class="errmsg">Could not load data.json<br><small>${e.message}</small><br><br>
+       <small>Run update_dashboard.py once to generate it, then push to repo.</small></div>`;
+  }
+}
+load();
+setInterval(load, 5*60*1000);
+</script>
+</body>
+</html>
