@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NVDA · OCC</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0a0d12;
+  --s1:     #0f1319;
+  --s2:     #141b25;
+  --bd:     #1e2738;
+  --bd2:    #171f2e;
+  --tx:     #94a3b8;
+  --tx2:    #64748b;
+  --tx3:    #475569;
+  --white:  #cbd5e1;
+  --bull:   #4ade80;
+  --bull2:  #166534;
+  --bear:   #f87171;
+  --bear2:  #7f1d1d;
+  --warn:   #fbbf24;
+  --warn2:  #78350f;
+  --blue:   #60a5fa;
+  --blue2:  #1e3a5f;
+  --mute:   #4b5563;
+  --cyan:   #22d3ee;
+  --purple: #a78bfa;
+}
+* { margin:0; padding:0; box-sizing:border-box }
+html { font-size:13px }
+body { background:var(--bg); color:var(--tx); font-family:'IBM Plex Mono',monospace; line-height:1.4 }
+a { color:inherit; text-decoration:none }
+
+.wrap  { max-width:1700px; margin:0 auto; padding:8px 10px; display:flex; flex-direction:column; gap:6px }
+.row   { display:grid; gap:6px }
+.r2    { grid-template-columns:1fr 1fr }
+.r3    { grid-template-columns:1fr 1fr 1fr }
+.r4    { grid-template-columns:1fr 1fr 1fr 1fr }
+
+.card  { background:var(--s1); border:1px solid var(--bd); padding:8px 10px; border-radius:3px }
+.card.bull-tint { border-color:#166534; background:linear-gradient(135deg,#0f1319,#0d1f12) }
+.card.bear-tint { border-color:#7f1d1d; background:linear-gradient(135deg,#0f1319,#1f0d0d) }
+
+.lbl   { font-size:.65rem; color:var(--tx2); letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px }
+.val   { font-size:.78rem; color:var(--white); font-weight:600 }
+.dim   { font-size:.65rem; color:var(--tx2) }
+.note  { font-size:.65rem; color:var(--tx) }
+
+header { background:var(--s1); border-bottom:1px solid var(--bd); padding:7px 12px;
+         display:flex; align-items:center; justify-content:space-between; gap:12px }
+.h-price { font-size:1.25rem; font-weight:600; letter-spacing:.02em }
+.h-chg   { font-size:.72rem; font-weight:500 }
+.h-meta  { font-size:.62rem; color:var(--tx2) }
+
+.verdict { padding:8px 12px; border-radius:3px; border-left:3px solid var(--bd);
+           display:grid; grid-template-columns:1fr auto; gap:16px; align-items:start; background:var(--s1) }
+.v-title { font-size:.88rem; font-weight:600; letter-spacing:.04em }
+.v-idea  { font-size:.68rem; color:var(--tx); margin-top:4px; padding:5px 8px;
+           background:rgba(255,255,255,.03); border-left:2px solid var(--bd); line-height:1.5 }
+.v-expl  { font-size:.67rem; color:var(--tx2); margin-top:3px }
+.v-stats { display:flex; flex-direction:column; gap:5px; min-width:130px }
+
+.sess-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:4px }
+.sess-cell { padding:4px 6px; border:1px solid var(--bd); border-radius:2px; text-align:center }
+.sess-cell.active { border-color:var(--blue) }
+.sess-name { font-size:.58rem; font-weight:600 }
+.sess-time { font-size:.55rem; color:var(--tx2) }
+.sess-now  { font-size:.52rem; color:var(--blue) }
+
+.sig-row  { display:flex; align-items:baseline; justify-content:space-between;
+            padding:3px 0; border-bottom:1px solid var(--bd2); gap:6px }
+.sig-name { font-size:.63rem; color:var(--tx2); min-width:60px }
+.sig-lbl  { font-size:.68rem; font-weight:600 }
+.sig-det  { font-size:.6rem; color:var(--tx2); text-align:right }
+
+.chk-row  { display:flex; align-items:baseline; gap:6px; padding:2px 0; font-size:.63rem }
+.chk-dot  { font-size:.55rem; min-width:10px }
+
+table  { width:100%; border-collapse:collapse }
+th     { font-size:.58rem; color:var(--tx2); font-weight:500; padding:3px 4px;
+         text-align:left; border-bottom:1px solid var(--bd) }
+td     { font-size:.63rem; padding:3px 4px; border-bottom:1px solid var(--bd2) }
+tr:hover td { background:rgba(255,255,255,.015) }
+.num   { text-align:right; font-variant-numeric:tabular-nums }
+
+.bar-wrap { height:2px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden }
+.bar-fill { height:100%; border-radius:2px }
+
+.ana-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px 12px }
+.ana-cell { padding:4px 0; border-bottom:1px solid var(--bd2) }
+.ana-lbl  { font-size:.58rem; color:var(--tx3) }
+.ana-val  { font-size:.72rem; font-weight:600; color:var(--white) }
+.ana-sub  { font-size:.58rem; color:var(--tx2) }
+
+/* ── BRANDO PRICE LADDER ── */
+.br-ladder { display:flex; flex-direction:column; gap:0; border:1px solid var(--bd2); border-radius:2px; overflow:hidden }
+.br-rung   { display:flex; align-items:center; gap:8px; padding:3px 7px; border-left:3px solid transparent; font-size:.63rem; border-bottom:1px solid var(--bd2) }
+.br-rung:last-child { border-bottom:none }
+.br-rung.key-res   { border-left-color:var(--bear); background:rgba(248,113,113,.03) }
+.br-rung.key-sup   { border-left-color:var(--bull); background:rgba(74,222,128,.03) }
+.br-rung.minor-res { border-left-color:rgba(248,113,113,.2) }
+.br-rung.minor-sup { border-left-color:rgba(74,222,128,.2) }
+.br-rung.current   { border-left-color:var(--warn); background:rgba(251,191,36,.07); padding:5px 7px }
+.br-price-tag { font-size:.7rem; font-weight:600; min-width:58px }
+.br-tf-badge  { font-size:.52rem; padding:1px 4px; border-radius:2px; font-weight:600; letter-spacing:.05em; min-width:26px; text-align:center }
+.br-dist      { font-size:.58rem; min-width:80px; text-align:right }
+.br-label     { font-size:.59rem; color:var(--tx2); flex:1 }
+
+/* ── MTF ALIGNMENT ── */
+.mtf-cards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-bottom:5px }
+.mtf-tf-card { padding:6px 8px; border:1px solid var(--bd); border-radius:3px }
+.mtf-tf-card.bullish { border-color:#166534; background:linear-gradient(160deg,#0f1319,#0d1a0f) }
+.mtf-tf-card.bearish { border-color:#7f1d1d; background:linear-gradient(160deg,#0f1319,#1a0d0d) }
+.mtf-tf-card.neutral { border-color:#2a3448 }
+.mtf-tf-card.setup   { border-color:#78350f; background:linear-gradient(160deg,#0f1319,#1a1408) }
+.mtf-tf-label { font-size:.58rem; color:var(--tx2); letter-spacing:.08em; text-transform:uppercase; margin-bottom:4px }
+.mtf-tf-bias  { font-size:.8rem; font-weight:600; letter-spacing:.04em; margin-bottom:4px }
+.mtf-tf-row   { font-size:.6rem; display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px solid rgba(255,255,255,.04) }
+.mtf-tf-row:last-child { border-bottom:none }
+
+.align-banner { padding:6px 10px; border-radius:3px; font-size:.65rem; font-weight:600; letter-spacing:.05em; text-align:center; margin-bottom:4px }
+.align-full    { background:rgba(74,222,128,.07);  border:1px solid rgba(74,222,128,.3);  color:var(--bull) }
+.align-partial { background:rgba(251,191,36,.07);  border:1px solid rgba(251,191,36,.3);  color:var(--warn) }
+.align-conflict{ background:rgba(248,113,113,.06); border:1px solid rgba(248,113,113,.25);color:var(--bear) }
+
+.entry-steps       { margin-top:6px; padding:6px 8px; background:rgba(0,0,0,.25); border:1px solid var(--bd2); border-radius:2px }
+.entry-steps.locked{ opacity:.4 }
+.entry-step { display:flex; gap:7px; padding:2px 0; font-size:.6rem; line-height:1.45; align-items:flex-start }
+.step-num   { min-width:14px; font-weight:600; font-size:.58rem; padding-top:1px }
+.step-text  { flex:1; color:var(--tx) }
+.step-val   { color:var(--white); font-weight:500 }
+
+/* ── OPTIONS FLOW ── */
+.flow-bar-outer { height:12px; background:var(--bd2); border-radius:2px; overflow:hidden; margin:5px 0 3px; display:flex }
+.flow-bar-call  { height:100%; background:linear-gradient(90deg,#166534,#4ade80); border-radius:2px 0 0 2px }
+.flow-bar-put   { height:100%; background:linear-gradient(90deg,#f87171,#7f1d1d); border-radius:0 2px 2px 0 }
+.flow-print { display:grid; grid-template-columns:52px 70px 1fr auto; gap:0 8px; align-items:center; padding:4px 6px; border-bottom:1px solid var(--bd2); font-size:.61rem }
+.flow-print:hover { background:rgba(255,255,255,.012) }
+.flow-badge { font-size:.54rem; font-weight:600; padding:1px 5px; border-radius:2px; letter-spacing:.05em; text-align:center }
+.flow-call-badge { background:rgba(74,222,128,.12); color:var(--bull); border:1px solid rgba(74,222,128,.25) }
+.flow-put-badge  { background:rgba(248,113,113,.12); color:var(--bear); border:1px solid rgba(248,113,113,.25) }
+.flow-dark-badge { background:rgba(167,139,250,.12); color:var(--purple); border:1px solid rgba(167,139,250,.25) }
+.flow-tool-link  { display:inline-block; padding:2px 7px; border:1px solid var(--bd); border-radius:2px; font-size:.57rem; color:var(--blue); margin:2px 3px 2px 0 }
+.flow-tool-link:hover { border-color:var(--blue); background:rgba(96,165,250,.05) }
+
+/* ── MISC ── */
+.loading { text-align:center; padding:80px; color:var(--tx2); font-size:.8rem }
+.errmsg  { text-align:center; padding:40px; color:var(--bear); font-size:.75rem; line-height:1.8 }
+.dot { width:5px; height:5px; border-radius:50%; display:inline-block; margin-right:4px }
+.dot-live { background:var(--bull) }
+.theta-ok   { color:var(--bull) }
+.theta-warn { color:var(--warn) }
+.theta-bad  { color:var(--bear) }
+</style>
+</head>
+<body>
+<div id="root"><div class="loading">loading data.json…</div></div>
+<script>
+const C = {
+  bull:'#4ade80', bear:'#f87171', warn:'#fbbf24',
+  blue:'#60a5fa', cyan:'#22d3ee', purple:'#a78bfa',
+  tx:'#94a3b8', tx2:'#64748b', tx3:'#475569', white:'#cbd5e1', mute:'#4b5563'
+};
+
+function bar(pct, color, h=2) {
+  return `<div class="bar-wrap" style="height:${h}px">
+    <div class="bar-fill" style="width:${Math.min(100,Math.max(0,pct))}%;background:${color}"></div></div>`;
+}
+function chkDot(pass) {
+  if (pass===true)  return `<span class="chk-dot" style="color:${C.bull}">+</span>`;
+  if (pass===false) return `<span class="chk-dot" style="color:${C.bear}">–</span>`;
+  return `<span class="chk-dot" style="color:${C.tx2}">·</span>`;
+}
+function biasColor(b) {
+  if (!b) return C.tx2;
+  const u=b.toUpperCase();
+  if (u==='BULL'||u==='STRONG BULL') return C.bull;
+  if (u==='BEAR'||u==='STRONG BEAR') return C.bear;
+  if (u==='WAIT'||u==='FLAT')        return C.mute;
+  return C.warn;
+}
+function levelColor(sc) {
+  return sc==='bull'?C.bull:sc==='bear'?C.bear:sc==='warn'?C.warn:C.tx2;
+}
+const TF_COL = {MO:'#94a3b8', WK:C.blue, DY:C.tx};
+
+// ───────────────────────────────────────────────────────
+function render(D) {
+  const m=D.market, spy=D.spy, sig=D.signals;
+  const tf=D.timeframes, br=D.brando, al=D.alignment;
+  const v=D.verdict, opts=D.options, news=D.news;
+  const div=sig.divergence, ms=al.max_signals;
+  const price=m.price;
+  const vc=m.change>=0?C.bull:C.bear;
+  const arrow=m.change>=0?'▲':'▼';
+  const ivs=opts.iv_stats||{};
+  const ca=opts.call_analytics, pa=opts.put_analytics;
+  const vbias=biasColor(v.bias);
+
+  // ═══ HEADER ══════════════════════════════════════════
+  const hdr=`<header>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="font-size:.65rem;color:var(--tx2);letter-spacing:.12em">NVDA · OCC</div>
+      <div>
+        <span class="h-price" style="color:${vc}">${price.toFixed(2)}</span>
+        <span class="h-chg" style="color:${vc};margin-left:8px">${arrow} ${m.change>0?'+':''}${m.change.toFixed(2)} (${m.change_pct>0?'+':''}${m.change_pct.toFixed(2)}%)</span>
+      </div>
+      <div style="padding:2px 9px;border:1px solid ${vbias}44;color:${vbias};font-size:.62rem;font-weight:600;letter-spacing:.08em">${v.bias}</div>
+      <div class="h-meta">ATR $${m.atr.toFixed(2)} · Vol ${m.vol_ratio}x · ${(m.volume/1e6).toFixed(1)}M / ${(m.avg_vol/1e6).toFixed(1)}M avg</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <span class="h-meta">SPY $${spy.price} vs E50 $${spy.e50} — <span style="color:${spy.bull?C.bull:C.bear}">${spy.bull?'above':'below'}</span></span>
+      <span class="h-meta"><span class="dot dot-live"></span>${D.generated_at}</span>
+    </div>
+  </header>`;
+
+  // ═══ SESSION BAR ══════════════════════════════════════
+  const SESS=[
+    {n:'PRE-MKT',t:'07:00'},{n:'FAKE-OUT',t:'08:30'},{n:'CONT.',t:'09:15'},
+    {n:'DEAD ZONE',t:'10:30'},{n:'POWER WIN',t:'13:00'},{n:'CLOSING',t:'14:30'}
+  ];
+  const sessHtml=`<div class="sess-grid">${SESS.map(s=>{
+    const act=D.session_name.startsWith(s.n.split(' ')[0])||D.session_name===s.n;
+    return `<div class="sess-cell${act?' active':''}">
+      <div style="font-size:.55rem;color:var(--tx2)">${s.t}</div>
+      <div class="sess-name" style="color:${act?C.blue:'var(--tx2)'}">${s.n}</div>
+      ${act?`<div style="font-size:.52rem;color:${C.blue}">NOW</div>`:''}
+    </div>`;
+  }).join('')}</div>`;
+
+  // ═══ VERDICT ══════════════════════════════════════════
+  const verdictHtml=`<div class="verdict" style="border-left-color:${vbias}">
+    <div>
+      <div class="v-title" style="color:${vbias}">${v.verdict}</div>
+      <div class="v-expl">${v.explanation}</div>
+      <div class="v-idea">${v.trade_idea}</div>
+    </div>
+    <div class="v-stats">
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:3px">
+          <span style="color:var(--tx2)">CALL</span><span style="color:${C.bull};font-weight:600">${al.call_count}/${ms}</span>
+        </div>${bar(al.call_count/ms*100,C.bull,3)}
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:3px">
+          <span style="color:var(--tx2)">PUT</span><span style="color:${C.bear};font-weight:600">${al.put_count}/${ms}</span>
+        </div>${bar(al.put_count/ms*100,C.bear,3)}
+      </div>
+      <div class="dim" style="padding-top:4px;border-top:1px solid var(--bd)">IV ${opts.iv_30}% · DTE ${opts.dte} · ±$${opts.exp_move}</div>
+    </div>
+  </div>`;
+
+  // ═══ ON-LEVEL BANNER ══════════════════════════════════
+  const onBanner=br.on_level
+    ?`<div style="padding:5px 10px;border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.04);font-size:.65rem;color:${C.warn};text-align:center">
+       ⚡ ON LEVEL — $${br.nearest.price.toFixed(2)} · ${br.nearest.label} (${br.nearest.tf}) · Price within $3 — treat as decision zone
+      </div>`:''
+
+  // ═══ SIGNALS ══════════════════════════════════════════
+  function sigRow(num,name,s) {
+    const c=s.bull?C.bull:(s.bear?C.bear:C.tx2);
+    return `<div class="sig-row">
+      <span class="sig-name">${num} ${name}</span>
+      <span class="sig-lbl" style="color:${c}">${s.label}</span>
+      <span class="sig-det">${s.detail||''}</span>
+    </div>`;
+  }
+  const divColor=div.confirms_bull||div.confirms_bear?C.warn:(div.exit_warning_bull||div.exit_warning_bear?C.bear:C.tx2);
+  const divNote=div.confirms_bull||div.confirms_bear?'CONFIRMS':(div.exit_warning_bull||div.exit_warning_bear?'EXIT WARNING':'');
+  const sigsHtml=`<div class="card">
+    <div class="lbl">Proven Signals</div>
+    ${sigRow('S1','ICHIMOKU',sig.ichimoku)}
+    ${sigRow('S2','KAUFMAN',sig.kama)}
+    ${sigRow('S3','RSI',sig.rsi)}
+    ${sigRow('S4','MACD+RSI',sig.macd_combo)}
+    <div class="sig-row" style="border-bottom:0">
+      <span class="sig-name" style="color:var(--tx3)">DIV BONUS</span>
+      <span style="font-size:.65rem;color:${divColor}">${div.label}${divNote?' · '+divNote:''}</span>
+      <span class="sig-det">${div.detail||'No action'}</span>
+    </div>
+  </div>`;
+
+  // ═══ CHECKLISTS ═══════════════════════════════════════
+  function chkList(items) {
+    return items.map(i=>`<div class="chk-row">${chkDot(i.pass)}<span style="color:${i.pass===true?'var(--tx)':'var(--tx2)'}">${i.text}</span></div>`).join('');
+  }
+  const callChks=`<div class="card ${al.call_count>=3?'bull-tint':''}">
+    <div class="lbl">Call checklist <span style="float:right;color:${C.bull}">${al.call_count}/${ms}</span></div>
+    ${chkList(al.call_reasons)}
+    <div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--bd2)">${chkList(al.call_context)}</div>
+  </div>`;
+  const putChks=`<div class="card ${al.put_count>=3?'bear-tint':''}">
+    <div class="lbl">Put checklist <span style="float:right;color:${C.bear}">${al.put_count}/${ms}</span></div>
+    ${chkList(al.put_reasons)}
+    <div style="margin-top:6px;padding-top:5px;border-top:1px solid var(--bd2)">${chkList(al.put_context)}</div>
+  </div>`;
+
+  // ═══ IV PANEL ═════════════════════════════════════════
+  const ivRank=ivs.iv_rank!=null?ivs.iv_rank:null;
+  const ivColor=ivRank==null?C.tx2:(ivRank<35?C.bull:ivRank<60?C.warn:C.bear);
+  const ivHtml=`<div class="card">
+    <div class="lbl">IV Environment</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:6px">
+      <div class="ana-cell"><div class="ana-lbl">ATM IV (30d)</div><div class="ana-val">${opts.iv_30}%</div></div>
+      <div class="ana-cell"><div class="ana-lbl">IV Rank</div><div class="ana-val" style="color:${ivColor}">${ivRank!=null?ivRank+'th':'—'}</div></div>
+      <div class="ana-cell"><div class="ana-lbl">IV Percentile</div><div class="ana-val">${ivs.iv_pct!=null?ivs.iv_pct+'%':'—'}</div></div>
+      <div class="ana-cell"><div class="ana-lbl">HV 20-day</div><div class="ana-val">${ivs.hv_20!=null?ivs.hv_20+'%':'—'}</div></div>
+      <div class="ana-cell" style="grid-column:1/-1">
+        <div class="ana-lbl">IV vs HV</div>
+        <div class="ana-val">${ivs.iv_vs_hv!=null?(ivs.iv_vs_hv>0?'+':'')+ivs.iv_vs_hv+'pts':'—'}</div>
+        <div class="ana-sub">${ivs.iv_quality||'—'}</div>
+      </div>
+    </div>
+    ${ivRank!=null?bar(ivRank,ivColor,3):''}
+    <div style="margin-top:6px;font-size:.6rem;color:var(--tx2);line-height:1.6">
+      Low rank (&lt;35) = IV cheap → buy premium. High (&gt;65) = IV rich → size down.
+    </div>
+  </div>`;
+
+  // ═══ NAKED ANALYTICS ══════════════════════════════════
+  function anaCard(a,direction) {
+    if (!a) return `<div class="card"><div class="lbl">${direction} analytics</div><div class="dim">No qualifying option found</div></div>`;
+    const dc=direction==='CALL'?C.bull:C.bear;
+    const thetaClass=a.days_to_danger===0?'theta-bad':(a.days_to_danger<7?'theta-warn':'theta-ok');
+    return `<div class="card">
+      <div class="lbl" style="color:${dc}">Naked ${direction} — $${a.strike} · ${opts.expiry}</div>
+      <div class="ana-grid">
+        <div class="ana-cell"><div class="ana-lbl">Premium (ask)</div><div class="ana-val">$${a.premium.toFixed(2)}</div><div class="ana-sub">bid $${a.bid} / ask $${a.ask} · spread $${a.spread.toFixed(2)}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Max loss</div><div class="ana-val" style="color:${C.bear}">$${a.max_loss.toFixed(0)}</div><div class="ana-sub">per contract (100 × premium)</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Breakeven at expiry</div><div class="ana-val">$${a.breakeven.toFixed(2)}</div><div class="ana-sub">${direction==='CALL'?'+':'-'}$${a.move_to_be.toFixed(2)} (${direction==='CALL'?'+':''}${(direction==='CALL'?1:-1)*a.move_to_be_pct}%)</div></div>
+        <div class="ana-cell"><div class="ana-lbl">+80% target premium</div><div class="ana-val" style="color:${dc}">$${a.target_prem.toFixed(2)}</div><div class="ana-sub">SELL ALL HERE — no exceptions</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Move needed for +80%</div><div class="ana-val">±$${a.move_for_2x?a.move_for_2x.toFixed(2):'—'}</div><div class="ana-sub">${a.move_for_2x_pct?'±'+a.move_for_2x_pct+'% · delta ~'+a.approx_delta:'—'}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">–50% stop premium</div><div class="ana-val" style="color:${C.bear}">$${a.stop_prem.toFixed(2)}</div><div class="ana-sub">HARD STOP — no debate, no averaging</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Daily theta (est.)</div><div class="ana-val ${thetaClass}">–$${(a.daily_theta*100).toFixed(2)}/day</div><div class="ana-sub">${a.days_to_danger===0?'PAST 21 DTE — theta accelerating':(a.days_to_danger+'d until theta danger')}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Liquidity</div><div class="ana-val" style="color:${a.liq==='Tight'?C.bull:a.liq.includes('Wide')||a.liq.includes('avoid')?C.bear:C.warn}">${a.liq}</div><div class="ana-sub">vol ${a.volume.toLocaleString()} · OI ${a.oi.toLocaleString()}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Option IV</div><div class="ana-val">${a.iv}%</div><div class="ana-sub">DTE ${opts.dte} · exp move ±$${opts.exp_move}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Approx delta</div><div class="ana-val">${a.approx_delta}</div><div class="ana-sub">$1 NVDA ≈ $${(a.approx_delta*100).toFixed(0)} P&amp;L/contract</div></div>
+      </div>
+    </div>`;
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // MTF ALIGNMENT — Market Moves Matt Method
+  // ═══════════════════════════════════════════════════════
+  function mtfTFCard(t, label) {
+    if (!t) return `<div class="mtf-tf-card neutral"><div class="mtf-tf-label">${label}</div><div class="dim">—</div></div>`;
+    const rsi=t.rsi, mh=t.macd_h;
+    const rsiAbove=rsi>50, macdPos=mh>0;
+    const rsiColor=rsi>55?C.bull:rsi<45?C.bear:C.warn;
+    const macdColor=macdPos?C.bull:C.bear;
+    const cloudStr=t.above_cloud?'Above cloud':t.below_cloud?'Below cloud':'In cloud';
+    const cloudColor=t.above_cloud?C.bull:t.below_cloud?C.bear:C.warn;
+
+    let bias, bClass, bColor, rsiNote='';
+
+    if (label==='4H') {
+      const inSetup = rsi>=45 && rsi<=55;
+      if (inSetup) {
+        bias='SETUP VALID'; bClass='setup'; bColor=C.warn;
+        rsiNote=`<span style="color:${C.warn}"> ✓ pullback zone</span>`;
+      } else if (rsi>55 && macdPos) {
+        bias='BULLISH'; bClass='bullish'; bColor=C.bull;
+        rsiNote=`<span style="color:${C.tx2}"> extended</span>`;
+      } else if (rsi<45 && !macdPos) {
+        bias='BEARISH'; bClass='bearish'; bColor=C.bear;
+        rsiNote=`<span style="color:${C.tx2}"> oversold</span>`;
+      } else {
+        bias='WAIT'; bClass='neutral'; bColor=C.tx2;
+      }
+    } else if (label==='1H') {
+      if (rsiAbove && macdPos) {
+        bias='BULLISH'; bClass='bullish'; bColor=C.bull;
+        rsiNote=`<span style="color:${C.bull}"> → CALL trigger</span>`;
+      } else if (!rsiAbove && !macdPos) {
+        bias='BEARISH'; bClass='bearish'; bColor=C.bear;
+        rsiNote=`<span style="color:${C.bear}"> → PUT trigger</span>`;
+      } else {
+        bias='MIXED'; bClass='neutral'; bColor=C.warn;
+        rsiNote=rsiAbove?`<span style="color:${C.warn}"> above 50</span>`:`<span style="color:${C.warn}"> below 50</span>`;
+      }
+    } else { // DAILY
+      if (rsiAbove && macdPos && t.hh_hl) {
+        bias='BULLISH'; bClass='bullish'; bColor=C.bull;
+      } else if (rsiAbove && macdPos) {
+        bias='BULLISH'; bClass='bullish'; bColor=C.bull;
+      } else if (!rsiAbove && !macdPos) {
+        bias='BEARISH'; bClass='bearish'; bColor=C.bear;
+      } else {
+        bias='WEAK'; bClass='neutral'; bColor=C.warn;
+      }
+      rsiNote=t.rsi_above_50?`<span style="color:${C.bull}"> above 50</span>`:`<span style="color:${C.bear}"> below 50 MM/HL</span>`;
+    }
+
+    return `<div class="mtf-tf-card ${bClass}">
+      <div class="mtf-tf-label">${label}</div>
+      <div class="mtf-tf-bias" style="color:${bColor}">${bias}</div>
+      <div class="mtf-tf-row"><span style="color:var(--tx2)">RSI</span><span style="color:${rsiColor}">${rsi.toFixed(1)}${rsiNote}</span></div>
+      <div class="mtf-tf-row"><span style="color:var(--tx2)">MACD H</span><span style="color:${macdColor}">${mh>0?'+':''}${mh.toFixed(3)} ${mh>0?'↑':'↓'}</span></div>
+      <div class="mtf-tf-row"><span style="color:var(--tx2)">Cloud</span><span style="color:${cloudColor}">${cloudStr}</span></div>
+      <div class="mtf-tf-row"><span style="color:var(--tx2)">E8</span><span style="color:${price>t.e8?C.bull:C.bear}">$${t.e8} ${price>t.e8?'↑':'↓'}</span></div>
+      <div class="mtf-tf-row"><span style="color:var(--tx2)">HH/HL</span><span style="color:${t.hh_hl?C.bull:C.bear}">${t.hh_hl?'YES — intact':'NO — broken'}</span></div>
+    </div>`;
+  }
+
+  // Alignment logic
+  const h1=tf.h1, h4=tf.h4, dy=tf.daily, m15=tf.m15;
+  const h1Bull = h1 && h1.rsi>50 && h1.macd_h>0;
+  const h1Bear = h1 && h1.rsi<50 && h1.macd_h<0;
+  const h4Setup= h4 && h4.rsi>=45 && h4.rsi<=55;
+  const h4Bull = h4 && h4.rsi>55 && h4.macd_h>0;
+  const h4Bear = h4 && h4.rsi<45 && h4.macd_h<0;
+  const dyBull = dy && dy.rsi>50;
+  const dyBear = dy && dy.rsi<50;
+
+  const fullBull    = h1Bull && (h4Bull||h4Setup) && dyBull;
+  const fullBear    = h1Bear && (h4Bear||h4Setup) && dyBear;
+  const partialBull = h1Bull && (h4Bull||h4Setup) && !dyBull;
+  const partialBear = h1Bear && (h4Bear||h4Setup) && !dyBear;
+
+  let alignClass, alignText, alignDetail, entryDirection;
+  if (fullBull)      { alignClass='align-full';    alignText='✓ FULLY ALIGNED — CALL SETUP';     alignDetail='1H + 4H + Daily all bullish. Full size allowed.'; entryDirection='CALL'; }
+  else if (fullBear) { alignClass='align-full';    alignText='✓ FULLY ALIGNED — PUT SETUP';      alignDetail='1H + 4H + Daily all bearish. Full size allowed.'; entryDirection='PUT'; }
+  else if (partialBull){alignClass='align-partial';alignText='⚠ PARTIAL · 2/3 ALIGNED (CALL)';  alignDetail='1H + 4H bullish — Daily bearish = CONFLICT. Reduce size 50% or wait for Daily RSI to reclaim 50 before full size.'; entryDirection='CALL';}
+  else if (partialBear){alignClass='align-partial';alignText='⚠ PARTIAL · 2/3 ALIGNED (PUT)';   alignDetail='1H + 4H bearish — Daily bullish = CONFLICT. Reduce size 50% or wait for Daily RSI to lose 50.'; entryDirection='PUT';}
+  else { alignClass='align-conflict'; alignText='✗ NO ALIGNMENT — WAIT'; alignDetail='Timeframes conflicting. No edge present. No trade.'; entryDirection=null; }
+
+  const entryArmed = (h1Bull&&(h4Bull||h4Setup)) || (h1Bear&&(h4Bear||h4Setup));
+  const entryColor = entryDirection==='CALL'?C.bull:entryDirection==='PUT'?C.bear:C.tx2;
+
+  const e5=[
+    { n:'1', pass: m15&&(entryDirection==='CALL'?m15.fast_bull:!m15.fast_bull),
+      text: entryDirection==='CALL'
+        ?`Wait for 15M candle to close <span class="step-val">above EMA9</span> after pullback`
+        :`Wait for 15M candle to close <span class="step-val">below EMA9</span> after rally`,
+      val: m15?`E8 $${m15.e8}`:''},
+    { n:'2', pass: m15&&(entryDirection==='CALL'?m15.rsi_above_50:!m15.rsi_above_50),
+      text: entryDirection==='CALL'
+        ?`Confirm 15M RSI crossing <span class="step-val">50</span> — not before the cross`
+        :`Confirm 15M RSI crossing <span class="step-val">below 50</span> — not before`,
+      val: m15?`RSI ${m15.rsi.toFixed(1)}`:''},
+    { n:'3', pass: m15&&(entryDirection==='CALL'?m15.macd_bull:!m15.macd_bull),
+      text:`15M MACD histogram <span class="step-val">turning ${entryDirection==='CALL'?'green':'red'}</span> (0-line cross ideal)`,
+      val: m15?`H ${m15.macd_h>0?'+':''}${m15.macd_h.toFixed(3)}`:''},
+    { n:'4', pass: m15&&m15.vol_expanded,
+      text:`Volume on 15M bar should be <span class="step-val">≥ 1.5× avg</span> — confirms institutional participation`,
+      val: m15?`${m15.vol_ratio}x avg`:''},
+    { n:'5', pass: null,
+      text:`Enter on <span class="step-val">NEXT candle open</span> after confirmation — never chase mid-candle`,
+      val: m15&&m15.rsi_above_50&&m15.macd_bull&&m15.vol_expanded
+        ?`<span style="color:${C.warn}">NEAR TRIGGER — WATCH NEXT 2 CANDLES</span>`
+        :(m15?`Current 15M: RSI ${m15.rsi.toFixed(1)} · MACD ${m15.macd_h>0?'green':'red'} · Vol ${m15.vol_ratio}x`:'')}
+  ];
+  const stepsPass=e5.filter(s=>s.pass===true).length;
+  const stepColor=stepsPass>=4?C.bull:stepsPass>=2?C.warn:C.tx2;
+
+  const mtfAlignHtml=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div class="lbl" style="margin-bottom:0">Multi-Timeframe Alignment · Market Moves Matt Method</div>
+      <div style="font-size:.58rem;padding:1px 8px;border:1px solid ${alignClass.includes('full')?C.bull:alignClass.includes('partial')?C.warn:C.bear}44;color:${alignClass.includes('full')?C.bull:alignClass.includes('partial')?C.warn:C.bear}">
+        ${fullBull||fullBear?'FULL · 3/3':partialBull||partialBear?'PARTIAL · 2/3':'NO ALIGN · 0/3'}
+      </div>
+    </div>
+
+    <div class="mtf-cards">
+      ${mtfTFCard(h1,'1H')}
+      ${mtfTFCard(h4,'4H')}
+      ${mtfTFCard(dy,'DAILY')}
+    </div>
+
+    <div class="align-banner ${alignClass}">${alignText}</div>
+    <div style="font-size:.61rem;color:var(--tx2);line-height:1.5;margin-bottom:6px">${alignDetail}</div>
+
+    <div style="font-size:.58rem;color:var(--tx2);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:3px">
+      ▶ Step 3: Drop to 15M for Precise Entry Timing
+    </div>
+    <div class="entry-steps${entryArmed?'':' locked'}">
+      <div style="display:flex;justify-content:space-between;font-size:.6rem;font-weight:600;letter-spacing:.04em;margin-bottom:4px">
+        <span style="color:${entryArmed?entryColor:C.tx3}">${entryArmed?('15-MIN ENTRY PROTOCOL · '+entryDirection+' SETUP'):'15-MIN PROTOCOL — WAITING FOR 1H+4H ALIGNMENT'}</span>
+        ${entryArmed?`<span style="color:${stepColor}">${stepsPass}/4 checks</span>`:''}
+      </div>
+      ${e5.map(s=>`<div class="entry-step">
+        <span class="step-num" style="color:${s.pass===true?entryColor:s.pass===false?C.tx3:C.tx3}">${s.n}</span>
+        <span class="step-text">${s.text}${s.val?` <span style="color:var(--tx3);font-size:.57rem">${s.val}</span>`:''}</span>
+        ${s.pass===true?`<span style="color:${entryColor};font-size:.6rem;margin-left:6px">✓</span>`:s.pass===false?`<span style="color:var(--tx3);font-size:.6rem;margin-left:6px">○</span>`:`<span style="font-size:.6rem;margin-left:6px">→</span>`}
+      </div>`).join('')}
+    </div>
+    <div style="margin-top:6px;font-size:.57rem;color:var(--tx3);line-height:1.55;border-top:1px solid var(--bd2);padding-top:5px">
+      4H RSI 45–55 = pullback zone = setup valid. NVDA trends hard — overbought stays overbought. | 1H RSI cross above 50 = call entry trigger. Cross below 50 = put entry trigger. | Low-vol decline = dead cat = no puts.
+    </div>
+  </div>`;
+
+  // ═══════════════════════════════════════════════════════
+  // BRANDO KEY LEVELS — Visual Price Ladder
+  // ═══════════════════════════════════════════════════════
+  function brRung(lv, side) {
+    const dist = side==='res' ? lv.price-price : price-lv.price;
+    const distPct = (dist/price*100).toFixed(1);
+    const lc = lv.key ? (side==='res'?C.bear:C.bull) : (side==='res'?'#b45252':'#3a8a5a');
+    const tc = TF_COL[lv.tf]||C.tx2;
+    const tfBg = lv.tf==='MO'?'rgba(148,163,184,.08)':lv.tf==='WK'?'rgba(96,165,250,.1)':'rgba(100,116,139,.07)';
+    const cls = lv.key ? (side==='res'?'key-res':'key-sup') : (side==='res'?'minor-res':'minor-sup');
+    const stars = lv.key ? '★★ ' : '';
+    return `<div class="br-rung ${cls}">
+      <span class="br-price-tag" style="color:${lc}">$${lv.price.toFixed(2)}</span>
+      <span class="br-tf-badge" style="color:${tc};background:${tfBg}">${lv.tf}</span>
+      <span class="br-label">${stars}${lv.label}</span>
+      <span class="br-dist" style="color:${side==='res'?C.bear:C.bull}">${side==='res'?'+':'-'}${dist.toFixed(2)}<span style="color:var(--tx3);font-size:.53rem"> (${distPct}%)</span></span>
+    </div>`;
+  }
+
+  const brandoHtml=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+      <div class="lbl" style="margin-bottom:0">Brando Key Levels · @EliteOptions2</div>
+      <a href="https://trendspider.com" target="_blank" style="font-size:.54rem;color:var(--blue);padding:1px 6px;border:1px solid rgba(96,165,250,.3)">TrendSpider ↗</a>
+    </div>
+
+    <div class="br-ladder">
+      ${(br.res||[]).slice(0,5).map(l=>brRung(l,'res')).join('')}
+      <div class="br-rung current">
+        <span class="br-price-tag" style="color:${C.warn};font-size:.78rem">▶ $${price.toFixed(2)}</span>
+        <span class="br-tf-badge" style="color:var(--warn);background:rgba(251,191,36,.1)">NOW</span>
+        <span class="br-label" style="color:var(--tx2)">ID H${m.id_high} · L${m.id_low}</span>
+        <span class="br-dist" style="color:${C.warn}">${price>br.key_sup.price?'▲ above pivot':'▼ below pivot'}</span>
+      </div>
+      ${(br.sup||[]).slice(0,5).map(l=>brRung(l,'sup')).join('')}
+    </div>
+
+    <div style="margin-top:7px;padding:5px 8px;background:rgba(0,0,0,.2);border:1px solid var(--bd2);border-radius:2px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:.62rem;color:${levelColor(br.scen_color)};font-weight:600">${br.scen_label}</span>
+        <span style="font-size:.54rem;padding:1px 5px;background:${price>br.key_sup.price?'rgba(74,222,128,.1)':'rgba(248,113,113,.1)'};color:${price>br.key_sup.price?C.bull:C.bear};border-radius:2px">${price>br.key_sup.price?'CALL BIAS':'PUT BIAS'}</span>
+      </div>
+      <div style="font-size:.61rem;color:${C.bull};margin-bottom:2px">▲ ${br.scen_a}</div>
+      <div style="font-size:.61rem;color:${C.bear}">▼ ${br.scen_b}</div>
+    </div>
+    <div style="margin-top:5px;font-size:.57rem;color:var(--tx3);line-height:1.6">
+      ◆ Above $${br.key_sup.price} = CALL bias &nbsp;|&nbsp; Below = PUT bias &nbsp;|&nbsp; Alert fires within $3 of ★★ level
+    </div>
+  </div>`;
+
+  // ═══════════════════════════════════════════════════════
+  // LIVE OPTIONS FLOW — Smart Money Tracker
+  // ═══════════════════════════════════════════════════════
+  const isBullBias = price > 180.34;
+  const near = Math.round(price/5)*5;
+  const dteMid = opts.expiry
+    ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(opts.expiry.slice(5,7))-1]+' '+opts.expiry.slice(8,10)
+    : 'Mar 21';
+
+  const flowPrints = [
+    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,       agg:'SWEEP',    detail:'AGGRESSIVE · MULTI-EXCHANGE',     size:'$2.1M', ctx:'NEAR ASK\nREPEAT BUYER' },
+    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,       agg:'BLOCK',    detail:'NEAR ASK · REPEAT BUYER',         size:'$1.3M', ctx:'BELOW ASK\nINSTITUTIONAL' },
+    { type:'DARK', strike:`$${(near+2.5).toFixed(0)}`,exp:'POOL', agg:'DARK POOL',detail:'285K SHARES',             size:'$53M',  ctx:'BELOW ASK\nACCUMULATION'  },
+    { type:'PUT',  strike:`$${near-5}P`, exp:'Mar 28',     agg:'SWEEP',    detail:'REPEAT · POSSIBLE HEDGE',         size:'$876K', ctx:'FUND HEDGE\n$50M+ LONG STOCK'},
+    { type:'PUT',  strike:`$${near}P`,   exp:'Apr 17',     agg:'BLOCK',    detail:'NEGOTIATED · BEARISH HEDGE',      size:'$540K', ctx:'BLOCK\nBELOW BID'         }
+  ];
+  const callPct = isBullBias ? 62 : 44;
+  const putPct  = 100-callPct;
+  const flowSent = callPct>=62?'BULLISH INSTITUTIONAL LEAN':callPct>=52?'MILD BULLISH INSTITUTIONAL LEAN':callPct<=38?'BEARISH INSTITUTIONAL LEAN':callPct<=48?'MILD BEARISH':'NEUTRAL FLOW';
+  const flowSentColor = callPct>=52?C.bull:callPct<=48?C.bear:C.tx2;
+
+  function fpRow(p) {
+    const isCall=p.type==='CALL', isDark=p.type==='DARK';
+    const badgeCls=isDark?'flow-dark-badge':isCall?'flow-call-badge':'flow-put-badge';
+    const tc=isDark?C.purple:isCall?C.bull:C.bear;
+    const aggColor=p.agg==='SWEEP'?C.warn:p.agg.includes('DARK')?C.purple:C.blue;
+    return `<div class="flow-print">
+      <span class="flow-badge ${badgeCls}">${p.type}</span>
+      <span style="color:var(--white);font-size:.62rem;font-weight:500">${p.strike} <span style="color:var(--tx2);font-weight:400;font-size:.58rem">${p.exp}</span></span>
+      <div>
+        <div style="color:${aggColor};font-size:.58rem;font-weight:600;letter-spacing:.04em">${p.agg}</div>
+        <div style="font-size:.57rem;color:var(--tx2)">${p.detail}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="color:${tc};font-size:.65rem;font-weight:600">${p.size}</div>
+        <div style="font-size:.55rem;color:var(--tx2);white-space:pre-line;line-height:1.3">${p.ctx}</div>
+      </div>
+    </div>`;
+  }
+
+  const flowHtml=`<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+      <div class="lbl" style="margin-bottom:0">Live Options Flow · Smart Money Tracker</div>
+      <div style="font-size:.53rem;color:var(--tx3);padding:1px 6px;border:1px solid var(--bd)">SIMULATED · USE FREE TOOLS BELOW FOR REAL DATA</div>
+    </div>
+
+    <div style="margin-bottom:5px;display:flex;flex-wrap:wrap">
+      <a class="flow-tool-link" href="https://unusualwhales.com/stock/NVDA/flow-overview" target="_blank">UnusualWhales ↗</a>
+      <a class="flow-tool-link" href="https://marketchameleon.com/Overview/NVDA/IV/" target="_blank">Market Chameleon ↗</a>
+      <a class="flow-tool-link" href="https://optionstrat.com/build/long-call/NVDA" target="_blank">OptionStrat ↗</a>
+      <a class="flow-tool-link" href="https://cheddarflow.com" target="_blank">Cheddar Flow ↗</a>
+      <a class="flow-tool-link" href="https://flowsage.io" target="_blank">FlowAlgo ↗</a>
+    </div>
+
+    ${flowPrints.map(fpRow).join('')}
+
+    <div style="margin-top:6px">
+      <div style="display:flex;justify-content:space-between;font-size:.6rem;margin-bottom:2px">
+        <span style="color:${C.bull}">CALL PREM ${callPct}%</span>
+        <span style="color:${C.bear}">PUT PREM ${putPct}%</span>
+      </div>
+      <div class="flow-bar-outer">
+        <div class="flow-bar-call" style="width:${callPct}%"></div>
+        <div class="flow-bar-put" style="width:${putPct}%"></div>
+      </div>
+      <div style="font-size:.62rem;font-weight:600;color:${flowSentColor};letter-spacing:.03em;margin-top:3px">Call premium dominance: ${flowSent}</div>
+    </div>
+
+    <div style="margin-top:6px;padding:5px 7px;background:rgba(0,0,0,.2);border:1px solid var(--bd2);font-size:.6rem;color:var(--tx2);line-height:1.65">
+      <span style="color:var(--tx)">Flow context matters:</span> Institutions hedge. A $876K put sweep on $175 could be a fund protecting $50M of NVDA long stock — not a directional bet. Always check: <span style="color:var(--tx)">sweep = aggressive/urgent</span> · <span style="color:var(--tx)">block = negotiated</span> · Near ask = bullish conviction · Near bid = bearish. Context + your system gates = edge.<br>
+      <span style="color:var(--tx3)">Best free alt to BlackboxStocks: </span><a href="https://unusualwhales.com/stock/NVDA/flow-overview" target="_blank" style="color:var(--blue)">unusualwhales.com/stock/NVDA/flow-overview</a> · <a href="https://marketchameleon.com" target="_blank" style="color:var(--blue)">marketchameleon.com</a> for IV skew + flow combo.
+    </div>
+  </div>`;
+
+  // ═══ MTF TABLE (compact version) ══════════════════════
+  function tfRow(t) {
+    if (!t) return '';
+    const tc=t.above_cloud&&t.hh_hl?C.bull:t.below_cloud?C.bear:C.warn;
+    const trend=t.above_cloud&&t.hh_hl?'BULL':t.below_cloud?'BEAR':'NEUT';
+    const mc=t.macd_bull?C.bull:C.bear;
+    const sc=[t.above_cloud,t.fast_bull,t.macd_bull,t.hh_hl,t.rsi_expansion_bull].filter(Boolean).length;
+    const [bias,bc]=sc>=4?['LONG',C.bull]:sc<=1?['SHORT',C.bear]:['WATCH',C.warn];
+    const vc2=t.vol_expanded?C.bull:t.vol_ratio>=1.0?C.warn:C.bear;
+    return `<tr>
+      <td style="color:var(--white);font-weight:500">${t.label}</td>
+      <td style="color:${tc};font-weight:500">${trend}</td>
+      <td style="color:${t.rsi>50?C.bull:C.bear}">${t.rsi}</td>
+      <td style="color:${mc}">${t.macd_bull?'↑':'↓'} ${t.macd_h>0?'+':''}${t.macd_h.toFixed(2)}</td>
+      <td style="color:${bc};font-weight:500">${bias}</td>
+      <td style="color:${vc2}">${t.vol_ratio}x</td>
+    </tr>`;
+  }
+  const m15d=tf.m15;
+  const timingChecks=[m15d?.rsi_above_50,m15d?.macd_bull,m15d?.vol_expanded].filter(Boolean).length;
+  const timingColor=timingChecks===3?C.bull:timingChecks===2?C.warn:C.bear;
+  const mtfHtml=`<div class="card">
+    <div class="lbl">Multi-timeframe</div>
+    <table>
+      <tr><th>TF</th><th>TREND</th><th>RSI</th><th>MACD</th><th>BIAS</th><th>VOL</th></tr>
+      ${tfRow(tf.daily)}${tfRow(tf.h4)}${tfRow(tf.h1)}${tfRow(tf.m15)}
+    </table>
+    <div style="margin-top:7px;padding:5px 7px;border:1px solid var(--bd2);font-size:.62rem">
+      <div style="color:var(--tx2);margin-bottom:3px">15M TIMING <span style="color:${timingColor};float:right">${timingChecks}/3</span></div>
+      <div>${chkDot(m15d?.rsi_above_50||false)} <span style="color:${m15d?.rsi_above_50?C.bull:C.bear}">15M RSI above 50</span></div>
+      <div>${chkDot(m15d?.macd_bull||false)} <span style="color:${m15d?.macd_bull?C.bull:C.bear}">15M MACD positive</span></div>
+      <div>${chkDot(m15d?.vol_expanded||false)} <span style="color:${m15d?.vol_expanded?C.bull:C.bear}">15M vol ≥ 1.5× avg</span></div>
+    </div>
+  </div>`;
+
+  // ═══ OPTIONS CHAIN ════════════════════════════════════
+  function chainRows(items, direction) {
+    if (!items?.length) return `<tr><td colspan="5" style="color:var(--tx2)">—</td></tr>`;
+    return items.map(o=>{
+      const atm=Math.abs(o.strike-price)<4;
+      const dc=direction==='call'?C.bull:C.bear;
+      const inRange=o.price>=3.0&&o.price<=8.0;
+      const sp=(o.ask-o.bid).toFixed(2);
+      const spColor=sp<0.20?C.bull:sp<0.40?C.warn:C.bear;
+      return `<tr style="${atm?'background:rgba(251,191,36,.04)':''}">
+        <td style="color:${inRange?C.warn:C.tx2}">${inRange?'►':' '}$${o.strike.toFixed(0)}</td>
+        <td style="color:var(--white);font-weight:500">$${o.price.toFixed(2)}</td>
+        <td style="color:var(--tx2)">${o.iv}%</td>
+        <td style="color:${spColor}" class="num">$${sp}</td>
+        <td class="num" style="color:var(--tx2)">${(o.volume/1000).toFixed(1)}K</td>
+      </tr>`;
+    }).join('');
+  }
+  const chainHtml=`<div class="card">
+    <div class="lbl">Chain · ${opts.expiry} (${opts.dte}d)</div>
+    <div style="font-size:.6rem;color:${C.bull};margin-bottom:3px">CALLS <span style="color:var(--tx2);float:right">► = $3–$8 target</span></div>
+    <table><tr><th>STRIKE</th><th>$</th><th>IV</th><th class="num">SPR</th><th class="num">VOL</th></tr>
+      ${chainRows(opts.calls,'call')}</table>
+    <div style="font-size:.6rem;color:${C.bear};margin:6px 0 3px">PUTS</div>
+    <table><tr><th>STRIKE</th><th>$</th><th>IV</th><th class="num">SPR</th><th class="num">VOL</th></tr>
+      ${chainRows(opts.puts,'put')}</table>
+    <div style="margin-top:5px;font-size:.58rem;color:var(--tx2)">Liquidity floor: spr &lt;$0.25 · vol &gt;300 · OI &gt;800</div>
+  </div>`;
+
+  // ═══ REGIME ═══════════════════════════════════════════
+  const compColor=m.compression>70?C.bull:m.compression>40?C.warn:C.tx2;
+  const yr=m.week52h!==m.week52l?Math.min(100,(price-m.week52l)/(m.week52h-m.week52l)*100):50;
+  const regimeHtml=`<div class="card">
+    <div class="lbl">Regime</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px">
+      <div class="ana-cell"><div class="ana-lbl">SPY bias</div><div class="ana-val" style="color:${spy.bull?C.bull:C.bear}">${spy.bull?'BULL':'BEAR'}</div><div class="ana-sub">$${spy.price} vs E50 $${spy.e50}</div></div>
+      <div class="ana-cell"><div class="ana-lbl">Compression</div><div class="ana-val" style="color:${compColor}">${m.compression}/100</div><div class="ana-sub">squeeze indicator</div></div>
+      <div class="ana-cell"><div class="ana-lbl">ATR 14</div><div class="ana-val">$${m.atr.toFixed(2)}</div><div class="ana-sub">daily expected range</div></div>
+      <div class="ana-cell"><div class="ana-lbl">52W range</div><div class="ana-val">${yr.toFixed(0)}th pct</div><div class="ana-sub">$${m.week52l.toFixed(0)}–$${m.week52h.toFixed(0)}</div></div>
+    </div>
+    <div style="margin-top:5px">${bar(yr,C.blue,2)}</div>
+    <div style="margin-top:6px;border-top:1px solid var(--bd2);padding-top:5px">
+      <div class="lbl" style="margin-bottom:3px">1H EMA stack</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;font-size:.62rem">
+        <div>E8 <span style="color:var(--white)">$${h1?.e8||'—'}</span></div>
+        <div>E21 <span style="color:var(--white)">$${h1?.e21||'—'}</span></div>
+        <div>E50 <span style="color:var(--white)">$${h1?.e50||'—'}</span></div>
+        <div>RSI <span style="color:var(--white)">${h1?.rsi||'—'}</span></div>
+      </div>
+    </div>
+  </div>`;
+
+  // ═══ CANDLES ══════════════════════════════════════════
+  const candlesHtml=`<div class="card">
+    <div class="lbl">5m candles</div>
+    <table><tr><th>TIME</th><th>CLOSE</th><th></th><th class="num">H</th><th class="num">L</th><th class="num">VOL</th></tr>
+    ${(D.candles||[]).map(c=>`<tr>
+      <td style="color:var(--tx2)">${c.time}</td>
+      <td style="color:${c.bull?C.bull:C.bear};font-weight:500">$${c.close.toFixed(2)}</td>
+      <td style="color:${c.bull?C.bull:C.bear}">${c.bull?'▲':'▼'}</td>
+      <td class="num" style="color:var(--tx2)">${c.high.toFixed(1)}</td>
+      <td class="num" style="color:var(--tx2)">${c.low.toFixed(1)}</td>
+      <td class="num" style="color:var(--tx2)">${(c.volume/1000).toFixed(0)}K</td>
+    </tr>`).join('')||'<tr><td colspan="6" style="color:var(--tx2)">No data</td></tr>'}
+    </table>
+  </div>`;
+
+  // ═══ NEWS ═════════════════════════════════════════════
+  const newsHtml=`<div class="card">
+    <div class="lbl">News</div>
+    ${(news||[]).map(n=>{
+      const dc=n.sentiment==='bull'?C.bull:n.sentiment==='bear'?C.bear:C.tx2;
+      const sym=n.sentiment==='bull'?'▲':n.sentiment==='bear'?'▼':'·';
+      return `<div style="padding:4px 0;border-bottom:1px solid var(--bd2)">
+        <div style="font-size:.63rem;line-height:1.35">
+          <span style="color:${dc};margin-right:5px">${sym}</span>
+          <a href="${n.link}" target="_blank" style="color:var(--tx)">${n.title}</a>
+        </div>
+        <div class="dim" style="margin-top:1px">${n.published}</div>
+      </div>`;
+    }).join('')||`<div class="dim">No articles</div>`}
+  </div>`;
+
+  // ═══ EXIT RULES ═══════════════════════════════════════
+  const rulesHtml=`<div class="card">
+    <div class="lbl">Exit rules · naked only</div>
+    <div style="font-size:.63rem;line-height:2;color:var(--tx)">
+      <div><span style="color:${C.bull}">+80%</span> premium → sell all · no exceptions</div>
+      <div><span style="color:${C.bear}">–50%</span> premium → hard stop · no averaging</div>
+      <div><span style="color:${C.warn}">Day 3</span> → exit regardless of P&amp;L</div>
+      <div><span style="color:${C.warn}">MACD flip</span> → exit half position</div>
+      <div><span style="color:${C.bear}">Dead cat</span> → no puts on low-vol decline</div>
+      <div><span style="color:${C.purple}">Div warning</span> → early exit signal</div>
+    </div>
+    <div style="margin-top:6px;padding:4px 7px;background:rgba(0,0,0,.2);border:1px solid var(--bd2);font-size:.6rem;color:var(--tx2);line-height:1.8">
+      No entry: 10:30–13:00 CT · never chase mid-candle · no entry without volume confirm
+    </div>
+  </div>`;
+
+  // ═══ LAYOUT ═══════════════════════════════════════════
+  return `${hdr}<div class="wrap">
+    ${onBanner}
+    ${sessHtml}
+    ${verdictHtml}
+
+    <!-- ROW 1: Signals + Checklists + IV -->
+    <div class="row r4">
+      ${sigsHtml}${callChks}${putChks}${ivHtml}
+    </div>
+
+    <!-- ROW 2: Call + Put analytics -->
+    <div class="row r2">
+      ${anaCard(ca,'CALL')}${anaCard(pa,'PUT')}
+    </div>
+
+    <!-- ROW 3: MTF Alignment + Brando -->
+    <div class="row" style="grid-template-columns:1.4fr 1fr">
+      ${mtfAlignHtml}${brandoHtml}
+    </div>
+
+    <!-- ROW 4: Options Flow + MTF table + Chain -->
+    <div class="row" style="grid-template-columns:1.3fr 1fr 1fr">
+      ${flowHtml}${mtfHtml}${chainHtml}
+    </div>
+
+    <!-- ROW 5: Regime + Candles + News -->
+    <div class="row r3">
+      ${regimeHtml}${candlesHtml}${newsHtml}
+    </div>
+
+    <!-- ROW 6: Rules + Entry model ref -->
+    <div class="row" style="grid-template-columns:1fr 3fr">
+      ${rulesHtml}
+      <div class="card" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div><div class="lbl">Entry model</div><div class="note">S1 Ichimoku (15M) · S2 KAMA (4H) · S3 RSI cross (1H) · S4 MACD+RSI (1H)</div></div>
+        <div><div class="lbl">Signal threshold</div><div class="note">2+ = watch · 3+ = trade · 4 = max size</div></div>
+        <div><div class="lbl">Size rules</div><div class="note">2 sig = $500 · 3 sig = $750 · 4 sig = $1,000</div></div>
+        <div><div class="lbl">MTF size rule</div><div class="note">Full align = full size · Partial = 50% size · No align = no trade</div></div>
+        <div><div class="lbl">Hold period</div><div class="note">Target 1–3 days · max Day 3 exit</div></div>
+        <div><div class="lbl">DTE target</div><div class="note">~30 DTE · theta danger below 21 DTE</div></div>
+      </div>
+    </div>
+
+    <div style="text-align:right;font-size:.58rem;color:var(--tx2);padding:4px 0;border-top:1px solid var(--bd2)">
+      OCC v7 · @EliteOptions2 · educational use only · auto-refreshes every 5 min · ${D.generated_at}
+    </div>
+  </div>`;
+}
+
+// ── fetch + refresh loop ─────────────────────────────
+async function load() {
+  try {
+    const r = await fetch(`data.json?t=${Date.now()}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const D = await r.json();
+    document.getElementById('root').innerHTML = render(D);
+  } catch(e) {
+    document.getElementById('root').innerHTML =
+      `<div class="errmsg">Could not load data.json<br><small>${e.message}</small><br><br>
+       <small>Run update_dashboard.py once to generate it, then push to repo.</small></div>`;
+  }
+}
+load();
+setInterval(load, 5*60*1000);
+</script>
+</body>
+</html>
