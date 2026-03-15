@@ -2,17 +2,20 @@ name: Update Dashboard
 
 on:
   schedule:
-    - cron: '50 13 * * 1-5'
-    - cron: '30 14 * * 1-5'
-    - cron: '0 15 * * 1-5'
-    - cron: '30 15 * * 1-5'
-    - cron: '0 16 * * 1-5'
-    - cron: '30 16 * * 1-5'
-    - cron: '0 18 * * 1-5'
-    - cron: '0 19 * * 1-5'
-    - cron: '30 19 * * 1-5'
-    - cron: '0 20 * * 1-5'
-    - cron: '30 20 * * 1-5'
+    # Chicago time (CDT = UTC-5, Mar–Nov). 12 runs, ~35 min apart, 8:30 AM–2:55 PM CDT.
+    # NOTE: In CST season (Nov–Mar, UTC-6) these fire 1 hour earlier than shown.
+    - cron: '30 13 * * 1-5'  #  8:30 AM CDT
+    - cron: '5 14 * * 1-5'   #  9:05 AM CDT
+    - cron: '40 14 * * 1-5'  #  9:40 AM CDT
+    - cron: '15 15 * * 1-5'  # 10:15 AM CDT
+    - cron: '50 15 * * 1-5'  # 10:50 AM CDT
+    - cron: '25 16 * * 1-5'  # 11:25 AM CDT
+    - cron: '0 17 * * 1-5'   # 12:00 PM CDT
+    - cron: '35 17 * * 1-5'  # 12:35 PM CDT
+    - cron: '10 18 * * 1-5'  #  1:10 PM CDT
+    - cron: '45 18 * * 1-5'  #  1:45 PM CDT
+    - cron: '20 19 * * 1-5'  #  2:20 PM CDT
+    - cron: '55 19 * * 1-5'  #  2:55 PM CDT
   workflow_dispatch:
 
 permissions:

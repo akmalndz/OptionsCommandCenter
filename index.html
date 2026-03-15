@@ -549,14 +549,31 @@ function render(D) {
     ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(opts.expiry.slice(5,7))-1]+' '+opts.expiry.slice(8,10)
     : 'Mar 21';
 
+  // Dynamic Friday expiry helper (n=1 → next Friday, n=2 → Friday after, etc.)
+  function nthFriday(n) {
+    const fd = new Date();
+    const dow = fd.getDay();
+    let dToFri = (5 - dow + 7) % 7;
+    if (dToFri === 0) dToFri = 7;
+    fd.setDate(fd.getDate() + dToFri + (n - 1) * 7);
+    return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][fd.getMonth()] + ' ' + fd.getDate();
+  }
+  const expNear = nthFriday(2);   // ~2 weeks out (hedge expiry)
+  const expFar  = nthFriday(5);   // ~5 weeks out (far hedge)
+
   const flowPrints = [
-    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,       agg:'SWEEP',    detail:'AGGRESSIVE · MULTI-EXCHANGE',     size:'$2.1M', ctx:'NEAR ASK\nREPEAT BUYER' },
-    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,       agg:'BLOCK',    detail:'NEAR ASK · REPEAT BUYER',         size:'$1.3M', ctx:'BELOW ASK\nINSTITUTIONAL' },
-    { type:'DARK', strike:`$${(near+2.5).toFixed(0)}`,exp:'POOL', agg:'DARK POOL',detail:'285K SHARES',             size:'$53M',  ctx:'BELOW ASK\nACCUMULATION'  },
-    { type:'PUT',  strike:`$${near-5}P`, exp:'Mar 28',     agg:'SWEEP',    detail:'REPEAT · POSSIBLE HEDGE',         size:'$876K', ctx:'FUND HEDGE\n$50M+ LONG STOCK'},
-    { type:'PUT',  strike:`$${near}P`,   exp:'Apr 17',     agg:'BLOCK',    detail:'NEGOTIATED · BEARISH HEDGE',      size:'$540K', ctx:'BLOCK\nBELOW BID'         }
+    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,   agg:'SWEEP',    detail:'AGGRESSIVE · MULTI-EXCHANGE',     size:'$2.1M', ctx:'NEAR ASK\nREPEAT BUYER' },
+    { type:'CALL', strike:`$${near+5}C`, exp:dteMid,   agg:'BLOCK',    detail:'NEAR ASK · REPEAT BUYER',         size:'$1.3M', ctx:'BELOW ASK\nINSTITUTIONAL' },
+    { type:'DARK', strike:`$${(near+2.5).toFixed(0)}`, exp:'POOL', agg:'DARK POOL', detail:'285K SHARES',        size:'$53M',  ctx:'BELOW ASK\nACCUMULATION'  },
+    { type:'PUT',  strike:`$${near-5}P`, exp:expNear,  agg:'SWEEP',    detail:'REPEAT · POSSIBLE HEDGE',         size:'$876K', ctx:'FUND HEDGE\n$50M+ LONG STOCK'},
+    { type:'PUT',  strike:`$${near}P`,   exp:expFar,   agg:'BLOCK',    detail:'NEGOTIATED · BEARISH HEDGE',      size:'$540K', ctx:'BLOCK\nBELOW BID'         }
   ];
-  const callPct = isBullBias ? 62 : 44;
+
+  // Drive call/put % from live signal counts in data.json (call_count & put_count 0–4 each)
+  const _cc = (d.alignment?.call_count) ?? 0;
+  const _pc = (d.alignment?.put_count)  ?? 0;
+  const _net = _cc - _pc;
+  const callPct = Math.max(20, Math.min(80, 50 + _net * 8));
   const putPct  = 100-callPct;
   const flowSent = callPct>=62?'BULLISH INSTITUTIONAL LEAN':callPct>=52?'MILD BULLISH INSTITUTIONAL LEAN':callPct<=38?'BEARISH INSTITUTIONAL LEAN':callPct<=48?'MILD BEARISH':'NEUTRAL FLOW';
   const flowSentColor = callPct>=52?C.bull:callPct<=48?C.bear:C.tx2;
