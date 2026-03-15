@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>NVDA · OCC</title>
+<meta name="description" content="NVDA Options Command Center — personal trading dashboard for educational use. Not financial advice.">
+<meta name="robots" content="noindex,nofollow">
+<title>NVDA · OCC v8</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -303,7 +305,7 @@ function render(D) {
   const ivHtml=`<div class="card">
     <div class="lbl">IV Environment</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-bottom:6px">
-      <div class="ana-cell"><div class="ana-lbl">ATM IV (30d)</div><div class="ana-val">${opts.iv_30}%</div></div>
+      <div class="ana-cell"><div class="ana-lbl">ATM IV · ${opts.dte}DTE</div><div class="ana-val">${opts.iv_30}%</div></div>
       <div class="ana-cell"><div class="ana-lbl">IV Rank</div><div class="ana-val" style="color:${ivColor}">${ivRank!=null?ivRank+'th':'—'}</div></div>
       <div class="ana-cell"><div class="ana-lbl">IV Percentile</div><div class="ana-val">${ivs.iv_pct!=null?ivs.iv_pct+'%':'—'}</div></div>
       <div class="ana-cell"><div class="ana-lbl">HV 20-day</div><div class="ana-val">${ivs.hv_20!=null?ivs.hv_20+'%':'—'}</div></div>
@@ -323,19 +325,23 @@ function render(D) {
   function anaCard(a,direction) {
     if (!a) return `<div class="card"><div class="lbl">${direction} analytics</div><div class="dim">No qualifying option found</div></div>`;
     const dc=direction==='CALL'?C.bull:C.bear;
-    const thetaClass=a.days_to_danger===0?'theta-bad':(a.days_to_danger<7?'theta-warn':'theta-ok');
+    // DTE zone drives theta color: 7-16 DTE is intentional (sweet spot), not danger
+    const thetaClass=opts.dte>=14?'theta-ok':opts.dte>=7?'theta-warn':'theta-bad';
+    const dteZone=a.dte_zone||`${opts.dte} DTE`;
+    const gammaSub=a.gamma_est?`Δ+${a.dollar_gamma}/contract per $1 move`:'—';
     return `<div class="card">
-      <div class="lbl" style="color:${dc}">Naked ${direction} — $${a.strike} · ${opts.expiry}</div>
+      <div class="lbl" style="color:${dc}">Naked ${direction} — $${a.strike} · ${opts.expiry} · ${opts.dte}DTE</div>
       <div class="ana-grid">
         <div class="ana-cell"><div class="ana-lbl">Premium (ask)</div><div class="ana-val">$${a.premium.toFixed(2)}</div><div class="ana-sub">bid $${a.bid} / ask $${a.ask} · spread $${a.spread.toFixed(2)}</div></div>
         <div class="ana-cell"><div class="ana-lbl">Max loss</div><div class="ana-val" style="color:${C.bear}">$${a.max_loss.toFixed(0)}</div><div class="ana-sub">per contract (100 × premium)</div></div>
         <div class="ana-cell"><div class="ana-lbl">Breakeven at expiry</div><div class="ana-val">$${a.breakeven.toFixed(2)}</div><div class="ana-sub">${direction==='CALL'?'+':'-'}$${a.move_to_be.toFixed(2)} (${direction==='CALL'?'+':''}${(direction==='CALL'?1:-1)*a.move_to_be_pct}%)</div></div>
         <div class="ana-cell"><div class="ana-lbl">+80% target premium</div><div class="ana-val" style="color:${dc}">$${a.target_prem.toFixed(2)}</div><div class="ana-sub">SELL ALL HERE — no exceptions</div></div>
-        <div class="ana-cell"><div class="ana-lbl">Move needed for +80%</div><div class="ana-val">±$${a.move_for_2x?a.move_for_2x.toFixed(2):'—'}</div><div class="ana-sub">${a.move_for_2x_pct?'±'+a.move_for_2x_pct+'% · delta ~'+a.approx_delta:'—'}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Move needed for +80%</div><div class="ana-val">±$${a.move_for_2x?a.move_for_2x.toFixed(2):'—'}</div><div class="ana-sub">${a.move_for_2x_pct?'±'+a.move_for_2x_pct+'% · δ ~'+a.approx_delta:'—'}</div></div>
         <div class="ana-cell"><div class="ana-lbl">–50% stop premium</div><div class="ana-val" style="color:${C.bear}">$${a.stop_prem.toFixed(2)}</div><div class="ana-sub">HARD STOP — no debate, no averaging</div></div>
-        <div class="ana-cell"><div class="ana-lbl">Daily theta (est.)</div><div class="ana-val ${thetaClass}">–$${(a.daily_theta*100).toFixed(2)}/day</div><div class="ana-sub">${a.days_to_danger===0?'PAST 21 DTE — theta accelerating':(a.days_to_danger+'d until theta danger')}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Daily theta (est.)</div><div class="ana-val ${thetaClass}">–$${(a.daily_theta*100).toFixed(2)}/day</div><div class="ana-sub">${dteZone}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Gamma (est.)</div><div class="ana-val" style="color:${thetaClass==='theta-ok'?C.bull:C.warn}">${a.gamma_est||'—'}</div><div class="ana-sub">${gammaSub}</div></div>
         <div class="ana-cell"><div class="ana-lbl">Liquidity</div><div class="ana-val" style="color:${a.liq==='Tight'?C.bull:a.liq.includes('Wide')||a.liq.includes('avoid')?C.bear:C.warn}">${a.liq}</div><div class="ana-sub">vol ${a.volume.toLocaleString()} · OI ${a.oi.toLocaleString()}</div></div>
-        <div class="ana-cell"><div class="ana-lbl">Option IV</div><div class="ana-val">${a.iv}%</div><div class="ana-sub">DTE ${opts.dte} · exp move ±$${opts.exp_move}</div></div>
+        <div class="ana-cell"><div class="ana-lbl">Option IV · exp move</div><div class="ana-val">${a.iv}%</div><div class="ana-sub">±$${opts.exp_move} expected move</div></div>
         <div class="ana-cell"><div class="ana-lbl">Approx delta</div><div class="ana-val">${a.approx_delta}</div><div class="ana-sub">$1 NVDA ≈ $${(a.approx_delta*100).toFixed(0)} P&amp;L/contract</div></div>
       </div>
     </div>`;
@@ -543,7 +549,7 @@ function render(D) {
   // ═══════════════════════════════════════════════════════
   // LIVE OPTIONS FLOW — Smart Money Tracker
   // ═══════════════════════════════════════════════════════
-  const isBullBias = price > 180.34;
+  const isBullBias = price > (br.key_sup?.price ?? 180.34);
   const near = Math.round(price/5)*5;
   const dteMid = opts.expiry
     ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(opts.expiry.slice(5,7))-1]+' '+opts.expiry.slice(8,10)
@@ -804,13 +810,14 @@ function render(D) {
         <div><div class="lbl">Signal threshold</div><div class="note">2+ = watch · 3+ = trade · 4 = max size</div></div>
         <div><div class="lbl">Size rules</div><div class="note">2 sig = $500 · 3 sig = $750 · 4 sig = $1,000</div></div>
         <div><div class="lbl">MTF size rule</div><div class="note">Full align = full size · Partial = 50% size · No align = no trade</div></div>
-        <div><div class="lbl">Hold period</div><div class="note">Target 1–3 days · max Day 3 exit</div></div>
-        <div><div class="lbl">DTE target</div><div class="note">~30 DTE · theta danger below 21 DTE</div></div>
+        <div><div class="lbl">Hold period</div><div class="note">1–3 days · hard exit Day 3 no exceptions</div></div>
+        <div><div class="lbl">DTE target</div><div class="note">7–14 DTE · high gamma · 4-6× leverage vs 30 DTE</div></div>
       </div>
     </div>
 
-    <div style="text-align:right;font-size:.58rem;color:var(--tx2);padding:4px 0;border-top:1px solid var(--bd2)">
-      OCC v7 · @EliteOptions2 · educational use only · auto-refreshes every 5 min · ${D.generated_at}
+    <div style="font-size:.57rem;color:var(--tx3);padding:6px 0;border-top:1px solid var(--bd2);line-height:1.7;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px">
+      <span>NOT FINANCIAL ADVICE · For personal educational use only · Past signals do not predict future results · Options trading involves substantial risk of loss</span>
+      <span style="color:var(--tx3)">OCC v8 · @EliteOptions2 Brando levels · Data: Yahoo Finance (yfinance) · auto-refreshes every 5 min · ${D.generated_at}</span>
     </div>
   </div>`;
 }
