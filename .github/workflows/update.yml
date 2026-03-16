@@ -2,24 +2,31 @@ name: Update Dashboard
 
 on:
   schedule:
-    # Chicago time (CDT = UTC-5, Mar–Nov). 12 runs, ~35 min apart, 8:30 AM–2:55 PM CDT.
-    # NOTE: In CST season (Nov–Mar, UTC-6) these fire 1 hour earlier than shown.
-    - cron: '30 13 * * 1-5'  #  8:30 AM CDT
-    - cron: '5 14 * * 1-5'   #  9:05 AM CDT
-    - cron: '40 14 * * 1-5'  #  9:40 AM CDT
-    - cron: '15 15 * * 1-5'  # 10:15 AM CDT
-    - cron: '50 15 * * 1-5'  # 10:50 AM CDT
-    - cron: '25 16 * * 1-5'  # 11:25 AM CDT
-    - cron: '0 17 * * 1-5'   # 12:00 PM CDT
-    - cron: '35 17 * * 1-5'  # 12:35 PM CDT
-    - cron: '10 18 * * 1-5'  #  1:10 PM CDT
-    - cron: '45 18 * * 1-5'  #  1:45 PM CDT
-    - cron: '20 19 * * 1-5'  #  2:20 PM CDT
-    - cron: '55 19 * * 1-5'  #  2:55 PM CDT
+    # All times in UTC. Safe range: 14:30–19:45 UTC (every 35 min, 10 runs/day).
+    #
+    #   CDT (UTC-5, Mar–Nov):  9:30 AM – 2:45 PM CT  ← market hours ✓
+    #   CST (UTC-6, Nov–Mar):  8:30 AM – 1:45 PM CT  ← market hours ✓
+    #
+    # Old schedule started at 13:30 UTC which fired at 7:30 AM CST (pre-market).
+    # This range is safe in BOTH timezones — no pre-market, no after-hours runs.
+    - cron: '30 14 * * 1-5'  #  9:30 AM CDT /  8:30 AM CST
+    - cron: '5 15 * * 1-5'   # 10:05 AM CDT /  9:05 AM CST
+    - cron: '40 15 * * 1-5'  # 10:40 AM CDT /  9:40 AM CST
+    - cron: '15 16 * * 1-5'  # 11:15 AM CDT / 10:15 AM CST
+    - cron: '50 16 * * 1-5'  # 11:50 AM CDT / 10:50 AM CST
+    - cron: '25 17 * * 1-5'  # 12:25 PM CDT / 11:25 AM CST
+    - cron: '0 18 * * 1-5'   #  1:00 PM CDT / 12:00 PM CST
+    - cron: '35 18 * * 1-5'  #  1:35 PM CDT / 12:35 PM CST
+    - cron: '10 19 * * 1-5'  #  2:10 PM CDT /  1:10 PM CST
+    - cron: '45 19 * * 1-5'  #  2:45 PM CDT /  1:45 PM CST
   workflow_dispatch:
 
 permissions:
   contents: write
+
+env:
+  # Opt into Node.js 24 now to avoid forced migration warning (June 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   update:
