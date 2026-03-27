@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-03-27 13:07 CT",
-  "generated_ts": "2026-03-27T13:07:16.505693-05:00",
+  "generated_at": "2026-03-27 13:37 CT",
+  "generated_ts": "2026-03-27T13:37:49.450206-05:00",
   "session_name": "POWER WINDOW",
   "session_trade": true,
   "session_advice": "Best entries. Institutional window.",
   "market": {
-    "price": 167.9,
+    "price": 167.93,
     "prev_close": 171.24,
-    "change": -3.34,
-    "change_pct": -1.95,
-    "volume": 127531208,
+    "change": -3.31,
+    "change_pct": -1.94,
+    "volume": 134739802,
     "avg_vol": 176948021,
-    "vol_ratio": 0.72,
-    "vol_20ma": 177.3,
+    "vol_ratio": 0.76,
+    "vol_20ma": 177.7,
     "week52h": 212.19,
     "week52l": 86.62,
     "atr": 5.0,
@@ -21,8 +21,8 @@
     "id_low": 167.55
   },
   "spy": {
-    "price": 635.77,
-    "e50": 671.94,
+    "price": 635.91,
+    "e50": 671.95,
     "bull": false
   },
   "signals": {
@@ -31,56 +31,56 @@
       "bear": true,
       "label": "BEAR",
       "detail": "Below cloud \u00b7 T<170.0",
-      "tenkan": 168.62,
+      "tenkan": 168.44,
       "kijun": 170.03,
-      "cloud_top": 173.44,
-      "cloud_bottom": 169.33
+      "cloud_top": 173.33,
+      "cloud_bottom": 169.23
     },
     "kama": {
       "bull": "False",
       "bear": "True",
       "label": "BEAR",
       "detail": "HLC3<177.1 \u00b7 KAMA\u2193 \u00b7 ER0.28",
-      "kama_val": 177.11,
-      "er": 0.279
+      "kama_val": 177.1,
+      "er": 0.28
     },
     "rsi": {
-      "bull": false,
+      "bull": true,
       "bear": false,
-      "label": "OS",
-      "detail": "RSI 13 \u00b7 wait 45/55",
-      "rsi_val": 12.6,
-      "rsi_prev": 12.8
+      "label": "BULL",
+      "detail": "RSI 13\u219214 OS BOUNCE",
+      "rsi_val": 13.5,
+      "rsi_prev": 13.2
     },
     "macd_combo": {
       "bull": false,
       "bear": false,
       "label": "WAIT",
-      "detail": "MACD -0.720 \u00b7 RSI13",
-      "macd_h": -0.72,
-      "rsi_val": 12.6
+      "detail": "MACD -0.625 \u00b7 RSI14",
+      "macd_h": -0.625,
+      "rsi_val": 13.5
     },
     "divergence": {
-      "divergence_type": "regular_bull",
-      "label": "Reg Bull (weak)",
-      "detail": "P\u2193 RSI\u2191 23\u219226",
-      "strength": "weak",
-      "confirms_bull": true,
-      "confirms_bear": false,
-      "exit_warning_bull": false,
-      "exit_warning_bear": true
+      "divergence_type": "hidden_bear",
+      "label": "Hidden Bear (strong)",
+      "detail": "P\u2193 RSI\u2191 26\u219251",
+      "strength": "strong",
+      "confirms_bull": false,
+      "confirms_bear": true,
+      "exit_warning_bull": true,
+      "exit_warning_bear": false
     }
   },
   "timeframes": {
     "daily": {
       "label": "DAILY",
       "e8": 174.61,
-      "e21": 178.79,
-      "e50": 181.87,
+      "e21": 178.8,
+      "e50": 181.88,
       "rsi": 31.7,
-      "macd_h": -1.127,
+      "macd_h": -1.126,
       "macd_h_prev": -0.819,
-      "vol_ratio": 0.72,
+      "vol_ratio": 0.76,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -95,13 +95,13 @@
     },
     "h4": {
       "label": "4H",
-      "e8": 172.34,
-      "e21": 176.05,
-      "e50": 179.82,
-      "rsi": 26.1,
-      "macd_h": -0.808,
+      "e8": 172.32,
+      "e21": 176.04,
+      "e50": 179.81,
+      "rsi": 25.9,
+      "macd_h": -0.813,
       "macd_h_prev": -0.664,
-      "vol_ratio": 0.14,
+      "vol_ratio": 0.24,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -116,13 +116,13 @@
     },
     "h1": {
       "label": "1H",
-      "e8": 169.79,
-      "e21": 172.65,
-      "e50": 175.47,
-      "rsi": 12.6,
-      "macd_h": -0.72,
-      "macd_h_prev": -0.78,
-      "vol_ratio": 0.42,
+      "e8": 169.39,
+      "e21": 172.22,
+      "e50": 175.18,
+      "rsi": 13.5,
+      "macd_h": -0.625,
+      "macd_h_prev": -0.713,
+      "vol_ratio": 0.06,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -137,13 +137,13 @@
     },
     "m15": {
       "label": "15M",
-      "e8": 168.29,
-      "e21": 169.29,
-      "e50": 171.52,
-      "rsi": 48.8,
-      "macd_h": 0.093,
-      "macd_h_prev": 0.09,
-      "vol_ratio": 0.29,
+      "e8": 168.17,
+      "e21": 169.07,
+      "e50": 171.25,
+      "rsi": 40.1,
+      "macd_h": 0.119,
+      "macd_h_prev": 0.112,
+      "vol_ratio": 0.25,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -261,79 +261,79 @@
   "options": {
     "expiry": "2026-04-24",
     "dte": 28,
-    "iv_30": 43.4,
-    "exp_move": 20.18,
+    "iv_30": 42.7,
+    "exp_move": 19.86,
     "calls": [
       {
         "strike": 150.0,
         "price": 21.41,
-        "bid": 20.15,
-        "ask": 20.9,
-        "iv": 52.4,
+        "bid": 20.5,
+        "ask": 20.85,
+        "iv": 50.4,
         "volume": 41,
         "oi": 183
       },
       {
         "strike": 155.0,
-        "price": 17.35,
-        "bid": 16.7,
-        "ask": 16.8,
-        "iv": 49.1,
-        "volume": 128,
+        "price": 16.52,
+        "bid": 16.5,
+        "ask": 16.55,
+        "iv": 47.3,
+        "volume": 131,
         "oi": 275
       },
       {
         "strike": 160.0,
-        "price": 12.9,
-        "bid": 12.95,
-        "ask": 13.05,
-        "iv": 46.3,
-        "volume": 268,
+        "price": 12.82,
+        "bid": 12.75,
+        "ask": 12.9,
+        "iv": 45.2,
+        "volume": 273,
         "oi": 666
       },
       {
         "strike": 165.0,
-        "price": 9.5,
-        "bid": 9.55,
-        "ask": 9.65,
-        "iv": 43.4,
-        "volume": 372,
+        "price": 9.55,
+        "bid": 9.5,
+        "ask": 9.55,
+        "iv": 42.7,
+        "volume": 383,
         "oi": 1507
       },
       {
         "strike": 170.0,
-        "price": 6.63,
-        "bid": 6.7,
-        "ask": 6.75,
-        "iv": 40.9,
-        "volume": 4498,
+        "price": 6.68,
+        "bid": 6.6,
+        "ask": 6.65,
+        "iv": 40.2,
+        "volume": 4591,
         "oi": 1750
       },
       {
         "strike": 175.0,
-        "price": 4.39,
-        "bid": 4.35,
+        "price": 4.35,
+        "bid": 4.3,
         "ask": 4.4,
-        "iv": 38.5,
-        "volume": 1537,
+        "iv": 38.4,
+        "volume": 2753,
         "oi": 3537
       },
       {
         "strike": 180.0,
         "price": 2.65,
         "bid": 2.64,
-        "ask": 2.67,
+        "ask": 2.68,
         "iv": 36.6,
-        "volume": 2913,
+        "volume": 3177,
         "oi": 6926
       },
       {
         "strike": 185.0,
-        "price": 1.49,
+        "price": 1.54,
         "bid": 1.5,
-        "ask": 1.54,
-        "iv": 35.4,
-        "volume": 9890,
+        "ask": 1.53,
+        "iv": 35.2,
+        "volume": 10036,
         "oi": 13566
       }
     ],
@@ -341,133 +341,145 @@
       {
         "strike": 185.0,
         "price": 17.71,
-        "bid": 17.75,
-        "ask": 18.0,
-        "iv": 29.7,
+        "bid": 17.8,
+        "ask": 18.25,
+        "iv": 32.4,
         "volume": 97,
         "oi": 4666
       },
       {
         "strike": 180.0,
-        "price": 14.1,
-        "bid": 14.0,
-        "ask": 14.15,
-        "iv": 32.4,
-        "volume": 277,
+        "price": 14.29,
+        "bid": 14.3,
+        "ask": 14.4,
+        "iv": 34.4,
+        "volume": 304,
         "oi": 2152
       },
       {
         "strike": 175.0,
-        "price": 10.9,
-        "bid": 10.7,
-        "ask": 10.8,
-        "iv": 34.5,
-        "volume": 420,
+        "price": 10.88,
+        "bid": 10.9,
+        "ask": 11.0,
+        "iv": 35.8,
+        "volume": 471,
         "oi": 2927
       },
       {
         "strike": 170.0,
-        "price": 8.2,
-        "bid": 8.0,
-        "ask": 8.1,
-        "iv": 36.8,
-        "volume": 3502,
+        "price": 8.25,
+        "bid": 8.2,
+        "ask": 8.3,
+        "iv": 38.0,
+        "volume": 3601,
         "oi": 6576
       },
       {
         "strike": 165.0,
-        "price": 5.91,
-        "bid": 5.9,
-        "ask": 6.0,
-        "iv": 39.3,
-        "volume": 2010,
+        "price": 6.1,
+        "bid": 6.1,
+        "ask": 6.15,
+        "iv": 40.2,
+        "volume": 2039,
         "oi": 5641
       },
       {
         "strike": 160.0,
-        "price": 4.36,
-        "bid": 4.25,
-        "ask": 4.35,
-        "iv": 41.6,
-        "volume": 1366,
+        "price": 4.4,
+        "bid": 4.45,
+        "ask": 4.5,
+        "iv": 42.5,
+        "volume": 1480,
         "oi": 4099
       },
       {
         "strike": 155.0,
-        "price": 3.05,
-        "bid": 3.05,
-        "ask": 3.1,
-        "iv": 43.8,
-        "volume": 2128,
+        "price": 3.2,
+        "bid": 3.2,
+        "ask": 3.25,
+        "iv": 44.9,
+        "volume": 2214,
         "oi": 9741
       },
       {
         "strike": 150.0,
-        "price": 2.18,
-        "bid": 2.18,
-        "ask": 2.2,
-        "iv": 46.1,
-        "volume": 1543,
+        "price": 2.25,
+        "bid": 2.25,
+        "ask": 2.28,
+        "iv": 46.9,
+        "volume": 1729,
         "oi": 2711
       }
     ],
     "iv_stats": {
-      "iv_rank": 30.8,
-      "iv_pct": 86.2,
+      "iv_rank": 29.7,
+      "iv_pct": 83.2,
       "hv_20": 32.5,
-      "iv_vs_hv": 10.9,
+      "iv_vs_hv": 10.2,
       "iv_quality": "Low IV \u2014 good time to buy premium"
     },
     "call_analytics": {
       "strike": 170.0,
-      "premium": 6.63,
-      "bid": 6.7,
-      "ask": 6.75,
-      "iv": 40.9,
-      "volume": 4498,
+      "premium": 6.68,
+      "bid": 6.6,
+      "ask": 6.65,
+      "iv": 40.2,
+      "volume": 4591,
       "oi": 1750,
-      "breakeven": 176.63,
-      "move_to_be": 8.73,
-      "move_to_be_pct": 5.2,
+      "breakeven": 176.68,
+      "move_to_be": 8.75,
+      "move_to_be_pct": 5.21,
       "approx_delta": 0.44,
-      "daily_theta": 0.205,
+      "daily_theta": 0.203,
       "days_to_danger": 7,
-      "move_for_2x": 15.07,
-      "move_for_2x_pct": 8.98,
-      "max_loss": 663.0,
+      "move_for_2x": 15.18,
+      "move_for_2x_pct": 9.04,
+      "max_loss": 668.0,
       "spread": 0.05,
       "liq": "Tight",
-      "target_prem": 11.93,
-      "stop_prem": 3.31,
+      "target_prem": 12.02,
+      "stop_prem": 3.34,
       "exit_pct": 80,
       "stop_pct": 50
     },
     "put_analytics": {
       "strike": 165.0,
-      "premium": 5.91,
-      "bid": 5.9,
-      "ask": 6.0,
-      "iv": 39.3,
-      "volume": 2010,
+      "premium": 6.1,
+      "bid": 6.1,
+      "ask": 6.15,
+      "iv": 40.2,
+      "volume": 2039,
       "oi": 5641,
-      "breakeven": 159.09,
-      "move_to_be": 8.81,
-      "move_to_be_pct": 5.25,
+      "breakeven": 158.9,
+      "move_to_be": 9.03,
+      "move_to_be_pct": 5.38,
       "approx_delta": 0.41,
-      "daily_theta": 0.176,
+      "daily_theta": 0.185,
       "days_to_danger": 7,
-      "move_for_2x": 14.41,
-      "move_for_2x_pct": 8.58,
-      "max_loss": 591.0,
-      "spread": 0.1,
+      "move_for_2x": 14.88,
+      "move_for_2x_pct": 8.86,
+      "max_loss": 610.0,
+      "spread": 0.05,
       "liq": "Tight",
-      "target_prem": 10.64,
-      "stop_prem": 2.96,
+      "target_prem": 10.98,
+      "stop_prem": 3.05,
       "exit_pct": 80,
       "stop_pct": 50
     }
   },
   "news": [
+    {
+      "title": "Micron Just Started Mass-Producing HBM4 for Nvidia's Vera Rubin. Here's Why This Stock Could Soar in",
+      "published": "Fri, 27 Mar 2026 18:25",
+      "link": "https://www.fool.com/investing/2026/03/27/micron-just-started-mass-producing-hbm4-for-nvidia/?.tsrc=rss",
+      "sentiment": "neut"
+    },
+    {
+      "title": "One-Third of the World's Fertilizer Passes Through the Strait of Hormuz. That Could Have Serious Rep",
+      "published": "Fri, 27 Mar 2026 18:05",
+      "link": "https://www.fool.com/investing/2026/03/27/one-third-of-the-worlds-fertilizer-passes-through/?.tsrc=rss",
+      "sentiment": "neut"
+    },
     {
       "title": "1 No-Brainer Artificial Intelligence (AI) Stock That Will Skyrocket By the End of 2026",
       "published": "Fri, 27 Mar 2026 17:50",
@@ -475,7 +487,7 @@
       "sentiment": "bull"
     },
     {
-      "title": "Could SpaceX's $1.75T Valuation Make It the Biggest Public Offering in History?",
+      "title": "Could SpaceX's $1.75 Trillion Valuation Make It the Biggest Public Offering in History?",
       "published": "Fri, 27 Mar 2026 17:32",
       "link": "https://www.fool.com/investing/2026/03/27/could-spacexs-175t-valuation-make-it-the-biggest-p/?.tsrc=rss",
       "sentiment": "neut"
@@ -485,22 +497,10 @@
       "published": "Fri, 27 Mar 2026 17:31",
       "link": "https://www.fool.com/investing/2026/03/27/3-things-american-express-investors-need-to-know/?.tsrc=rss",
       "sentiment": "neut"
-    },
-    {
-      "title": "These Top Stocks Have a Big China Problem to Solve",
-      "published": "Fri, 27 Mar 2026 17:15",
-      "link": "https://www.fool.com/investing/2026/03/27/these-top-stocks-have-a-big-china-problem-to-solve/?.tsrc=rss",
-      "sentiment": "neut"
-    },
-    {
-      "title": "S&P 500, Nasdaq Slide as Iran Conflict Keeps Oil Prices Elevated",
-      "published": "Fri, 27 Mar 2026 17:11",
-      "link": "https://www.fool.com/investing/2026/03/27/sp-500-nasdaq-slide-on-iran-conflict/?.tsrc=rss",
-      "sentiment": "bear"
     }
   ],
   "alignment": {
-    "call_count": 0,
+    "call_count": 1,
     "put_count": 2,
     "max_signals": 4,
     "call_reasons": [
@@ -513,11 +513,11 @@
         "pass": false
       },
       {
-        "text": "S3 RSI: RSI 13 \u00b7 wait 45/55",
-        "pass": false
+        "text": "S3 RSI: RSI 13\u219214 OS BOUNCE",
+        "pass": true
       },
       {
-        "text": "S4 MACD: MACD -0.720 \u00b7 RSI13",
+        "text": "S4 MACD: MACD -0.625 \u00b7 RSI14",
         "pass": false
       }
     ],
@@ -531,11 +531,11 @@
         "pass": true
       },
       {
-        "text": "S3 RSI: RSI 13 \u00b7 wait 45/55",
+        "text": "S3 RSI: RSI 13\u219214 OS BOUNCE",
         "pass": false
       },
       {
-        "text": "S4 MACD: MACD -0.720 \u00b7 RSI13",
+        "text": "S4 MACD: MACD -0.625 \u00b7 RSI14",
         "pass": false
       }
     ],
@@ -549,7 +549,7 @@
         "pass": false
       },
       {
-        "text": "Vol 0.72x \u2014 low-vol pullback",
+        "text": "Vol 0.76x \u2014 low-vol pullback",
         "pass": true
       },
       {
@@ -557,8 +557,8 @@
         "pass": true
       },
       {
-        "text": "Divergence: Reg Bull (weak) \u2014 confirms",
-        "pass": true
+        "text": "Divergence: Hidden Bear (strong) \u2014 EXIT WARNING",
+        "pass": false
       }
     ],
     "put_context": [
@@ -571,7 +571,7 @@
         "pass": true
       },
       {
-        "text": "Vol 0.72x \u2014 low-vol decline (dead cat)",
+        "text": "Vol 0.76x \u2014 low-vol decline (dead cat)",
         "pass": false
       },
       {
@@ -579,83 +579,29 @@
         "pass": true
       },
       {
-        "text": "Divergence: Reg Bull (weak) \u2014 EXIT WARNING",
-        "pass": false
+        "text": "Divergence: Hidden Bear (strong) \u2014 confirms",
+        "pass": true
       }
     ],
     "h1_div": {
-      "divergence_type": "regular_bull",
-      "label": "Reg Bull (weak)",
-      "detail": "P\u2193 RSI\u2191 23\u219226",
-      "strength": "weak",
-      "confirms_bull": true,
-      "confirms_bear": false,
-      "exit_warning_bull": false,
-      "exit_warning_bear": true
+      "divergence_type": "hidden_bear",
+      "label": "Hidden Bear (strong)",
+      "detail": "P\u2193 RSI\u2191 26\u219251",
+      "strength": "strong",
+      "confirms_bull": false,
+      "confirms_bear": true,
+      "exit_warning_bull": true,
+      "exit_warning_bear": false
     }
   },
   "verdict": {
     "verdict": "PUT \u2014 WATCH (2/4)",
     "bias": "BEAR",
     "explanation": "2/4 signals. Confirm volume.",
-    "trade_idea": "$165P 2026-04-24 @ $5.91 | BE $159.09 | need -5.25%",
+    "trade_idea": "$165P 2026-04-24 @ $6.10 | BE $158.90 | need -5.38%",
     "level": "watch"
   },
   "candles": [
-    {
-      "time": "12:30 PM",
-      "open": 167.84,
-      "high": 168.1,
-      "low": 167.84,
-      "close": 168.07,
-      "volume": 1116799,
-      "bull": true
-    },
-    {
-      "time": "12:35 PM",
-      "open": 168.07,
-      "high": 168.23,
-      "low": 168.05,
-      "close": 168.1,
-      "volume": 970794,
-      "bull": true
-    },
-    {
-      "time": "12:40 PM",
-      "open": 168.09,
-      "high": 168.15,
-      "low": 167.87,
-      "close": 167.91,
-      "volume": 1306424,
-      "bull": false
-    },
-    {
-      "time": "12:45 PM",
-      "open": 167.91,
-      "high": 168.07,
-      "low": 167.76,
-      "close": 167.79,
-      "volume": 1416965,
-      "bull": false
-    },
-    {
-      "time": "12:50 PM",
-      "open": 167.79,
-      "high": 167.97,
-      "low": 167.74,
-      "close": 167.82,
-      "volume": 1191264,
-      "bull": true
-    },
-    {
-      "time": "12:55 PM",
-      "open": 167.82,
-      "high": 167.93,
-      "low": 167.61,
-      "close": 167.88,
-      "volume": 1393160,
-      "bull": true
-    },
     {
       "time": "01:00 PM",
       "open": 167.87,
@@ -671,7 +617,61 @@
       "high": 168.06,
       "low": 167.79,
       "close": 167.9,
-      "volume": 618588,
+      "volume": 1358280,
+      "bull": false
+    },
+    {
+      "time": "01:10 PM",
+      "open": 167.91,
+      "high": 168.02,
+      "low": 167.77,
+      "close": 168.01,
+      "volume": 1283475,
+      "bull": true
+    },
+    {
+      "time": "01:15 PM",
+      "open": 168.02,
+      "high": 168.24,
+      "low": 167.92,
+      "close": 168.18,
+      "volume": 1421496,
+      "bull": true
+    },
+    {
+      "time": "01:20 PM",
+      "open": 168.18,
+      "high": 168.22,
+      "low": 167.91,
+      "close": 167.99,
+      "volume": 1143762,
+      "bull": false
+    },
+    {
+      "time": "01:25 PM",
+      "open": 167.99,
+      "high": 168.11,
+      "low": 167.93,
+      "close": 168.0,
+      "volume": 1069799,
+      "bull": true
+    },
+    {
+      "time": "01:30 PM",
+      "open": 168.01,
+      "high": 168.05,
+      "low": 167.8,
+      "close": 167.92,
+      "volume": 975314,
+      "bull": false
+    },
+    {
+      "time": "01:35 PM",
+      "open": 167.93,
+      "high": 167.94,
+      "low": 167.79,
+      "close": 167.93,
+      "volume": 410614,
       "bull": false
     }
   ]
