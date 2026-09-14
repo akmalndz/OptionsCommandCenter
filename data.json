@@ -1,27 +1,27 @@
 {
-  "generated_at": "2026-09-14 14:29 CT",
-  "generated_ts": "2026-09-14T14:29:51.354072-05:00",
-  "session_name": "POWER WINDOW",
+  "generated_at": "2026-09-14 14:41 CT",
+  "generated_ts": "2026-09-14T14:41:57.267818-05:00",
+  "session_name": "CLOSING PUSH",
   "session_trade": true,
-  "session_advice": "Best entries. Institutional window.",
+  "session_advice": "Final push. Exit if down.",
   "market": {
-    "price": 212.18,
+    "price": 212.02,
     "prev_close": 218.29,
-    "change": -6.11,
-    "change_pct": -2.8,
-    "volume": 95878834,
+    "change": -6.27,
+    "change_pct": -2.87,
+    "volume": 98821440,
     "avg_vol": 132087064,
-    "vol_ratio": 0.73,
-    "vol_20ma": 128.7,
+    "vol_ratio": 0.75,
+    "vol_20ma": 128.9,
     "week52h": 236.54,
     "week52l": 164.27,
     "atr": 7.74,
-    "compression": 20.1,
+    "compression": 20.0,
     "id_high": 222.0,
     "id_low": 208.93
   },
   "spy": {
-    "price": 761.79,
+    "price": 761.63,
     "e50": 758.32,
     "bull": true
   },
@@ -31,56 +31,56 @@
       "bear": true,
       "label": "BEAR",
       "detail": "Below cloud \u00b7 T<213.9",
-      "tenkan": 212.37,
+      "tenkan": 212.22,
       "kijun": 213.89,
       "cloud_top": 215.46,
-      "cloud_bottom": 213.13
+      "cloud_bottom": 213.06
     },
     "kama": {
       "bull": "False",
       "bear": "True",
       "label": "BEAR",
-      "detail": "HLC3<216.2 \u00b7 KAMA\u2193 \u00b7 ER0.77",
-      "kama_val": 216.16,
-      "er": 0.774
+      "detail": "HLC3<216.1 \u00b7 KAMA\u2193 \u00b7 ER0.79",
+      "kama_val": 216.05,
+      "er": 0.79
     },
     "rsi": {
       "bull": false,
       "bear": false,
       "label": "MID",
-      "detail": "RSI 33 \u00b7 wait 45/55",
-      "rsi_val": 33.2,
-      "rsi_prev": 33.5
+      "detail": "RSI 32 \u00b7 wait 45/55",
+      "rsi_val": 32.1,
+      "rsi_prev": 32.6
     },
     "macd_combo": {
       "bull": false,
       "bear": false,
       "label": "WAIT",
-      "detail": "MACD -0.461 \u00b7 RSI33",
-      "macd_h": -0.461,
-      "rsi_val": 33.2
+      "detail": "MACD -0.368 \u00b7 RSI32",
+      "macd_h": -0.368,
+      "rsi_val": 32.1
     },
     "divergence": {
-      "divergence_type": null,
-      "label": "None",
-      "detail": "",
-      "strength": null,
+      "divergence_type": "hidden_bear",
+      "label": "Hidden Bear (strong)",
+      "detail": "P\u2193 RSI\u2191 21\u219266",
+      "strength": "strong",
       "confirms_bull": false,
-      "confirms_bear": false,
-      "exit_warning_bull": false,
+      "confirms_bear": true,
+      "exit_warning_bull": true,
       "exit_warning_bear": false
     }
   },
   "timeframes": {
     "daily": {
       "label": "DAILY",
-      "e8": 219.44,
-      "e21": 218.85,
-      "e50": 214.61,
-      "rsi": 52.7,
-      "macd_h": -1.132,
+      "e8": 219.41,
+      "e21": 218.84,
+      "e50": 214.6,
+      "rsi": 52.5,
+      "macd_h": -1.143,
       "macd_h_prev": -0.507,
-      "vol_ratio": 0.74,
+      "vol_ratio": 0.77,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -95,13 +95,13 @@
     },
     "h4": {
       "label": "4H",
-      "e8": 217.64,
-      "e21": 220.09,
-      "e50": 218.59,
-      "rsi": 27.4,
-      "macd_h": -1.699,
+      "e8": 217.58,
+      "e21": 220.06,
+      "e50": 218.58,
+      "rsi": 27.1,
+      "macd_h": -1.715,
       "macd_h_prev": -1.51,
-      "vol_ratio": 0.36,
+      "vol_ratio": 0.42,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -116,13 +116,13 @@
     },
     "h1": {
       "label": "1H",
-      "e8": 213.56,
-      "e21": 216.85,
-      "e50": 219.93,
-      "rsi": 33.2,
-      "macd_h": -0.461,
-      "macd_h_prev": -0.569,
-      "vol_ratio": 0.74,
+      "e8": 213.19,
+      "e21": 216.39,
+      "e50": 219.62,
+      "rsi": 32.1,
+      "macd_h": -0.368,
+      "macd_h_prev": -0.472,
+      "vol_ratio": 0.25,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -137,13 +137,13 @@
     },
     "m15": {
       "label": "15M",
-      "e8": 212.29,
-      "e21": 212.78,
-      "e50": 214.94,
-      "rsi": 49.8,
-      "macd_h": 0.304,
-      "macd_h_prev": 0.33,
-      "vol_ratio": 1.5,
+      "e8": 212.22,
+      "e21": 212.7,
+      "e50": 214.82,
+      "rsi": 56.3,
+      "macd_h": 0.269,
+      "macd_h_prev": 0.299,
+      "vol_ratio": 1.19,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -153,8 +153,8 @@
       "macd_turning_bear": false,
       "rsi_expansion_bull": false,
       "rsi_expansion_bear": false,
-      "vol_expanded": true,
-      "rsi_above_50": false
+      "vol_expanded": false,
+      "rsi_above_50": true
     }
   },
   "brando": {
@@ -255,116 +255,116 @@
   "options": {
     "expiry": "2026-10-09",
     "dte": 25,
-    "iv_30": 34.8,
-    "exp_move": 19.32,
+    "iv_30": 34.9,
+    "exp_move": 19.37,
     "calls": [
       {
         "strike": 195.0,
         "price": 19.73,
         "bid": 19.6,
         "ask": 19.85,
-        "iv": 40.1,
+        "iv": 40.9,
         "volume": 23,
         "oi": 134
       },
       {
         "strike": 200.0,
-        "price": 15.71,
-        "bid": 15.55,
-        "ask": 15.65,
-        "iv": 37.2,
-        "volume": 72,
+        "price": 15.57,
+        "bid": 15.5,
+        "ask": 15.75,
+        "iv": 38.4,
+        "volume": 75,
         "oi": 245
       },
       {
         "strike": 205.0,
         "price": 12.0,
-        "bid": 11.95,
-        "ask": 12.2,
+        "bid": 11.85,
+        "ask": 12.1,
         "iv": 36.5,
         "volume": 130,
         "oi": 149
       },
       {
         "strike": 210.0,
-        "price": 8.91,
-        "bid": 8.8,
-        "ask": 8.95,
-        "iv": 34.8,
-        "volume": 848,
+        "price": 8.83,
+        "bid": 8.75,
+        "ask": 8.9,
+        "iv": 34.9,
+        "volume": 872,
         "oi": 327
       },
       {
         "strike": 215.0,
         "price": 6.3,
         "bid": 6.3,
-        "ask": 6.4,
-        "iv": 34.0,
-        "volume": 1388,
+        "ask": 6.35,
+        "iv": 34.1,
+        "volume": 1393,
         "oi": 1199
       },
       {
         "strike": 220.0,
-        "price": 4.3,
-        "bid": 4.3,
-        "ask": 4.35,
-        "iv": 33.2,
-        "volume": 2650,
+        "price": 4.25,
+        "bid": 4.2,
+        "ask": 4.25,
+        "iv": 33.0,
+        "volume": 2652,
         "oi": 1838
       },
       {
         "strike": 225.0,
-        "price": 2.83,
-        "bid": 2.77,
-        "ask": 2.82,
-        "iv": 32.5,
-        "volume": 3866,
+        "price": 2.8,
+        "bid": 2.76,
+        "ask": 2.81,
+        "iv": 32.7,
+        "volume": 3884,
         "oi": 3162
       },
       {
         "strike": 230.0,
-        "price": 1.79,
-        "bid": 1.78,
-        "ask": 1.81,
+        "price": 1.76,
+        "bid": 1.75,
+        "ask": 1.78,
         "iv": 32.4,
-        "volume": 7239,
+        "volume": 7460,
         "oi": 7611
       }
     ],
     "puts": [
       {
         "strike": 230.0,
-        "price": 18.95,
-        "bid": 18.9,
-        "ask": 19.05,
-        "iv": 28.4,
-        "volume": 53,
+        "price": 19.05,
+        "bid": 18.85,
+        "ask": 19.0,
+        "iv": 26.9,
+        "volume": 63,
         "oi": 2481
       },
       {
         "strike": 225.0,
         "price": 14.96,
-        "bid": 14.75,
-        "ask": 14.9,
-        "iv": 28.4,
+        "bid": 14.8,
+        "ask": 14.95,
+        "iv": 28.0,
         "volume": 475,
         "oi": 3177
       },
       {
         "strike": 220.0,
-        "price": 11.17,
-        "bid": 11.2,
+        "price": 11.35,
+        "bid": 11.25,
         "ask": 11.4,
-        "iv": 29.5,
-        "volume": 396,
+        "iv": 29.0,
+        "volume": 397,
         "oi": 5740
       },
       {
         "strike": 215.0,
         "price": 8.3,
-        "bid": 8.25,
+        "bid": 8.3,
         "ask": 8.4,
-        "iv": 30.3,
+        "iv": 30.0,
         "volume": 394,
         "oi": 5068
       },
@@ -372,43 +372,43 @@
         "strike": 210.0,
         "price": 5.82,
         "bid": 5.85,
-        "ask": 5.95,
-        "iv": 31.1,
+        "ask": 6.0,
+        "iv": 31.0,
         "volume": 887,
         "oi": 2145
       },
       {
         "strike": 205.0,
-        "price": 4.0,
-        "bid": 3.95,
-        "ask": 4.05,
+        "price": 4.02,
+        "bid": 4.0,
+        "ask": 4.1,
         "iv": 31.8,
-        "volume": 996,
+        "volume": 1008,
         "oi": 3466
       },
       {
         "strike": 200.0,
-        "price": 2.67,
+        "price": 2.72,
         "bid": 2.66,
-        "ask": 2.72,
-        "iv": 33.0,
-        "volume": 955,
+        "ask": 2.7,
+        "iv": 32.7,
+        "volume": 963,
         "oi": 3349
       },
       {
         "strike": 195.0,
-        "price": 1.77,
+        "price": 1.8,
         "bid": 1.77,
         "ask": 1.8,
-        "iv": 34.3,
-        "volume": 1725,
+        "iv": 34.2,
+        "volume": 1737,
         "oi": 5286
       }
     ],
     "iv_stats": {
-      "iv_rank": 45.0,
-      "iv_pct": 27.3,
-      "hv_20": 44.7,
+      "iv_rank": 45.4,
+      "iv_pct": 28.6,
+      "hv_20": 44.8,
       "iv_vs_hv": -9.9,
       "iv_quality": "Moderate IV \u2014 acceptable entry"
     },
@@ -416,20 +416,20 @@
       "strike": 215.0,
       "premium": 6.3,
       "bid": 6.3,
-      "ask": 6.4,
-      "iv": 34.0,
-      "volume": 1388,
+      "ask": 6.35,
+      "iv": 34.1,
+      "volume": 1393,
       "oi": 1199,
       "breakeven": 221.3,
-      "move_to_be": 9.12,
-      "move_to_be_pct": 4.3,
+      "move_to_be": 9.28,
+      "move_to_be_pct": 4.38,
       "approx_delta": 0.43,
-      "daily_theta": 0.171,
+      "daily_theta": 0.172,
       "days_to_danger": 4,
       "move_for_2x": 14.65,
-      "move_for_2x_pct": 6.9,
+      "move_for_2x_pct": 6.91,
       "max_loss": 630.0,
-      "spread": 0.1,
+      "spread": 0.05,
       "liq": "Tight",
       "target_prem": 11.34,
       "stop_prem": 3.15,
@@ -440,20 +440,20 @@
       "strike": 210.0,
       "premium": 5.82,
       "bid": 5.85,
-      "ask": 5.95,
-      "iv": 31.1,
+      "ask": 6.0,
+      "iv": 31.0,
       "volume": 887,
       "oi": 2145,
       "breakeven": 204.18,
-      "move_to_be": 8.0,
-      "move_to_be_pct": 3.77,
+      "move_to_be": 7.84,
+      "move_to_be_pct": 3.7,
       "approx_delta": 0.45,
-      "daily_theta": 0.145,
+      "daily_theta": 0.144,
       "days_to_danger": 4,
       "move_for_2x": 12.93,
-      "move_for_2x_pct": 6.09,
+      "move_for_2x_pct": 6.1,
       "max_loss": 582.0,
-      "spread": 0.1,
+      "spread": 0.15,
       "liq": "Tight",
       "target_prem": 10.48,
       "stop_prem": 2.91,
@@ -462,6 +462,12 @@
     }
   },
   "news": [
+    {
+      "title": "The 10-Year Treasury Yield Just Hit the Significant 5% Threshold. Here's What That Means for the Sto",
+      "published": "Mon, 14 Sep 2026 19:36",
+      "link": "https://www.fool.com/investing/2026/09/14/the-10-year-treasury-yield-just-hit-the-significant-5-threshold-heres-what-that-means-for-the-stock-market/?.tsrc=rss",
+      "sentiment": "neut"
+    },
     {
       "title": "AI Warning Sends Nvidia, AMD, Micron and Intel Shares Tumbling",
       "published": "Mon, 14 Sep 2026 19:09",
@@ -485,12 +491,6 @@
       "published": "Mon, 14 Sep 2026 19:00",
       "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-vs-oracle-ai-stock-190000301.html?.tsrc=rss",
       "sentiment": "bull"
-    },
-    {
-      "title": "Stock Market Today: Dow Falls, Trump Hits Out At AI Fears; These Cyber Stocks Near Entries (Live Cov",
-      "published": "Mon, 14 Sep 2026 18:58",
-      "link": "https://finance.yahoo.com/m/e8c0a567-addf-325b-8e69-657d5975fcc3/stock-market-today%3A-dow.html?.tsrc=rss",
-      "sentiment": "neut"
     }
   ],
   "alignment": {
@@ -503,15 +503,15 @@
         "pass": false
       },
       {
-        "text": "S2 KAMA: HLC3<216.2 \u00b7 KAMA\u2193 \u00b7 ER0.77",
+        "text": "S2 KAMA: HLC3<216.1 \u00b7 KAMA\u2193 \u00b7 ER0.79",
         "pass": false
       },
       {
-        "text": "S3 RSI: RSI 33 \u00b7 wait 45/55",
+        "text": "S3 RSI: RSI 32 \u00b7 wait 45/55",
         "pass": false
       },
       {
-        "text": "S4 MACD: MACD -0.461 \u00b7 RSI33",
+        "text": "S4 MACD: MACD -0.368 \u00b7 RSI32",
         "pass": false
       }
     ],
@@ -521,15 +521,15 @@
         "pass": true
       },
       {
-        "text": "S2 KAMA: HLC3<216.2 \u00b7 KAMA\u2193 \u00b7 ER0.77",
+        "text": "S2 KAMA: HLC3<216.1 \u00b7 KAMA\u2193 \u00b7 ER0.79",
         "pass": true
       },
       {
-        "text": "S3 RSI: RSI 33 \u00b7 wait 45/55",
+        "text": "S3 RSI: RSI 32 \u00b7 wait 45/55",
         "pass": false
       },
       {
-        "text": "S4 MACD: MACD -0.461 \u00b7 RSI33",
+        "text": "S4 MACD: MACD -0.368 \u00b7 RSI32",
         "pass": false
       }
     ],
@@ -543,12 +543,16 @@
         "pass": true
       },
       {
-        "text": "Vol 0.73x \u2014 low-vol pullback",
+        "text": "Vol 0.75x \u2014 low-vol pullback",
         "pass": true
       },
       {
-        "text": "Session: POWER WINDOW",
+        "text": "Session: CLOSING PUSH",
         "pass": true
+      },
+      {
+        "text": "Divergence: Hidden Bear (strong) \u2014 EXIT WARNING",
+        "pass": false
       }
     ],
     "put_context": [
@@ -561,22 +565,26 @@
         "pass": false
       },
       {
-        "text": "Vol 0.73x \u2014 low-vol decline (dead cat)",
+        "text": "Vol 0.75x \u2014 low-vol decline (dead cat)",
         "pass": false
       },
       {
-        "text": "Session: POWER WINDOW",
+        "text": "Session: CLOSING PUSH",
+        "pass": true
+      },
+      {
+        "text": "Divergence: Hidden Bear (strong) \u2014 confirms",
         "pass": true
       }
     ],
     "h1_div": {
-      "divergence_type": null,
-      "label": "None",
-      "detail": "",
-      "strength": null,
+      "divergence_type": "hidden_bear",
+      "label": "Hidden Bear (strong)",
+      "detail": "P\u2193 RSI\u2191 21\u219266",
+      "strength": "strong",
       "confirms_bull": false,
-      "confirms_bear": false,
-      "exit_warning_bull": false,
+      "confirms_bear": true,
+      "exit_warning_bull": true,
       "exit_warning_bear": false
     }
   },
@@ -584,37 +592,10 @@
     "verdict": "PUT \u2014 WATCH (2/4)",
     "bias": "BEAR",
     "explanation": "2/4 signals. Confirm volume.",
-    "trade_idea": "$210P 2026-10-09 @ $5.82 | BE $204.18 | need -3.77%",
+    "trade_idea": "$210P 2026-10-09 @ $5.82 | BE $204.18 | need -3.7%",
     "level": "watch"
   },
   "candles": [
-    {
-      "time": "01:50 PM",
-      "open": 212.34,
-      "high": 212.42,
-      "low": 212.23,
-      "close": 212.35,
-      "volume": 457830,
-      "bull": true
-    },
-    {
-      "time": "01:55 PM",
-      "open": 212.34,
-      "high": 212.58,
-      "low": 212.31,
-      "close": 212.55,
-      "volume": 473021,
-      "bull": true
-    },
-    {
-      "time": "02:00 PM",
-      "open": 212.57,
-      "high": 212.6,
-      "low": 212.25,
-      "close": 212.58,
-      "volume": 657559,
-      "bull": true
-    },
     {
       "time": "02:05 PM",
       "open": 212.59,
@@ -655,10 +636,37 @@
       "time": "02:25 PM",
       "open": 212.24,
       "high": 212.36,
-      "low": 212.19,
-      "close": 212.19,
-      "volume": 432812,
+      "low": 212.1,
+      "close": 212.1,
+      "volume": 562227,
       "bull": false
+    },
+    {
+      "time": "02:30 PM",
+      "open": 212.1,
+      "high": 212.2,
+      "low": 211.72,
+      "close": 211.8,
+      "volume": 1692517,
+      "bull": false
+    },
+    {
+      "time": "02:35 PM",
+      "open": 211.79,
+      "high": 211.86,
+      "low": 211.68,
+      "close": 211.85,
+      "volume": 845772,
+      "bull": true
+    },
+    {
+      "time": "02:40 PM",
+      "open": 211.84,
+      "high": 212.05,
+      "low": 211.82,
+      "close": 212.02,
+      "volume": 244980,
+      "bull": true
     }
   ]
 }
