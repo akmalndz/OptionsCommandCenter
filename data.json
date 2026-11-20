@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-19 18:00 CT",
-  "generated_ts": "2026-11-19T18:00:03.324119-06:00",
+  "generated_at": "2026-11-19 19:03 CT",
+  "generated_ts": "2026-11-19T19:03:13.632235-06:00",
   "session_name": "AFTER HOURS",
   "session_trade": false,
   "session_advice": "Market closed. Plan tomorrow.",
@@ -15,14 +15,14 @@
     "vol_20ma": 259.6,
     "week52h": 243.37,
     "week52l": 145.71,
-    "atr": 11.9,
-    "compression": 0.0,
+    "atr": NaN,
+    "compression": 100.0,
     "id_high": 159.7,
     "id_low": 145.71
   },
   "spy": {
-    "price": 715.87,
-    "e50": 756.38,
+    "price": NaN,
+    "e50": 758.03,
     "bull": false
   },
   "signals": {
@@ -40,9 +40,9 @@
       "bull": "False",
       "bear": "True",
       "label": "BEAR",
-      "detail": "HLC3<155.6 \u00b7 KAMA\u2193 \u00b7 ER0.90",
-      "kama_val": 155.58,
-      "er": 0.904
+      "detail": "HLC3<155.4 \u00b7 KAMA\u2193 \u00b7 ER0.91",
+      "kama_val": 155.4,
+      "er": 0.905
     },
     "rsi": {
       "bull": false,
@@ -74,11 +74,11 @@
   "timeframes": {
     "daily": {
       "label": "DAILY",
-      "e8": 160.52,
-      "e21": 180.71,
-      "e50": 198.71,
-      "rsi": 16.5,
-      "macd_h": -3.717,
+      "e8": 164.68,
+      "e21": 184.18,
+      "e50": 200.86,
+      "rsi": 50.0,
+      "macd_h": -3.061,
       "macd_h_prev": -3.826,
       "vol_ratio": 1.22,
       "hh_hl": false,
@@ -89,7 +89,7 @@
       "macd_turning": false,
       "macd_turning_bear": false,
       "rsi_expansion_bull": false,
-      "rsi_expansion_bear": true,
+      "rsi_expansion_bear": false,
       "vol_expanded": false,
       "rsi_above_50": false
     },
@@ -99,9 +99,9 @@
       "e21": 165.63,
       "e50": 185.21,
       "rsi": 26.1,
-      "macd_h": -0.326,
+      "macd_h": -0.325,
       "macd_h_prev": -0.332,
-      "vol_ratio": 2.6,
+      "vol_ratio": 2.81,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -122,7 +122,7 @@
       "rsi": 22.2,
       "macd_h": -0.087,
       "macd_h_prev": 0.056,
-      "vol_ratio": 0.17,
+      "vol_ratio": 2.04,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -132,18 +132,18 @@
       "macd_turning_bear": true,
       "rsi_expansion_bull": false,
       "rsi_expansion_bear": true,
-      "vol_expanded": false,
+      "vol_expanded": true,
       "rsi_above_50": false
     },
     "m15": {
       "label": "15M",
       "e8": 147.46,
       "e21": 148.95,
-      "e50": 150.87,
-      "rsi": 25.5,
-      "macd_h": -0.198,
+      "e50": 150.86,
+      "rsi": 25.6,
+      "macd_h": -0.197,
       "macd_h_prev": -0.157,
-      "vol_ratio": 0.2,
+      "vol_ratio": 0.21,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -414,8 +414,8 @@
     "iv_stats": {
       "iv_rank": 100.0,
       "iv_pct": 100.0,
-      "hv_20": 51.1,
-      "iv_vs_hv": 5.0,
+      "hv_20": 51.7,
+      "iv_vs_hv": 4.4,
       "iv_quality": "High IV \u2014 overpaying, consider waiting"
     },
     "call_analytics": {
@@ -469,6 +469,12 @@
   },
   "news": [
     {
+      "title": "1 Unstoppable Stock to Buy Before It Joins NVDA and AAPL in the $1 Trillion Club",
+      "published": "Fri, 20 Nov 2026 00:52",
+      "link": "https://www.fool.com/investing/2026/11/19/1-unstoppable-stock-to-buy-before-it-joins-hot-tickers-in-the-1-3-trillion-club/?.tsrc=rss",
+      "sentiment": "bull"
+    },
+    {
       "title": "The Semiconductor ETF Is on Track to Beat the S&P 500 for a 4th Straight Year. It Has Never Done Tha",
       "published": "Thu, 19 Nov 2026 23:43",
       "link": "https://www.fool.com/investing/2026/11/19/the-semiconductor-etf-is-on-track-to-beat-the-s-and-p-500-for-a-4th-straight-year-it-has-never-done-that-before/?.tsrc=rss",
@@ -481,21 +487,15 @@
       "sentiment": "bear"
     },
     {
+      "title": "California subpoenas Nvidia as questions about CEO affair, AI chips mount",
+      "published": "Thu, 19 Nov 2026 23:04",
+      "link": "https://finance.yahoo.com/technology/ai/articles/california-subpoenas-nvidia-questions-ceo-230444672.html?.tsrc=rss",
+      "sentiment": "neut"
+    },
+    {
       "title": "Grand Theft Auto VI outplays Nvidia and SpaceX",
       "published": "Thu, 19 Nov 2026 23:00",
       "link": "https://www.thestreet.com/crypto/markets/grand-theft-auto-vi-outplays-nvidia-and-spacex?.tsrc=rss",
-      "sentiment": "neut"
-    },
-    {
-      "title": "Nvidia vs. Intel: One AI Stock Is Worth the Drama, the Other Isn\u2019t Worth the Wait, Says Investor",
-      "published": "Thu, 19 Nov 2026 22:20",
-      "link": "https://finance.yahoo.com/markets/stocks/articles/nvidia-vs-intel-one-ai-222036270.html?.tsrc=rss",
-      "sentiment": "neut"
-    },
-    {
-      "title": "Stock Market Today, Nov. 19: Nvidia Slides as Investors Weigh CEO Transition Fallout Despite Strong ",
-      "published": "Thu, 19 Nov 2026 22:20",
-      "link": "https://www.fool.com/coverage/stock-market-today/2026/11/19/stock-market-today-nov-19-nvidia-slides-as-investors-weigh-ceo-transition-fallout-despite-strong-q3-results/?.tsrc=rss",
       "sentiment": "neut"
     }
   ],
@@ -509,7 +509,7 @@
         "pass": false
       },
       {
-        "text": "S2 KAMA: HLC3<155.6 \u00b7 KAMA\u2193 \u00b7 ER0.90",
+        "text": "S2 KAMA: HLC3<155.4 \u00b7 KAMA\u2193 \u00b7 ER0.91",
         "pass": false
       },
       {
@@ -527,7 +527,7 @@
         "pass": true
       },
       {
-        "text": "S2 KAMA: HLC3<155.6 \u00b7 KAMA\u2193 \u00b7 ER0.90",
+        "text": "S2 KAMA: HLC3<155.4 \u00b7 KAMA\u2193 \u00b7 ER0.91",
         "pass": true
       },
       {
@@ -627,7 +627,7 @@
       "high": 147.62,
       "low": 146.94,
       "close": 147.33,
-      "volume": 2354046,
+      "volume": 258170004,
       "bull": true
     },
     {
@@ -645,7 +645,7 @@
       "high": 147.64,
       "low": 146.87,
       "close": 147.28,
-      "volume": 2838833,
+      "volume": 2838949,
       "bull": false
     },
     {
@@ -654,7 +654,7 @@
       "high": 147.53,
       "low": 146.98,
       "close": 146.98,
-      "volume": 3786230,
+      "volume": 3786653,
       "bull": false
     },
     {
@@ -663,7 +663,7 @@
       "high": 146.98,
       "low": 145.71,
       "close": 146.0,
-      "volume": 12082423,
+      "volume": 12082422,
       "bull": false
     }
   ]
