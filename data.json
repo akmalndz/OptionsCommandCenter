@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-27 20:25 CT",
-  "generated_ts": "2026-11-27T20:25:10.413945-06:00",
+  "generated_at": "2026-11-27 20:49 CT",
+  "generated_ts": "2026-11-27T20:49:41.492452-06:00",
   "session_name": "AFTER HOURS",
   "session_trade": false,
   "session_advice": "Market closed. Plan tomorrow.",
@@ -15,14 +15,14 @@
     "vol_20ma": 356.4,
     "week52h": 243.37,
     "week52l": 124.5,
-    "atr": NaN,
-    "compression": 100.0,
+    "atr": 15.35,
+    "compression": 7.3,
     "id_high": 151.98,
     "id_low": 141.17
   },
   "spy": {
-    "price": NaN,
-    "e50": 749.93,
+    "price": 728.32,
+    "e50": 749.08,
     "bull": false
   },
   "signals": {
@@ -40,45 +40,45 @@
       "bull": "True",
       "bear": "False",
       "label": "BULL",
-      "detail": "HLC3>141.9 \u00b7 KAMA\u2191 \u00b7 ER0.03",
-      "kama_val": 141.94,
-      "er": 0.03
+      "detail": "HLC3>142.0 \u00b7 KAMA\u2191 \u00b7 ER0.04",
+      "kama_val": 142.02,
+      "er": 0.035
     },
     "rsi": {
-      "bull": true,
+      "bull": false,
       "bear": false,
-      "label": "BULL",
-      "detail": "RSI 42\u219245 CROSS\u219145",
-      "rsi_val": 45.2,
-      "rsi_prev": 42.3
+      "label": "MID",
+      "detail": "RSI 42 \u00b7 wait 45/55",
+      "rsi_val": 42.3,
+      "rsi_prev": 45.6
     },
     "macd_combo": {
-      "bull": true,
+      "bull": false,
       "bear": false,
-      "label": "BULL",
-      "detail": "MACD\u21910 \u00b7 RSI45",
-      "macd_h": 0.027,
-      "rsi_val": 45.2
+      "label": "WAIT",
+      "detail": "MACD -0.186 \u00b7 RSI42",
+      "macd_h": -0.186,
+      "rsi_val": 42.3
     },
     "divergence": {
-      "divergence_type": "regular_bear",
-      "label": "Reg Bear (weak)",
-      "detail": "P\u2191 RSI\u2193 70\u219267",
-      "strength": "weak",
+      "divergence_type": null,
+      "label": "None",
+      "detail": "",
+      "strength": null,
       "confirms_bull": false,
-      "confirms_bear": true,
-      "exit_warning_bull": true,
+      "confirms_bear": false,
+      "exit_warning_bull": false,
       "exit_warning_bear": false
     }
   },
   "timeframes": {
     "daily": {
       "label": "DAILY",
-      "e8": 154.09,
-      "e21": 170.82,
-      "e50": 191.37,
-      "rsi": 50.0,
-      "macd_h": -0.541,
+      "e8": 153.29,
+      "e21": 168.97,
+      "e50": 189.77,
+      "rsi": 35.8,
+      "macd_h": -0.093,
       "macd_h_prev": -0.676,
       "vol_ratio": 0.52,
       "hh_hl": false,
@@ -89,19 +89,19 @@
       "macd_turning": false,
       "macd_turning_bear": false,
       "rsi_expansion_bull": false,
-      "rsi_expansion_bear": false,
+      "rsi_expansion_bear": true,
       "vol_expanded": false,
       "rsi_above_50": false
     },
     "h4": {
       "label": "4H",
-      "e8": 151.2,
-      "e21": 156.93,
-      "e50": 174.61,
-      "rsi": 48.2,
-      "macd_h": 1.955,
-      "macd_h_prev": 1.963,
-      "vol_ratio": 4.44,
+      "e8": 150.92,
+      "e21": 156.81,
+      "e50": 174.56,
+      "rsi": 47.5,
+      "macd_h": 1.873,
+      "macd_h_prev": 1.962,
+      "vol_ratio": 0.57,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": true,
@@ -111,28 +111,28 @@
       "macd_turning_bear": false,
       "rsi_expansion_bull": false,
       "rsi_expansion_bear": false,
-      "vol_expanded": true,
+      "vol_expanded": false,
       "rsi_above_50": false
     },
     "h1": {
       "label": "1H",
-      "e8": 148.99,
-      "e21": 149.84,
-      "e50": 152.7,
-      "rsi": 45.2,
-      "macd_h": 0.027,
-      "macd_h_prev": -0.186,
-      "vol_ratio": 1.81,
+      "e8": 148.53,
+      "e21": 149.76,
+      "e50": 152.78,
+      "rsi": 42.3,
+      "macd_h": -0.186,
+      "macd_h_prev": -0.367,
+      "vol_ratio": 0.0,
       "hh_hl": false,
       "above_cloud": false,
       "below_cloud": false,
       "fast_bull": false,
-      "macd_bull": true,
-      "macd_turning": true,
+      "macd_bull": false,
+      "macd_turning": false,
       "macd_turning_bear": false,
       "rsi_expansion_bull": false,
       "rsi_expansion_bear": false,
-      "vol_expanded": true,
+      "vol_expanded": false,
       "rsi_above_50": false
     },
     "m15": {
@@ -140,10 +140,10 @@
       "e8": 149.15,
       "e21": 148.34,
       "e50": 148.64,
-      "rsi": 57.2,
-      "macd_h": 0.296,
+      "rsi": 57.3,
+      "macd_h": 0.297,
       "macd_h_prev": 0.228,
-      "vol_ratio": 0.26,
+      "vol_ratio": 0.59,
       "hh_hl": false,
       "above_cloud": true,
       "below_cloud": false,
@@ -412,10 +412,10 @@
       }
     ],
     "iv_stats": {
-      "iv_rank": 43.1,
-      "iv_pct": 98.3,
-      "hv_20": 127.2,
-      "iv_vs_hv": -59.8,
+      "iv_rank": 42.9,
+      "iv_pct": 97.8,
+      "hv_20": 127.5,
+      "iv_vs_hv": -60.1,
       "iv_quality": "Moderate IV \u2014 acceptable entry"
     },
     "call_analytics": {
@@ -500,7 +500,7 @@
     }
   ],
   "alignment": {
-    "call_count": 4,
+    "call_count": 2,
     "put_count": 0,
     "max_signals": 4,
     "call_reasons": [
@@ -509,16 +509,16 @@
         "pass": true
       },
       {
-        "text": "S2 KAMA: HLC3>141.9 \u00b7 KAMA\u2191 \u00b7 ER0.03",
+        "text": "S2 KAMA: HLC3>142.0 \u00b7 KAMA\u2191 \u00b7 ER0.04",
         "pass": true
       },
       {
-        "text": "S3 RSI: RSI 42\u219245 CROSS\u219145",
-        "pass": true
+        "text": "S3 RSI: RSI 42 \u00b7 wait 45/55",
+        "pass": false
       },
       {
-        "text": "S4 MACD: MACD\u21910 \u00b7 RSI45",
-        "pass": true
+        "text": "S4 MACD: MACD -0.186 \u00b7 RSI42",
+        "pass": false
       }
     ],
     "put_reasons": [
@@ -527,15 +527,15 @@
         "pass": false
       },
       {
-        "text": "S2 KAMA: HLC3>141.9 \u00b7 KAMA\u2191 \u00b7 ER0.03",
+        "text": "S2 KAMA: HLC3>142.0 \u00b7 KAMA\u2191 \u00b7 ER0.04",
         "pass": false
       },
       {
-        "text": "S3 RSI: RSI 42\u219245 CROSS\u219145",
+        "text": "S3 RSI: RSI 42 \u00b7 wait 45/55",
         "pass": false
       },
       {
-        "text": "S4 MACD: MACD\u21910 \u00b7 RSI45",
+        "text": "S4 MACD: MACD -0.186 \u00b7 RSI42",
         "pass": false
       }
     ],
@@ -555,10 +555,6 @@
       {
         "text": "Session: AFTER HOURS",
         "pass": false
-      },
-      {
-        "text": "Divergence: Reg Bear (weak) \u2014 EXIT WARNING",
-        "pass": false
       }
     ],
     "put_context": [
@@ -577,20 +573,16 @@
       {
         "text": "Session: AFTER HOURS",
         "pass": false
-      },
-      {
-        "text": "Divergence: Reg Bear (weak) \u2014 confirms",
-        "pass": true
       }
     ],
     "h1_div": {
-      "divergence_type": "regular_bear",
-      "label": "Reg Bear (weak)",
-      "detail": "P\u2191 RSI\u2193 70\u219267",
-      "strength": "weak",
+      "divergence_type": null,
+      "label": "None",
+      "detail": "",
+      "strength": null,
       "confirms_bull": false,
-      "confirms_bear": true,
-      "exit_warning_bull": true,
+      "confirms_bear": false,
+      "exit_warning_bull": false,
       "exit_warning_bear": false
     }
   },
@@ -604,12 +596,12 @@
   "candles": [
     {
       "time": "11:20 AM",
-      "open": 149.23,
+      "open": 149.46,
       "high": 149.49,
       "low": 149.14,
       "close": 149.45,
       "volume": 2113357,
-      "bull": true
+      "bull": false
     },
     {
       "time": "11:25 AM",
@@ -617,12 +609,12 @@
       "high": 149.73,
       "low": 149.09,
       "close": 149.35,
-      "volume": 2688597,
+      "volume": 0,
       "bull": false
     },
     {
       "time": "11:30 AM",
-      "open": 149.37,
+      "open": 149.36,
       "high": 149.42,
       "low": 149.01,
       "close": 149.16,
@@ -653,21 +645,21 @@
       "high": 149.2,
       "low": 148.78,
       "close": 148.84,
-      "volume": 2100270,
+      "volume": 2100170,
       "bull": false
     },
     {
       "time": "11:50 AM",
       "open": 148.83,
-      "high": 149.51,
+      "high": 149.24,
       "low": 148.74,
       "close": 149.24,
-      "volume": 3204961,
+      "volume": 3204781,
       "bull": true
     },
     {
       "time": "11:55 AM",
-      "open": 149.23,
+      "open": 149.53,
       "high": 150.85,
       "low": 149.23,
       "close": 150.62,
